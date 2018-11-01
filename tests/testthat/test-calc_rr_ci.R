@@ -12,5 +12,5 @@ test_that("Gets expected RR interval", {
     other_n=2000, other_snp=56,
     CI_size = 0.95
   )
-  expect_equivalent(RR_results, expected_results)
+  expect_equivalent(RR_results, expected_results, tolerance = .002)
 })
