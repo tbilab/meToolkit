@@ -3,13 +3,13 @@
 #'     inverted it simple reverts back to normal.
 #'
 #' @param codes_to_invert Character vector of codes you wish to invert
-#' @param currently_inverted_codes Currently selected dataframe with column \code{code} upon which to invert.
+#' @param currently_inverted_codes Character vector of currently inverted codes
 #'
-#' @return Updated currently selected codes dataframe with previously requested codes inverted from their previous state.
+#' @return Vector of codes that are currently inverted
 #' @export
 #'
 #' @examples
-#' invertCodes(c('001.00', '002.00'), myCurrentCodes)
+#' invertCodes(c('001.00', '002.00'), c('001.00', '005.00'))
 invertCodes <- function(codes_to_invert, currently_inverted_codes){
 
   # codes that have been inverted and are now being reverted to normal

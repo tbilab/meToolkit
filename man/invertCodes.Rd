@@ -11,10 +11,10 @@ invertCodes(codes_to_invert, currently_inverted_codes)
 \arguments{
 \item{codes_to_invert}{Character vector of codes you wish to invert}
 
-\item{currently_inverted_codes}{Currently selected dataframe with column \code{code} upon which to invert.}
+\item{currently_inverted_codes}{Character vector of currently inverted codes}
 }
 \value{
-Updated currently selected codes dataframe with previously requested codes inverted from their previous state.
+Vector of codes that are currently inverted
 }
 \description{
 Invert currently selected codes
@@ -22,5 +22,5 @@ Only inverts codes that were not preivously inverted. If a code is 'inverted' af
 inverted it simple reverts back to normal.
 }
 \examples{
-invertCodes(c('001.00', '002.00'), myCurrentCodes)
+invertCodes(c('001.00', '002.00'), c('001.00', '005.00'))
 }
