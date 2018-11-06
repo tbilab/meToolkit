@@ -17,6 +17,7 @@ Imports:
     tidyr,
     dplyr,
     epitools,
-    rlang
+    rlang,
+    tibble
 Suggests: 
     testthat
