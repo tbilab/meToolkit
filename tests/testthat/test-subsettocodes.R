@@ -31,3 +31,18 @@ test_that("subsetting", {
 
   expect_setequal(c('a', 'b', 'e', 'f', 'h', 'j'), simple_subset$IID)
 })
+
+test_that("Inverting", {
+
+  simple_invert <- subsetToCodes(
+    sample_phenotypes,
+    c('001.00', '002.00', '005.00'),
+    codes_to_invert = c('002.00')
+  )
+
+  expect_equal(ncol(simple_invert), 5)
+
+  expect_equal(nrow(simple_invert), 6)
+
+  expect_setequal(c('c', 'd', 'e', 'f', 'g', 'i'), simple_invert$IID)
+})
