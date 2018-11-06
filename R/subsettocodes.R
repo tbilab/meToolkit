@@ -9,6 +9,7 @@
 #' @export
 #'
 #' @examples
+#' subsetToCodes(myPhenotypes, c('001.00', '002.00'), codes_to_invert = c('001.00'))
 subsetToCodes <-
   function(data, desiredCodes, codes_to_invert = c()) {
     # are we going to invert any of these codes?
@@ -26,7 +27,7 @@ subsetToCodes <-
           dplyr::mutate(., invert = FALSE)
         }
       } %>% # Deal with inversion scenarios
-      mutate(
+      dplyr::mutate(
         value = as.numeric(value),
         #gets mad when value is an integer, so just in case make sure to force it to double.
         value = dplyr::case_when(
