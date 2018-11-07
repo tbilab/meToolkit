@@ -64,8 +64,8 @@ makeNetworkData <- function(
         is.na(color) ~ no_copies,
         TRUE ~ color
       ),
-      size = ifelse(string::str_detect(name, 'case'), case_size, code_size),
-      selectable = !string::str_detect(name, 'case'),
+      size = ifelse(stringr::str_detect(name, 'case'), case_size, code_size),
+      selectable = !stringr::str_detect(name, 'case'),
       id = index
     )
 
