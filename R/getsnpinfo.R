@@ -8,7 +8,7 @@
 #' @examples
 #' getSNPInf('rs13283456')
 getSNPInfo <- function(snp){
-  results <- ncbi_snp_query(snp)
+  results <- rsnps::ncbi_snp_query(snp)
   list(
     chromosome = results$Chromosome,
     gene = results$Gene,

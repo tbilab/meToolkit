@@ -10,12 +10,12 @@
 #' @export
 #'
 #' @examples
-#' calc_RR_CI(
+#' calcRrCi(
 #'  pattern_n=120, pattern_snp=5,
 #'  other_n=2000, other_snp=56,
 #'  CI_size = 0.95
 #' )
-calc_RR_CI <- function(pattern_n, pattern_snp, other_n, other_snp, CI_size = 0.95){
+calcRrCi <- function(pattern_n, pattern_snp, other_n, other_snp, CI_size = 0.95){
 
   cont_table <- matrix(c(
     pattern_snp,  other_snp,
