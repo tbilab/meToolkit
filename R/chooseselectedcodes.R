@@ -3,6 +3,7 @@
 #' @param selection Selection dataframe (NULL will default to a given number of defaults)
 #' @param phewas_table Phewas table dataframe
 #' @param just_snps Boolean for if we're in a just snps mode which allows more codes to be seen at a time.
+#' @param p_value_threshold Float between 0 and 1 for the threshold at which we exclude codes if our selection is too large.
 #' @param max_num_phenos_all Integer of how max number of phenotypes function will select if including all cases (default = 15).
 #' @param max_num_phenos_just_snps Integer of max number of phenotypes selected if app is only showing snp MA carriers (default = 150).
 #'
@@ -15,6 +16,7 @@ chooseSelectedCodes <- function(
   selection,
   phewas_table,
   just_snps,
+  p_value_threshold = 0.001,
   max_num_phenos_all = 15,
   max_num_phenos_just_snps = 150
 ){
@@ -33,7 +35,7 @@ chooseSelectedCodes <- function(
   # 3) Subset is of reasonable size
   #    - Take those desired.
   if(noCodesSelected){
-    new_codes <- phewas_table %>% dplyr::filter(p_val < P_VAL_THRESH)
+    new_codes <- phewas_table %>% dplyr::filter(p_val < p_value_threshold)
 
     if(nrow(new_codes) <= 1){
       new_codes <- phewas_table %>%

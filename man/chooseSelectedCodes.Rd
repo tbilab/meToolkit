@@ -6,7 +6,8 @@
 Takes a selection dataframe (or NULL) and our phewas table and returns the selected phewas codes from the table.}
 \usage{
 chooseSelectedCodes(selection, phewas_table, just_snps,
-  max_num_phenos_all = 15, max_num_phenos_just_snps = 150)
+  p_value_threshold = 0.001, max_num_phenos_all = 15,
+  max_num_phenos_just_snps = 150)
 }
 \arguments{
 \item{selection}{Selection dataframe (NULL will default to a given number of defaults)}
@@ -14,6 +15,8 @@ chooseSelectedCodes(selection, phewas_table, just_snps,
 \item{phewas_table}{Phewas table dataframe}
 
 \item{just_snps}{Boolean for if we're in a just snps mode which allows more codes to be seen at a time.}
+
+\item{p_value_threshold}{Float between 0 and 1 for the threshold at which we exclude codes if our selection is too large.}
 
 \item{max_num_phenos_all}{Integer of how max number of phenotypes function will select if including all cases (default = 15).}
 
