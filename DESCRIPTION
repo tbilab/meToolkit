@@ -18,6 +18,11 @@ Imports:
     dplyr,
     epitools,
     rlang,
-    tibble
+    tibble,
+    shiny,
+    shinydashboard,
+    shinydashboardPlus,
+    r2d3,
+    jsonlite
 Suggests: 
     testthat
