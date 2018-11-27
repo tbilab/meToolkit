@@ -4,7 +4,7 @@
 \alias{upset_UI}
 \title{Upset UI function}
 \usage{
-upset_UI(id, app_ns = I)
+upset_UI(id, app_ns = I, size_max = 250)
 }
 \arguments{
 \item{id}{ID of shiny module. Needs to match the server-side call.}

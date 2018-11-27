@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' upset_ui('upsetPlot', parentNS)
-upset_UI <- function(id, app_ns = I) {
+upset_UI <- function(id, app_ns = I, size_max = 250) {
 
   ns <- . %>% shiny::NS(id)() %>% app_ns()
 
@@ -24,7 +24,7 @@ upset_UI <- function(id, app_ns = I) {
       dropdown_icon = "wrench",
       dropdown_menu = shinydashboardPlus::dropdownItemList(
         shiny::sliderInput(ns("setSize"), "Min Size of Set:",
-                    min = 0, max = 250,
+                    min = 0, max = size_max,
                     value = 20)
       ),
       shiny::div(id = 'upset2',
@@ -99,7 +99,7 @@ upset <- function(input, output, session, codeData, snpData) {
     dplyr::group_by(pattern) %>%
     dplyr::summarise(
       count = n(),
-      size = last(size),
+      size = dplyr::last(size),
       num_snp = sum(snp)
     )
 
@@ -109,7 +109,7 @@ upset <- function(input, output, session, codeData, snpData) {
     setData <- allSets %>%
       dplyr::filter(count > input$setSize) %>%
       dplyr::arrange(size, desc(count)) %>%
-      dplyr::bind_cols(map_df(.$pattern, testEnrichment))
+      dplyr::bind_cols(purrr::map_df(.$pattern, testEnrichment))
 
     codesLeft <- setData$pattern %>%
       paste(collapse = '-') %>%

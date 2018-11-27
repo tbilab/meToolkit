@@ -29,4 +29,5 @@ calcRrCi(
  other_n=2000, other_snp=56,
  CI_size = 0.95
 )
+
 }
