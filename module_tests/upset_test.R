@@ -1,6 +1,6 @@
 library(shiny)
 library(shinydashboard)
-
+library(magrittr)
 
 upsetData <- here::here('module_tests/data/upset_data.rds') %>%
   readr::read_rds()

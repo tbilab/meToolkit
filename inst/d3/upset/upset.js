@@ -8,11 +8,12 @@
 svg.html('');
 
 
-if(data.length === 0){
+if(data.length < 2){
 
+  const lead_message = data.length === 1 ? "Only one group meets" : "No groups meet";
   svg.append('text')
     .attr('text-anchor', 'middle')
-    .tspans(['No groups meet filter size threshold', 'Adjust threshold down to see groups.'])
+    .tspans([`${lead_message} filter size threshold`, 'Adjust threshold down to see groups.'])
     .attr('x', width/2)
     .attr('y', height/2);
 
