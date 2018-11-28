@@ -1,4 +1,10 @@
 // Info banner for SNP name, MAF for current selection and the entire cohort. Along with link to click for genome browser location of SNP.
+
+const snp_info_style = {
+  fontWeight: 'bold',
+};
+
+
 const {snp, maf_exome, maf_sel, gene, loc, chromosome} = data;
 
 const padding = 15;
@@ -20,25 +26,41 @@ svg.html('');
 // draw the snp name in the upper left corner
 svg.append('text')
   .text(snp)
-  .attr('class', 'snp_name')
+  //.attr('class', 'snp_name')
+  .st({
+    alignmentBaseline: 'hanging',
+    textAnchor: 'start',
+    fontWeight: 'bold',
+    fontSize: '30px',
+  })
   .attr('x', 10)
   .attr('y', 10);
 
-const snp_details = svg.append('g').attr('id', 'snp_details');
+const snp_details = svg.append('g').attr('id', 'snp_details').st({fontSize: '18px'});
 
 snp_details.append('text')
-  .html(`Gene: <tspan class = 'snp_info'>${gene}</tspan>`)
+  .html(`Gene: `)
   .attr('x', 10)
-  .attr('y', height - 50);
+  .attr('y', height - 50)
+  .append('tspan')
+    .text(gene)
+    .st(snp_info_style);
 
 snp_details.append('text')
-  .html(`Chromosome: <tspan class = 'snp_info'>${chromosome}</tspan>`)
+  .html(`Chromosome: `)
   .attr('x', 10)
-  .attr('y', height - 30);
+  .attr('y', height - 30)
+  .append('tspan')
+    .text(chromosome)
+    .st(snp_info_style);
 
 snp_details.append('text')
   .html(`Genome Browser Link`)
   .attr('class', 'genome_browser_link')
+  .st({
+    textDecoration: 'underline',
+    cursor: 'pointer',
+  })
   .attr('x', 10)
   .attr('y', height - 10)
   .on('click', () => {
@@ -65,6 +87,11 @@ svg.append("g")
 // add label for MAF
 svg.append("text")
   .attr('id', 'maf_axis_label')
+  .st({
+    textAnchor: 'middle',
+    fontSize: '14px',
+    fill: '#5c5b5b',
+  })
   .attr("transform", `translate(${maf_chart_start + (width - maf_chart_start)/2},${exome_height + 35})`)
   .text("Minor Allele Frequency (MAF)");
 
@@ -89,6 +116,10 @@ const maf_plot = svg.selectAll('#maf_plot')
 maf_plot.append('text')
   .text(d => d.group)
   .attr('class', 'labels')
+  .st({
+    textAnchor: 'end',
+    fontSize: '20px',
+  })
   .attr('y', -3)
   .attr('x', -(point_r + 3));
 
@@ -99,4 +130,10 @@ maf_plot.append('circle')
 
 maf_plot.append('text')
   .text(d => toPercent(d.maf).replace('%',''))
+  .st({
+    fill: 'white',
+    alignmentBaseline: 'middle',
+    textAnchor: 'middle',
+    fontSize: '16px',
+  })
   .attr('class', 'maf_points');

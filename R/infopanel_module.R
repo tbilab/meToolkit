@@ -49,8 +49,8 @@ infoPanel <- function(input, output, session, snp_name, individual_data, subset_
   output$info_banner <- r2d3::renderD3({
     r2d3::r2d3(
       snp_info,
-      script = system.file("d3/infoPanel/infoPanel.js", package = "meToolkit"),
-      css = system.file("d3/infoPanel/infoPanel.css", package = "meToolkit")
+      dependencies = "d3-jetpack",
+      script = system.file("d3/infoPanel/infoPanel.js", package = "meToolkit")
     )
   })
 }
