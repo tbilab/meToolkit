@@ -23,6 +23,7 @@ Imports:
     shinydashboard,
     shinydashboardPlus,
     r2d3,
-    jsonlite
+    jsonlite,
+    rsnps
 Suggests: 
     testthat
