@@ -20,7 +20,10 @@ buildColorPalette <- function(df, indexCol){
     "#792f39","#ccc795","#3c2a46","#97b7dc","#98653a","#5a7684",
     "#d395a5","#3a412b")
 
-  unique_values <- unique(dplyr::pull(df, !!indexCol_quo))
+  # By sorting here we ensure the same colors will always map to the same
+  # index/categories even if the dataframe is in a different order/has different
+  # numbers of rows. As long as the same unique categories exist.
+  unique_values <- df %>% dplyr::pull(!!indexCol_quo) %>% unique() %>% sort()
 
   if(length(unique_values) > length(available_colors)) {
     stop('Currently only supports up to 20 unique categories. Consider using a sparser category delimeter.')
@@ -29,7 +32,7 @@ buildColorPalette <- function(df, indexCol){
   dplyr::right_join(
     df,
     tibble::tibble(
-      !!indexCol_quo := unique_values,
+      !!rlang::quo_name(indexCol_quo) := unique_values,
       color = head(available_colors, length(unique_values))
     ),
     by = rlang::quo_name(indexCol_quo))

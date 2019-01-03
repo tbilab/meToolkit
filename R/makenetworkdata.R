@@ -8,8 +8,8 @@
 #'
 #' @param data A phenome dataframe with phecodes as columns and also with an \code{IID} column and a \code{snp} status column
 #' @param phecode_info Information about each codes results in phewas study in form of columns: \code{code}, \code{category}, \code{color}, \code{tooltip}.
-#' @param inverted_codes An array of codes that are inverted. Note that if a code is inverted that should also be reflected in \code{data}. This is only for visual modifications.
 #' @param color_palette Dataframe with columns of phecode description (category) and a mapped a color for node coloring.
+#' @param inverted_codes An array of codes that are inverted. Note that if a code is inverted that should also be reflected in \code{data}. This is only for visual modifications.
 #' @param case_size Size of nodes drawn for cases (default of 0.1)
 #' @param code_size Size of nodes drawn for phecodes (default of 0.3)
 #' @param no_copies Color of cases nodes with no minor allele copy (default grey)

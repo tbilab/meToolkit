@@ -1,13 +1,6 @@
 library(tidyverse)
 context("test-makenetworkdata")
 
-
-#' @param data A phenome dataframe with phecodes as columns and also with an IID column and a snp status column
-#' @param phecode_info Information about each codes results in phewas study in form of columns: code, category, tooltip.
-#' @param inverted_codes An array of codes that are inverted.
-#' @param color_palette Dataframe with columns of phecode description (category) and a mapped a color for node coloring.
-
-
 df <- tibble(
   IID = c('a', 'b', 'c', 'd', 'e'),
   snp = c(  0,   0,   1,   1,   2),
@@ -22,7 +15,6 @@ phecode_info <- tibble(
   tooltip  = c(  'hi', 'there',     '!'),
   color    = c('pink',  'blue', 'green')
 )
-
 
 edges <- tibble(
   source = c(1,1,2,3,3,4,4,4,5), #case

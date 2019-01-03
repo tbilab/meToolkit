@@ -1,4 +1,4 @@
-library(tibble)
+library(tidyverse)
 library(meToolkit)
 context("test-buildcolorpalette")
 
@@ -31,4 +31,29 @@ test_that("Color mappings are deterministic", {
 
   expect_equal(unique(df$color), first_five_colors)
   expect_equal(unique(df2$color), unique(df$color))
+})
+
+
+test_that("Two dataframes with the same categories present will map the same colors to each category", {
+  reduce_to_mappings <- . %>%
+    group_by(color_by_me) %>%
+    summarise(color = first(color))
+
+  mapping_a <- tibble(
+    color_by_me = rep(head(letters,5), 4),
+    values = rnorm(4*5)
+  ) %>%
+    buildColorPalette(color_by_me) %>%
+    reduce_to_mappings()
+
+  mapping_b <- tibble(
+    color_by_me = rep(head(letters,5), 6),
+    values = rnorm(6*5)
+  ) %>%
+    sample_n(size = nrow(.), replace = FALSE) %>%
+    buildColorPalette(color_by_me) %>%
+    reduce_to_mappings()
+
+  expect_equal(mapping_a, mapping_b)
+
 })
