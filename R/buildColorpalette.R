@@ -21,13 +21,12 @@ buildColorPalette <- function(df, indexCol){
     "#d395a5","#3a412b")
 
   unique_values <- unique(dplyr::pull(df, !!indexCol_quo))
-  n_unique <- length(unique_values)
 
-  if(n_unique > length(available_colors)) {
+  if(length(unique_values) > length(available_colors)) {
     stop('Currently only supports up to 20 unique categories. Consider using a sparser category delimeter.')
   }
 
-  right_join(
+  dplyr::right_join(
     df,
     tibble::tibble(
       !!indexCol_quo := unique_values,

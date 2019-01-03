@@ -9,16 +9,18 @@
 #' @export
 #'
 #' @examples
-#' codeFilter('inver', c('001.00', '002.00'), myCurrentCodes)
+#' codeFilter('invert', c('001.00', '002.00'), myCurrentCodes)
 codeFilter <- function(type, code_list, current_codes){
 
   included_codes <- current_codes
 
   if(type == 'delete'){
+    print('Deleting codes')
     included_codes <- meToolkit::deleteCodes(code_list, current_codes)
   }
 
   if(type == 'isolate'){
+    print('Isolating codes')
     included_codes <- meToolkit::isolateCodes(code_list, current_codes)
   }
 

@@ -20,5 +20,5 @@ Filtered currently selected codes dataframe.
 Filter codes.
 }
 \examples{
-codeFilter('inver', c('001.00', '002.00'), myCurrentCodes)
+codeFilter('invert', c('001.00', '002.00'), myCurrentCodes)
 }
