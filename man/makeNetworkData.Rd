@@ -4,16 +4,16 @@
 \alias{makeNetworkData}
 \title{Convert phenotype dataframe to a data list that works with network plotting functions}
 \usage{
-makeNetworkData(data, phecode_info, inverted_codes, color_palette,
+makeNetworkData(data, phecode_info, inverted_codes = c(), color_palette,
   case_size = 0.1, code_size = 0.3, no_copies = "#bdbdbd",
   one_copy = "orangered", two_copies = "red")
 }
 \arguments{
-\item{data}{A phenome dataframe with phecodes as columns and also with an IID column and a snp status column}
+\item{data}{A phenome dataframe with phecodes as columns and also with an \code{IID} column and a \code{snp} status column}
 
-\item{phecode_info}{Information about each codes results in phewas study in form of columns: code, category, tooltip.}
+\item{phecode_info}{Information about each codes results in phewas study in form of columns: \code{code}, \code{category}, \code{color}, \code{tooltip}.}
 
-\item{inverted_codes}{An array of codes that are inverted.}
+\item{inverted_codes}{An array of codes that are inverted. Note that if a code is inverted that should also be reflected in \code{data}. This is only for visual modifications.}
 
 \item{color_palette}{Dataframe with columns of phecode description (category) and a mapped a color for node coloring.}
 
@@ -28,7 +28,10 @@ makeNetworkData(data, phecode_info, inverted_codes, color_palette,
 \item{two_copies}{Color of cases nodes with two minor allele copies (default redish)}
 }
 \value{
-A list of edges and vertices with attributes used by the various network plotting functions included in library
+A list containing two dataframes:
+\code{vertices} a dataframe containing each unique node in network (all unique IIDs and Phecodes) along with columns
+\code{snp_status}, \code{name}, \code{color}, \code{size}, \code{selectable}, \code{id}, \code{tooltip} which are all attributes used by the various network plotting functions included in library
+\code{edges}: a dataframe with columns \code{source} and \code{target} corresponding to the edges between each vertices according to the assigned interger \code{id}.
 }
 \description{
 Convert phenotype dataframe to a data list that works with network plotting functions
