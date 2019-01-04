@@ -11,9 +11,12 @@ n_cases <- 200
 individual_data <- meToolkit::simIndividualData(n_codes = n_codes, n_cases = n_cases, prob_snp = 0.1)
 phewas_results <- meToolkit::simPhewasResults(n_codes = n_codes, n_categories = 3) %>%
   meToolkit::buildColorPalette(category)
-
 inverted_codes <- c()
 snp_filter <- FALSE
+
+?meToolkit::makeNetworkData
+
+meToolkit::makeNetworkData(individual_data,phewas_results)
 
 ui <- shinyUI(
   dashboardPage(
