@@ -15,6 +15,8 @@ A dataframe the following columns:
 - `snp`: number of copies of the current snp's minor allele.
 - Phecodes...: a series of columns corresponding to the phecodes of interest and if the occurred (`1`) or if they didn't (`0`). 
 
+If no real data is available this data can be simulated with the included function `meToolkit::simIndividualData(n_codes, n_cases, prob_snp)`.
+
 ### Phewas Results: 
 A dataframe containing the results of the to-be-investigated phewas study. Contains at least the following columns:
 
@@ -23,6 +25,8 @@ A dataframe containing the results of the to-be-investigated phewas study. Conta
 - `p_val`: The P-Value for the current phecode's association with the study's SNP.
 - `tooltip`: Html formatted text shown on hover over a phecode in manhattan or network plot. 
 - `color`: CSS compliant color string for encoding each phecode in plots. 
+
+If no real data is available this data can be simulated with the two included functions: `meToolkit::simPhewasResults(n_codes, n_categories) %>% meToolkit::buildColorPalette(category)`.
 
 ### SNP Name: 
 A simple string containing the name of the SNP investigated in study.
