@@ -24,6 +24,7 @@ Imports:
     shinydashboardPlus,
     r2d3,
     jsonlite,
-    rsnps
+    rsnps,
+    purrr
 Suggests: 
     testthat
