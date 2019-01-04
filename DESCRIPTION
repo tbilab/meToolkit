@@ -25,6 +25,7 @@ Imports:
     r2d3,
     jsonlite,
     rsnps,
-    purrr
+    purrr,
+    glue
 Suggests: 
     testthat
