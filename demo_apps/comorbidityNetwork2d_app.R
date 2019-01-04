@@ -14,9 +14,9 @@ phewas_results <- meToolkit::simPhewasResults(n_codes = n_codes, n_categories = 
 inverted_codes <- c()
 snp_filter <- FALSE
 
-?meToolkit::makeNetworkData
 
-meToolkit::makeNetworkData(individual_data,phewas_results)
+network_data <- meToolkit::makeNetworkData(individual_data,phewas_results, inverted_codes)
+
 
 ui <- shinyUI(
   dashboardPage(
