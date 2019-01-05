@@ -32,9 +32,11 @@ ui <- shinyUI(
       collapsed = TRUE
     ),
     dashboardBody(
-      # includeCSS(here("www/test_app.css")),
+      h2("My Network"),
       # network_plots_UI('network_plots', I),
-      h1('Hi There')
+      div(class = 'networkPlot', style = 'height: calc(80vh - 40px) !important;',
+          r2d3::d3Output("networkPlot2d", height = '100%')
+      )
     ),
     skin = 'black'
   )
@@ -49,6 +51,22 @@ server <- function(input, output, session) {
   #   parent_ns = session$ns,
   #   snp_filter = TRUE # THIS NEEDS TO BE WIRED UP PROPERLY
   # )
+
+  # send data and options to the 2d plot
+  output$networkPlot2d <- r2d3::renderD3({
+    network_data %>%
+      jsonlite::toJSON() %>%
+      r2d3::r2d3(
+        script = here('inst/d3/comorbidityNetwork2d/index.js'),
+        container = 'div',
+        dependencies = "d3-jetpack",
+        options = list(
+          just_snp = snp_filter,
+          msg_loc ='message'
+        )
+      )
+  })
+
   #
   # observeEvent(input$message, {
   #   print('message from network')
