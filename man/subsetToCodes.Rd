@@ -5,12 +5,12 @@
 \title{Subset phenotype data to a given list of phecodes
 Removes individuals who have none of the requested codes}
 \usage{
-subsetToCodes(data, desiredCodes, codes_to_invert = c())
+subsetToCodes(data, desired_codes, codes_to_invert = c())
 }
 \arguments{
 \item{data}{A wide phenotype file with columns IID, snp, and all the normalized phecode names}
 
-\item{desiredCodes}{Character vector of the phecodes to be extracted}
+\item{desired_codes}{Character vector of the phecodes to be extracted}
 
 \item{codes_to_invert}{Character vector of phecodes that the user has requested be inverted (e.g. not having the code is considered 'having' it.)}
 }

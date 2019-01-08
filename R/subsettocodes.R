@@ -2,7 +2,7 @@
 #'    Removes individuals who have none of the requested codes
 #'
 #' @param data A wide phenotype file with columns IID, snp, and all the normalized phecode names
-#' @param desiredCodes Character vector of the phecodes to be extracted
+#' @param desired_codes Character vector of the phecodes to be extracted
 #' @param codes_to_invert Character vector of phecodes that the user has requested be inverted (e.g. not having the code is considered 'having' it.)
 #'
 #' @return A wide dataframe with just the columns desired and only rows corresponding to cases with one or more of the desired codes.
@@ -10,13 +10,15 @@
 #'
 #' @examples
 #' subsetToCodes(myPhenotypes, c('001.00', '002.00'), codes_to_invert = c('001.00'))
-subsetToCodes <-
-  function(data, desiredCodes, codes_to_invert = c()) {
+subsetToCodes <- function(data, desired_codes, codes_to_invert = c()) {
+    # Normalize phecodes in case it hasn't been done already
+    desired_codes <- desired_codes %>% meToolkit::normalizePhecode()
+    codes_to_invert <- codes_to_invert %>% meToolkit::normalizePhecode()
+
     # are we going to invert any of these codes?
     inverting_codes <- length(codes_to_invert) > 0
 
-
-    data[, c('IID', 'snp', desiredCodes)] %>%
+    data[, c('IID', 'snp', desired_codes)] %>%
       tidyr::gather(code, value,-IID,-snp) %>% {
         if (inverting_codes) {
           dplyr::left_join(.,
