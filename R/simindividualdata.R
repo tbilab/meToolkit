@@ -1,35 +1,65 @@
-#' Generate sample indivual level data
-#' This function is a helper for prototyping functions. Generates a dataframe of individual-level data for use in other functions.
-#' Note that there is a guarentee that each case will have at least one code, but there is not a guarentee that each code will have a case.
+#' Generate sample indivual level data based upon some phewas results
 #'
-#' @param n_codes How many phecodes needed
-#' @param n_cases How many cases are needed
-#' @param prob_snp What's the probability of a copy of a minor allele? A bernouli probability with two trials.
+#' This function will take the results of a phewas study (most importantly a code, case and control numbers, and an OR) and simulate as many individual
+#' datapoints as you desire.
 #'
-#' @return A dataframe with rows corresponding to each case or patient and columns corresponding to phecode.
-#' In addition, a column \code{IID} for a case id string and \code{snp} corresponding to number of copies of the minor allele are included in output.
+#' @param phewas_results Phewas results. Needs a column \code{code} with the id of a given phecode, \code{code_proportion}: with the proportion of individuals that have the code in the entire population, and \code{OR}: the odds ratio of having a code given having the snp of interest.
+#' @param num_patients How many patients should be simulated.
+#' @param snp_prev The overall population prevalence of the snp you want to simulate.
+#'
+#' @return list with following components
+#' \describe{
+#'   \item{snp_status}{tibble with patient \code{ID} and snp status (\code{snp})}
+#'   \item{phenotypes}{wide tibble with an \code{ID} column and a column for each code provided in the \code{phewas_resuts} input. Cell values are if the patient had that given code.}
+#' }
 #' @export
 #'
 #' @examples
-simIndividualData <- function(n_codes, n_cases, prob_snp){
-
-  code_names <- sprintf('%2.2f', 1:n_codes)
-
-  gen_case_row <- function(case_name){
-    case_n_codes <- sample(1:n_codes, size = 1)
-    case_code_vec <- sample(rep(c(1,0), times = c(case_n_codes, n_codes - case_n_codes)), size = n_codes)
-
-    case_code_vec %>%
-      t() %>%
-      magrittr::set_colnames(code_names) %>%
-      tibble::as_tibble() %>%
+simIndividualData <- function(phewas_results, num_patients, snp_prev){
+    # Get needed statistics out of the phewas results
+    code_stats <- phewas_results %>%
       dplyr::mutate(
-        IID = case_name,
-        snp = rbinom(1,2, prob = prob_snp)
-      )
-  }
+        # code_proportion = cases/(cases+controls),
+        prob_wo_snp = code_proportion / (1 + snp_prev*(OR - 1)),
+        prob_w_snp = OR*prob_wo_snp
+      ) %>%
+      dplyr::select(code, prob_w_snp, prob_wo_snp)
 
-  paste0('case_', 1:n_cases) %>%
-    purrr::map_df(gen_case_row)
+    # Function to setup an individual patients code list with
+    # their snp status and id added to each code.
+    setup_patient <- function(id){
+      dplyr::mutate(code_stats,
+                    id = paste0('r',id),
+                    # Does this person have the mutation of interest?
+                    has_snp = rbinom(n=1,size=1,p=snp_prev)
+      )
+    }
+
+    # Simulate a tidy list of patient phenotypes and snp statuses
+    patient_data_tidy <- 1:num_patients %>%
+      purrr::map_df(setup_patient) %>%
+      dplyr::mutate(
+        # Decide code probabilities based upon snp status
+        prob_of_code = ifelse(has_snp, prob_w_snp, prob_wo_snp),
+        # Draw bernouli for each code based upon patients prob
+        value = rbinom(n=n(), size=1, p=ifelse(has_snp, prob_w_snp, prob_wo_snp))
+      ) %>%
+      dplyr::select(id, has_snp, code, value)
+
+    # Extract each patient's snp status from the tidy sim results
+    patient_snp_status <- patient_data_tidy %>%
+      dplyr::group_by(id) %>%
+      dplyr::summarise(snp = dplyr::first(has_snp))
+
+    # Make phenotype data wide
+    patient_phenotypes <- patient_data_tidy %>%
+      dplyr::select(-has_snp) %>%
+      tidyr::spread(code, value)
+
+    # Return list of results
+    list(
+      snp_status = patient_snp_status,
+      phenotypes = patient_phenotypes
+    )
 }
 
