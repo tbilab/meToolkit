@@ -35,6 +35,6 @@ simPhewasResults <- function(n_codes, n_categories){
     ) %>% head(n_codes)
   ) %>%
     dplyr::mutate(
-      tooltip = glue::glue('<strong> Code: </strong> {code}</br><strong>P-Value: </strong> {p_val}')
+      tooltip = glue::glue('<strong> Code: </strong> {code}</br><strong>P-Value: </strong> {formatC(p_val, format = "e", digits = 2)}')
     )
 }

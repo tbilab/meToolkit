@@ -2,25 +2,25 @@
 % Please edit documentation in R/simindividualdata.R
 \name{simIndividualData}
 \alias{simIndividualData}
-\title{Generate sample indivual level data
-This function is a helper for prototyping functions. Generates a dataframe of individual-level data for use in other functions.
-Note that there is a guarentee that each case will have at least one code, but there is not a guarentee that each code will have a case.}
+\title{Generate sample indivual level data based upon some phewas results}
 \usage{
-simIndividualData(n_codes, n_cases, prob_snp)
+simIndividualData(phewas_results, num_patients, snp_prev)
 }
 \arguments{
-\item{n_codes}{How many phecodes needed}
+\item{phewas_results}{Phewas results. Needs a column \code{code} with the id of a given phecode, \code{code_proportion}: with the proportion of individuals that have the code in the entire population, and \code{OR}: the odds ratio of having a code given having the snp of interest.}
 
-\item{n_cases}{How many cases are needed}
+\item{num_patients}{How many patients should be simulated.}
 
-\item{prob_snp}{What's the probability of a copy of a minor allele? A bernouli probability with two trials.}
+\item{snp_prev}{The overall population prevalence of the snp you want to simulate.}
 }
 \value{
-A dataframe with rows corresponding to each case or patient and columns corresponding to phecode.
-In addition, a column \code{IID} for a case id string and \code{snp} corresponding to number of copies of the minor allele are included in output.
+list with following components
+\describe{
+\item{snp_status}{tibble with patient \code{ID} and snp status (\code{snp})}
+\item{phenotypes}{wide tibble with an \code{ID} column and a column for each code provided in the \code{phewas_resuts} input. Cell values are if the patient had that given code.}
+}
 }
 \description{
-Generate sample indivual level data
-This function is a helper for prototyping functions. Generates a dataframe of individual-level data for use in other functions.
-Note that there is a guarentee that each case will have at least one code, but there is not a guarentee that each code will have a case.
+This function will take the results of a phewas study (most importantly a code, case and control numbers, and an OR) and simulate as many individual
+datapoints as you desire.
 }

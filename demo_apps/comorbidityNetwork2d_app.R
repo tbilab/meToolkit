@@ -15,8 +15,11 @@ inverted_codes <- c()
 snp_filter <- FALSE
 
 
+
+
 network_data <- meToolkit::makeNetworkData(individual_data,phewas_results, inverted_codes)
 
+write_rds(network_data, 'sample_network_data.rds')
 
 ui <- shinyUI(
   dashboardPage(
