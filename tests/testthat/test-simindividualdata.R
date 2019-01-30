@@ -6,9 +6,7 @@ data("fake_phewas_results")
 
 simulated_data_10 <- meToolkit::simIndividualData(fake_phewas_results, 10, 0.15)
 simulated_data_100 <- meToolkit::simIndividualData(fake_phewas_results, 100, 0.15)
-
 simulated_data_50_codes <- meToolkit::simIndividualData(fake_phewas_results %>% head(50), 10, 0.15)
-
 simulated_data_high_snp <- meToolkit::simIndividualData(fake_phewas_results, 100, 0.95)
 simulated_data_low_snp <- meToolkit::simIndividualData(fake_phewas_results, 100, 0.05)
 

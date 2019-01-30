@@ -19,13 +19,14 @@ simIndividualData <- function(phewas_results, num_patients, snp_prev){
     # Get needed statistics out of the phewas results
     code_stats <- phewas_results %>%
       dplyr::mutate(
-        # code_proportion = cases/(cases+controls),
+        # Force codes to be normalized
+        code = meToolkit::normalizePhecode(code),
         prob_wo_snp = code_proportion / (1 + snp_prev*(OR - 1)),
         prob_w_snp = OR*prob_wo_snp
       ) %>%
-      dplyr::select(code, prob_w_snp, prob_wo_snp)
+      dplyr::select(code, code_proportion, prob_w_snp, prob_wo_snp)
 
-    # Function to setup an individual patients code list with
+   # Function to setup an individual patients code list with
     # their snp status and id added to each code.
     setup_patient <- function(id){
       dplyr::mutate(code_stats,
@@ -40,9 +41,9 @@ simIndividualData <- function(phewas_results, num_patients, snp_prev){
       purrr::map_df(setup_patient) %>%
       dplyr::mutate(
         # Decide code probabilities based upon snp status
-        prob_of_code = ifelse(has_snp, prob_w_snp, prob_wo_snp),
+        prob_of_codes = ifelse(has_snp, prob_w_snp, prob_wo_snp),
         # Draw bernouli for each code based upon patients prob
-        value = rbinom(n=n(), size=1, p=ifelse(has_snp, prob_w_snp, prob_wo_snp))
+        value = rbinom(n=n(), size=1, p=prob_of_codes)
       ) %>%
       dplyr::select(id, has_snp, code, value)
 
