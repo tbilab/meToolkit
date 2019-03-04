@@ -2,79 +2,63 @@ library(shiny)
 library(shinydashboard)
 library(meToolkit)
 library(here)
+library(tidyverse)
+
+setup_data <- function(){
+  # Load packaged fake phewas results dataframe with 1,578 phecodes
+  data("fake_phewas_results")
+  phewas_results <- fake_phewas_results %>%
+    head() %>%
+    mutate(code = meToolkit::normalizePhecode(code)) %>%
+    meToolkit::buildColorPalette(category)
+
+  # Some constants
+  n_patients <- 200
+  snp_prev <- 0.15
+  inverted_codes <- c()
+  snp_filter <- FALSE
+
+  individual_data <- phewas_results %>%
+    meToolkit::simIndividualData(n_patients, snp_prev) %>% {
+      right_join(
+        .$phenotypes, .$snp_status,
+        by = 'id'
+      )
+    } %>%
+    rename(IID = id)
 
 
-# testing main app module in own shiny app.
-n_codes <- 9
-n_cases <- 200
+  network_data <- meToolkit::makeNetworkData(individual_data, phewas_results, inverted_codes)
 
-individual_data <- meToolkit::simIndividualData(n_codes = n_codes, n_cases = n_cases, prob_snp = 0.1)
-phewas_results <- meToolkit::simPhewasResults(n_codes = n_codes, n_categories = 3) %>%
-  meToolkit::buildColorPalette(category)
-inverted_codes <- c()
-snp_filter <- FALSE
+  cases_with_edges <- network_data$edges %>%
+    pull(source) %>%
+    unique()
 
+  # Make sure we're only drawing individuals with edges
+  network_data$vertices <- network_data$vertices %>%
+    filter((index %in% cases_with_edges) | (size == 0.3))
 
+  network_data
+}
 
-
-network_data <- meToolkit::makeNetworkData(individual_data,phewas_results, inverted_codes)
-
-write_rds(network_data, 'sample_network_data.rds')
 
 ui <- shinyUI(
-  dashboardPage(
-    dashboardHeader(
-      title = "Multimorbidity Explorer",
-      titleWidth = 300
-    ),
-    dashboardSidebar(
-      h2('Settings'),
-      sliderInput("setSize", "Min Size of Set:",
-                  min = 0, max = 250,
-                  value = 20),
-      collapsed = TRUE
-    ),
-    dashboardBody(
-      h2("My Network"),
-      # network_plots_UI('network_plots', I),
-      div(class = 'networkPlot', style = 'height: calc(80vh - 40px) !important;',
-          r2d3::d3Output("networkPlot2d", height = '100%')
-      )
-    ),
-    skin = 'black'
+  tagList(
+    h1('Network module test'),
+    network2d_UI('networkPlot',  height = '500px')
   )
 )
 
 server <- function(input, output, session) {
-  # networks <- callModule(
-  #   network_plots, 'network_plots',
-  #   subset_data = subset_data,
-  #   results_data = results_data,
-  #   inverted_codes = inverted_codes,
-  #   parent_ns = session$ns,
-  #   snp_filter = TRUE # THIS NEEDS TO BE WIRED UP PROPERLY
-  # )
 
-  # send data and options to the 2d plot
-  output$networkPlot2d <- r2d3::renderD3({
-    network_data %>%
-      jsonlite::toJSON() %>%
-      r2d3::r2d3(
-        script = here('inst/d3/comorbidityNetwork2d/index.js'),
-        container = 'div',
-        dependencies = "d3-jetpack",
-        options = list(
-          just_snp = snp_filter,
-          msg_loc ='message'
-        )
-      )
+  networkPlot <- callModule(network2d, 'networkPlot', setup_data(), snp_filter=FALSE)
+
+  observeEvent(networkPlot(),{
+    print("we have a message from the network!")
+    print(networkPlot())
   })
-
-  #
-  # observeEvent(input$message, {
-  #   print('message from network')
-  #   print(input$message)
-  # })
 }
 
 shinyApp(ui, server)
+
+

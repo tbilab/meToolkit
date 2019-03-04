@@ -59,3 +59,8 @@ test_that("Size changes reflected", {
   expect_equal(results_sized$vertices, vertices_sized)
 })
 
+
+test_that('Handles automatically building tooltips if needed', {
+  results <- meToolkit::makeNetworkData(df, phecode_info %>% select(-tooltip))
+  expect_true((results$vertices %>% tail(1) %>% pull(tooltip)) == '<h2>p3</h2>')
+})
