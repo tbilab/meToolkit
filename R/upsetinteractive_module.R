@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' upset_ui('upsetPlot', parentNS)
-upset_UI <- function(id, app_ns = I, size_max = 250) {
+upset_old_UI <- function(id, app_ns = I, size_max = 250) {
 
   ns <- . %>% shiny::NS(id)() %>% app_ns()
 
@@ -49,7 +49,7 @@ upset_UI <- function(id, app_ns = I, size_max = 250) {
 #' callModule(meToolkit::upset, 'upsetPlotV2',
 #' codeData = codeFiltered,
 #' npData = snpData)
-upset <- function(input, output, session, codeData, snpData) {
+upset_old <- function(input, output, session, codeData, snpData) {
 
   # In order to get our general enrichment we will need all people in the dataset's snp data.
   snpAllCases <- snpData %>%
