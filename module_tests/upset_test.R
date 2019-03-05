@@ -13,7 +13,10 @@ all_snp_data <- upsetData$snpData %>% select(IID, snp)
 ui <- shinyUI(
   tagList(
     h1('Upset module test'),
-    upset_UI('upsetPlot')
+    tags$style(HTML("
+      .my_upset {height: calc(90vh - 133px) !important;}
+    ")),
+    upset_UI('upsetPlot', div_class = 'my_upset')
   )
 )
 
@@ -24,4 +27,3 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-

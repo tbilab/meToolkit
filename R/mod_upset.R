@@ -1,19 +1,26 @@
 #' UI function of upset module
 #'
 #' @param id String with unique id of module in app
+#' @param div_class A character string containing a class name for the entire plot to be wrapped in. This can then be used to style with external css. Defaults to 'upset_plot'.
 #' @return HTML component of shiny module
 #' @export
 #'
 #' @examples
 #' upset_UI('my_mod')
-upset_UI <- function(id, size_max = 1000) {
+upset_UI <- function(id, div_class = 'upset_plot') {
   ns <- NS(id)
   tagList(
-    r2d3::d3Output(ns('chart')),
-    shiny::sliderInput(
-      ns("setSize"), "Min Size of Set:",
-      min = 1, max = size_max,
-      value = 20
+    div(
+      div(class = div_class,
+        r2d3::d3Output(ns('chart'), height = '100%')
+      ),
+      div(
+        shiny::sliderInput(
+          ns("setSize"), "Min Size of Set:",
+          min = 1, max = 1000,
+          value = 20
+        )
+      )
     )
   )
 }
