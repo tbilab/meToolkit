@@ -2,6 +2,7 @@
 #'
 #' @param id Unique id of module
 #' @param height How tall we want this module to be in css units (defaults to '500px')
+#' @param snp_colors A three element array of colors corresponding to the color of patient nodes and their snp status in order of 0,1,2 copies of minor allele.
 #'
 #' @return HTML tag containing interactive network
 #' @export
@@ -9,9 +10,28 @@
 #' @examples
 #'
 #' network2d_UI('mycomorbidityNetwork2d', '100%')
-network2d_UI <- function(id, height = '500px') {
+network2d_UI <- function(id, height = '500px', snp_colors = c('#bdbdbd','#fcae91', '#a50f15')) {
   ns <- NS(id)
+
+  rounded_span <- 'border-radius: 15px; padding: 1px 6px;'
   tagList(
+    div(class = 'network_header',
+        style = 'display: grid; grid-template-columns: 1fr 1fr; padding: 2px 10px;',
+        div(class = 'network_controls',
+            checkboxInput(
+              ns("snp_filter"),
+              label = "Just minor-allele carriers",
+              value = FALSE
+            )
+        ),
+        div(class = 'network_controls',
+            style = 'text-align: right;',
+            span('Copies of minor allele:'),
+            span(class = 'legend_entry', style=glue::glue("background:{snp_colors[1]};{rounded_span}"), "0"),
+            span(class = 'legend_entry', style=glue::glue("background:{snp_colors[2]};{rounded_span}"), "1"),
+            span(class = 'legend_entry', style=glue::glue("background:{snp_colors[3]};{rounded_span}"), "2")
+        )
+    ),
     r2d3::d3Output(ns("plot"), height = height)
   )
 }
@@ -30,7 +50,8 @@ network2d <- function(input, output, session, network_data, snp_filter) {
   output$plot <- r2d3::renderD3({
     r2d3::r2d3(
       data = jsonlite::toJSON(network_data),
-      script = here('inst/d3/comorbidityNetwork2d/index.js'),
+      # script = here('inst/d3/comorbidityNetwork2d/index.js'),
+      script = system.file("d3/comorbidityNetwork2d/index.js", package = "meToolkit"),
       container = 'div',
       dependencies = "d3-jetpack",
       options = list(
