@@ -13,24 +13,36 @@
 network2d_UI <- function(id, height = '500px', snp_colors = c('#bdbdbd','#fcae91', '#a50f15')) {
   ns <- NS(id)
 
-  rounded_span <- 'border-radius: 15px; padding: 1px 6px;'
+  # CSS Styles
+  rounded_span <- function(color){
+    glue::glue("
+      border-radius: 15px;
+      padding: 1px 6px;
+      background: {color};")
+  }
+  header_style <- glue::glue("
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 8px 10px;
+    border-style: solid;
+    border-width: 1px 0px;
+    border-color: grey; ")
+
   tagList(
-    div(class = 'network_header',
-        style = 'display: grid; grid-template-columns: 1fr 1fr; padding: 2px 10px;',
-        div(class = 'network_controls',
-            checkboxInput(
-              ns("snp_filter"),
-              label = "Just minor-allele carriers",
-              value = FALSE
-            )
-        ),
-        div(class = 'network_controls',
-            style = 'text-align: right;',
-            span('Copies of minor allele:'),
-            span(class = 'legend_entry', style=glue::glue("background:{snp_colors[1]};{rounded_span}"), "0"),
-            span(class = 'legend_entry', style=glue::glue("background:{snp_colors[2]};{rounded_span}"), "1"),
-            span(class = 'legend_entry', style=glue::glue("background:{snp_colors[3]};{rounded_span}"), "2")
+    div(style = header_style,
+      div(
+        checkboxInput(
+          ns("snp_filter"),
+          label = "Just minor-allele carriers",
+          value = FALSE
         )
+      ),
+      div(style = 'text-align: right;',
+        span('Copies of minor allele:'),
+        span(style=rounded_span(snp_colors[1]), "0"),
+        span(style=rounded_span(snp_colors[2]), "1"),
+        span(style=rounded_span(snp_colors[3]), "2")
+      )
     ),
     r2d3::d3Output(ns("plot"), height = height)
   )
@@ -60,10 +72,27 @@ network2d <- function(input, output, session, network_data, snp_filter) {
       )
     )
   })
+  # Make sure checkbox is displaying right value
+  updateCheckboxInput(session, "snp_filter", value = snp_filter)
 
-  filtering_action <- reactive({
+  filtering_action <- reactiveVal()
+
+  # If we've received a message from the network viz package
+  # it into the returned reactive value
+  observeEvent(input$message, {
     validate(need(input$message, message = FALSE))
-    input$message
+    filtering_action(input$message)
+  })
+
+  # If the snp filter toggle has been changed, send the message
+  # to the reactive value
+  observeEvent(input$snp_filter, {
+    validate(need(input$snp_filter, message = FALSE))
+    to_return <- list(
+      type = 'snp_filter_change',
+      payload = input$snp_filter
+    )
+    filtering_action(to_return)
   })
 
   return(filtering_action)
