@@ -4,12 +4,17 @@
 \alias{network2d_UI}
 \title{Interactive individual-level data network diagram of patients to codes}
 \usage{
-network2d_UI(id, height = "500px")
+network2d_UI(id, height = "500px", snp_colors = c("#bdbdbd", "#fcae91",
+  "#a50f15"), div_class = "network_plot")
 }
 \arguments{
 \item{id}{Unique id of module}
 
 \item{height}{How tall we want this module to be in css units (defaults to '500px')}
+
+\item{snp_colors}{A three element array of colors corresponding to the color of patient nodes and their snp status in order of 0,1,2 copies of minor allele.}
+
+\item{div_class}{A character string containing a class name for the entire plot to be wrapped in. This can then be used to style with external css. Defaults to 'network_plot'.}
 }
 \value{
 HTML tag containing interactive network

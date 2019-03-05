@@ -50,7 +50,7 @@ ui <- shinyUI(
 
 server <- function(input, output, session) {
 
-  networkPlot <- callModule(network2d, 'networkPlot', setup_data(), snp_filter=FALSE)
+  networkPlot <- callModule(network2d, 'networkPlot', reactive(setup_data()), snp_filter=reactive(FALSE))
 
   observeEvent(networkPlot(),{
     print("we have a message from the network!")
