@@ -151,10 +151,10 @@ function render_plot(patterns, marginals, sizes){
   // ----------------------------------------------------------------------
   // Chart Components
   // ----------------------------------------------------------------------
-  const matrixChart = g.selectAppend('g.matrixChart')
+  const matrix_chart = g.selectAppend('g.matrix_chart')
     .translate([sizes.set_size_bars_w,0]);
 
-  matrixChart.selectAll('.currentRow')
+  matrix_chart.selectAll('.currentRow')
     .data(patterns)
     .enter().append('g.currentRow')
     .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2] )
@@ -307,13 +307,34 @@ function render_plot(patterns, marginals, sizes){
           class: 'hoverInfo'
         });
 
-
-
-
     })
+    .on('mouseover', function(d){
+      d3.select(this).selectAll('.hoverInfo').attr('opacity', 1);
+    })
+    .on('mouseout', function(d){
+      d3.select(this).selectAll('.hoverInfo').attr('opacity', 0);
+    });
 
+  // ----------------------------------------------------------------------
+  // Axes
+  // ----------------------------------------------------------------------
+  const matrix_axis = matrix_chart.append("g")
+    .call(d3.axisBottom().scale(scales.matrix_width_scale))
+    .translate([0, sizes.h]);
 
+  // Shift text for legibility
+  matrix_axis
+    .selectAll("text")
+    .at({
+      x: -7,
+      y: -1,
+      textAnchor: 'end',
+      transform: 'rotate(-60)',
+      fontSize:12
+    });
 
+  // remove horizontal bar
+  matrix_axis.select('.domain').remove();
 
 }
 
