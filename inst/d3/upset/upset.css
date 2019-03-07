@@ -11,6 +11,13 @@ svg text{
   fill: #4d4d4d;
 }
 
+svg .marginal_bar text{
+  fill: white;
+  text-anchor: middle;
+  alignment-baseline: hanging;
+}
+
+
 tspan {
   font-weight: bold;
   font-size: 28;

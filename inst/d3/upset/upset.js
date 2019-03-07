@@ -3,14 +3,26 @@
 //
 
 // Constants
-const highlightColor = '#fdcdac'; // Color of the highlight bars
 const margin = {right: 25, left: 25, top: 20, bottom: 50}; // margins on side of chart
 
-// matrix settings
-const matrixPadding = 5;              // How far in from sides the dots start
-const matrixSize = 7;                  // radius of dots
-const matrixPresentColor = 'black';
-const matrixMissingColor = 'lightgrey';
+const colors = {
+  marginal_count_bars: 'orangered',
+  pattern_count_bars: 'steelblue',
+  rr_interval: 'orangered',
+  null_rr_interval: 'grey',
+  highlight: '#fdcdac',
+  code_present: 'black',
+  code_missing: 'lightgrey',
+  interaction_box_border: 'grey',
+};
+
+const interaction_box_styles = {
+  opacity: 0,
+  fillOpacity:0,
+  rx: 5,
+  stroke: 'grey',
+  strokeWidth: 1
+};
 
 // proportion plot settings
 const ciThickness = 4;   // how thick is the CI?
@@ -148,7 +160,7 @@ function draw_pattern_matrix(g, patterns, scales, sizes){
     .at({
       cx: d => scales.matrix_width_scale(d) + scales.matrix_width_scale.bandwidth()/2,
       r: scales.matrix_dot_size,
-      fill: matrixMissingColor,
+      fill: colors.code_missing,
       fillOpacity: 0.5,
     });
 
@@ -157,7 +169,7 @@ function draw_pattern_matrix(g, patterns, scales, sizes){
     .at({
       x1: d => get_pattern_info(d, scales).range[0],
       x2: d => get_pattern_info(d, scales).range[1],
-      stroke: matrixPresentColor,
+      stroke: colors.code_present,
       strokeWidth: scales.matrix_dot_size/2
     });
 
@@ -169,7 +181,7 @@ function draw_pattern_matrix(g, patterns, scales, sizes){
       class: 'presentCodes',
       cx: d => d,
       r: scales.matrix_dot_size,
-      fill: matrixPresentColor,
+      fill: colors.code_present,
     });
 
 
@@ -205,7 +217,7 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
   pattern_count_bars
     .selectAppend('rect')
     .at({
-      fill: 'steelblue',
+      fill: colors.pattern_count_bars,
       height: scales.set_size_bar_height,
       y: -scales.set_size_bar_height/2,
       x: d => scales.set_size_x(d.count),
@@ -229,7 +241,7 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
   pattern_size_axis.selectAll(".tick line")
     .at({
       opacity: 0.5,
-    })
+    });
 }
 
 function draw_rr_intervals(g, patterns, scales, sizes){
@@ -267,7 +279,7 @@ function draw_rr_intervals(g, patterns, scales, sizes){
     .at({
       x1: d => scales.rr_x(d.lower),
       x2: d => scales.rr_x(d.upper),
-      stroke: d => d.pointEst === 0 ? 'darkgrey': 'orangered',
+      stroke: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
       strokeWidth: ciThickness,
     });
 
@@ -276,7 +288,7 @@ function draw_rr_intervals(g, patterns, scales, sizes){
     .at({
       cx: d => scales.rr_x(d.pointEst),
       r: ciThickness*1.5,
-      fill: d => d.pointEst === 0 ? 'darkgrey': 'orangered',
+      fill: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
     });
 
 
@@ -293,7 +305,7 @@ function draw_code_marginal_bars(g, marginals, scales, sizes){
   code_marginal_bars.selectAppend('rect')
     .at({
       height: d => scales.marginal_y(d.count),
-      fill: 'orangered',
+      fill: colors.marginal_count_bars,
       width: scales.matrix_column_width,
     });
 
@@ -303,13 +315,11 @@ function draw_code_marginal_bars(g, marginals, scales, sizes){
       x: scales.matrix_column_width/2,
       textAnchor: 'middle',
       alignmentBaseline: 'hanging',
-      fill: 'white',
       y: 2,
     })
-
 }
 
-function create_pattern_interaction_layer(g, patterns, scales, sizes, onMouseover){
+function create_pattern_interaction_layer(g, patterns, scales, sizes, callbacks){
   // Draws invisible selection rectangles over the horizontal patterns
   // That enable various interaction popups etc.
   const pattern_rows = g.selectAll('.pattern_row')
@@ -320,17 +330,16 @@ function create_pattern_interaction_layer(g, patterns, scales, sizes, onMouseove
       .at({
         width: sizes.w + 2*sizes.padding,
         height: scales.matrix_row_height,
-        fill: 'green',
-        opacity: 0,
-        rx: 5,
-        stroke: 'grey',
-        strokeWidth: 1,
-      });
+      })
+      .at(interaction_box_styles);
 
-  pattern_rows.on('mouseover', onMouseover);
+  // Apply desired callbacks
+  Object.keys(callbacks).forEach(name => {
+    pattern_rows.on(name, callbacks[name]);
+  });
 }
 
-function create_code_interaction_layer(g, marginals, scales, sizes, onMouseover){
+function create_code_interaction_layer(g, marginals, scales, sizes, callbacks){
   // Draws invisible selection rectangles over the vertical patterns
   const code_cols = g.selectAll('.code_col')
     .data(marginals)
@@ -339,24 +348,63 @@ function create_code_interaction_layer(g, marginals, scales, sizes, onMouseover)
     .selectAppend('rect')
       .at({
         width: scales.matrix_column_width,
-        height: sizes.h + sizes.margin.bottom + sizes.padding,
-        fill: 'purple',
-        opacity: 0,
-        rx: 5,
-        stroke: 'grey',
-        strokeWidth: 1,
-      });
+        height: sizes.h + sizes.margin.bottom + sizes.padding
+      })
+      .at(interaction_box_styles);
 
-  code_cols.on('mouseover', onMouseover);
+  // Apply desired callbacks
+  Object.keys(callbacks).forEach(name => {
+    code_cols.on(name, callbacks[name]);
+  });
 }
 
-function pattern_moused_over(d){
-  console.log('moused over a pattern!');
+// Creates a panel that can display text wherever it is placed
+// Returns methods to update, show, and hide info
+function create_info_panel(g, panel_size, panel_padding = 5){
+  const panel = g.selectAppend('g.info');
+
+  panel.selectAppend('rect')
+    .at({
+      width: panel_size[0],
+      height: panel_size[1],
+      fillOpacity: 0
+    });
+
+  const panel_text = panel.selectAppend('text')
+    .at({
+      y:  panel_size[1]/2,
+      x:  panel_size[0]/2,
+    })
+    .st({
+      fontSize: '20px',
+      alignmentBaseline: 'middle',
+      textAnchor: 'middle',
+    });
+
+  function update(content){
+    panel_text.html(content);
+    return this;
+  }
+  function hide(){
+    panel.attr('opacity', 0);
+    return this;
+  }
+  function show(){
+    panel.attr('opacity', 1);
+    return this;
+  }
+
+  // Start with panel hidden
+  hide();
+
+  return {
+    update,
+    hide,
+    show,
+  };
 }
 
-function code_moused_over(d){
-  console.log('moused over a code!');
-}
+
 
 // Function to draw upset plot given filtered data and scales
 function render_plot(patterns, marginals, sizes, have_snps = true){
@@ -387,14 +435,59 @@ function render_plot(patterns, marginals, sizes, have_snps = true){
     .translate([sizes.set_size_bars_w,0])
     .call(draw_code_marginal_bars, marginals, scales, sizes);
 
+  // ----------------------------------------------------------------------
+  // Interaction setup and logic
+  // ----------------------------------------------------------------------
+  const left_info_panel = create_info_panel(
+    g.selectAppend('g.left_info_panel'),
+    [sizes.set_size_bars_w, sizes.margin_count_h-sizes.padding*2]
+  );
+
+  const right_info_panel = create_info_panel(
+    g.selectAppend('g.right_info_panel').translate([sizes.set_size_bars_w + sizes.matrix_plot_w, 0]),
+    [sizes.set_size_bars_w, sizes.margin_count_h-sizes.padding*2]
+  );
+
+  const pattern_callbacks = {
+    mouseover: function(d){
+      const rr_message = `RR: ${CiFormat(d.pointEst)} (${CiFormat(d.lower)}, ${CiFormat(d.upper)})`;
+      const size_message = `Pattern appears ${countFormat(d.count)} times`;
+      const codes_in_pattern = d.pattern.split('-');
+
+      // Update right panel with rr info
+      right_info_panel.update(rr_message).show();
+      left_info_panel.update(size_message).show();
+      // highlight pattern
+      d3.select(this).attr('opacity', 0.7);
+    },
+    mouseout: function(d){
+      right_info_panel.hide();
+      left_info_panel.hide();
+      d3.select(this).attr('opacity', 0);
+    }
+  };
+
+  const code_callbacks = {
+    mouseover: function(d){
+      const message = `Code: ${d.code}`;
+
+      left_info_panel.update(message).show();
+      // highlight
+      d3.select(this).attr('opacity', 0.7);
+    },
+    mouseout: function(d){
+      left_info_panel.hide();
+      d3.select(this).attr('opacity', 0);
+    }
+  };
+
   const code_interaction_layer = g.selectAppend('g.code_interaction_layer')
     .translate([sizes.set_size_bars_w,0])
-    .call(create_code_interaction_layer, marginals, scales, sizes, code_moused_over);
+    .call(create_code_interaction_layer, marginals, scales, sizes, code_callbacks);
 
   const pattern_interaction_layer = g.selectAppend('g.pattern_interaction_layer')
     .translate([0, sizes.margin_count_h])
-    .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_moused_over);
-
+    .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
 }
 
 

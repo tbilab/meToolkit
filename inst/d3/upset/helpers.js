@@ -2,7 +2,7 @@
 
 // number formatters
 const countFormat = d3.format(",d");
-const CiFormat = d3.format(".3f");
+const CiFormat = d3.format(".2f");
 const pValFormat = d3.format("0.2");
 
 
