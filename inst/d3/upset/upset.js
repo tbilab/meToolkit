@@ -13,22 +13,7 @@ const matrixPresentColor = 'black';
 const matrixMissingColor = 'lightgrey';
 
 // proportion plot settings
-const propPointSize = 3; // size of the point estimates for proportions
 const ciThickness = 4;   // how thick is the CI?
-
-// maginal bars settings
-const marginalBottomPadding = 5;  // padding between matrix and start of bars
-const marginalBarPadding = 0.5;
-
-// count bar settings
-const countBarPadding = 0.5;  // vertical gap between count bars.
-const countBarLeftPad = 35; // how much space on left of count bars do we leave for popup info?
-
-// layout grid
-const marginalChartRatio = 1/3;  // what proportion of vertical space is the code marginal count bars?
-const proportionPlotUnits_opts = {just_snp: 0.5, all: 3}; // width of proportion CIs
-const matrixPlotUnits_opts     = {just_snp: 2.5, all: 2};
-const countBarUnits_opts       = {just_snp: 3.5, all: 3};
 
 // new layout grid
 const set_size_bars_units = 3;
@@ -75,7 +60,6 @@ function setup_scales(patterns, marginal, sizes){
 
   // Make the top margin bars a tiny bit narrower than the columns of our matrix for breathing room
   const matrix_column_width = matrix_width_scale.bandwidth();
-  const margin_bar_width = matrix_column_width*0.9;
 
   // Setup the x-scale for counts of the patterns
   const set_size_x = d3.scaleLinear()
@@ -89,7 +73,7 @@ function setup_scales(patterns, marginal, sizes){
 
   // Y scale for patterns in all lower charts, domain is index of pattern
   const pattern_y = d3.scaleLinear()
-    .range([margin_count_h, matrix_plot_h + margin_count_h])
+    .range([0, matrix_plot_h])
     .domain([0, patterns.length]);
 
   // How thick each pattern's count bar is
@@ -98,7 +82,7 @@ function setup_scales(patterns, marginal, sizes){
 
   // Continuous y count scale for the code marginals
   const marginal_y = d3.scaleLinear()
-    .range([margin_count_h, 0])
+    .range([0, margin_count_h])
     .domain([0, d3.max(marginal, d => d.count)]);
 
   // How big should the dots be in matrix?
@@ -111,7 +95,6 @@ function setup_scales(patterns, marginal, sizes){
     rr_x,
     pattern_y,
     marginal_y,
-    margin_bar_width,
     matrix_dot_size,
     matrix_row_height,
     matrix_column_width,
@@ -137,9 +120,246 @@ function setup_chart_sizes(width, height, margin){
   };
 }
 
+function get_pattern_info(d, scales) {
+  const positions_of_codes = d.pattern
+    .split('-')
+    .map(p => scales.matrix_width_scale(p) + scales.matrix_width_scale.bandwidth()/2);
+
+  const range_of_pattern = d3.extent(positions_of_codes);
+
+  return {
+    positions: positions_of_codes,
+    range: range_of_pattern,
+  };
+}
+
+function draw_pattern_matrix(g, patterns, scales, sizes){
+
+  const matrix_rows = g.selectAll('.matrix_row')
+    .data(patterns)
+    .enter().append('g.matrix_row')
+    .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2] );
+
+  // Light grey dots in the background to show possible codes
+  matrix_rows.selectAll('.background_dots')
+    .data(marginals.map(d => d.code))
+    .enter().append('circle')
+    .attr('class', 'allCodes')
+    .at({
+      cx: d => scales.matrix_width_scale(d) + scales.matrix_width_scale.bandwidth()/2,
+      r: scales.matrix_dot_size,
+      fill: matrixMissingColor,
+      fillOpacity: 0.5,
+    });
+
+  // Thin lines that span code range
+  matrix_rows.selectAppend('line.pattern_extent')
+    .at({
+      x1: d => get_pattern_info(d, scales).range[0],
+      x2: d => get_pattern_info(d, scales).range[1],
+      stroke: matrixPresentColor,
+      strokeWidth: scales.matrix_dot_size/2
+    });
+
+  // Shaded present-codes dots
+  matrix_rows.selectAll('.present_code_dots')
+    .data(d => get_pattern_info(d, scales).positions)
+    .enter().append('circle')
+    .at({
+      class: 'presentCodes',
+      cx: d => d,
+      r: scales.matrix_dot_size,
+      fill: matrixPresentColor,
+    });
+
+
+  //// Axis
+  const matrix_axis = g.selectAppend("g.matrix_axis")
+    .call(d3.axisBottom().scale(scales.matrix_width_scale))
+    .translate([0, sizes.matrix_plot_h]);
+
+  // Shift text for legibility
+  matrix_axis
+    .selectAll("text")
+    .at({
+      x: -7,
+      y: -1,
+      textAnchor: 'end',
+      transform: 'rotate(-60)',
+      fontSize:12
+    });
+  // remove horizontal bar
+  matrix_axis.select('.domain').remove();
+
+
+}
+
+function draw_pattern_count_bars(g, patterns, scales, sizes){
+
+  const pattern_count_bars = g
+    .selectAll('.pattern_count_bars')
+      .data(patterns)
+      .enter().append('g.pattern_count_bars')
+      .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2]);
+
+  pattern_count_bars
+    .selectAppend('rect')
+    .at({
+      fill: 'steelblue',
+      height: scales.set_size_bar_height,
+      y: -scales.set_size_bar_height/2,
+      x: d => scales.set_size_x(d.count),
+      width: d => scales.set_size_x(0) - scales.set_size_x(d.count),
+    });
+
+  //// Pattern count bars axis
+  const pattern_size_axis = g.selectAppend("g.pattern_size_axis")
+    .call(d3.axisTop()
+            .scale(scales.set_size_x)
+            .ticks(5)
+            .tickSizeOuter(0) );
+
+  pattern_size_axis.selectAll("text")
+    .at({
+      x: -2, y: -4,
+      textAnchor: 'end',
+      opacity: 0.5
+    });
+
+  pattern_size_axis.selectAll(".tick line")
+    .at({
+      opacity: 0.5,
+    })
+}
+
+function draw_rr_intervals(g, patterns, scales, sizes){
+  // Axis
+  const axis_drawing_func = d3.axisTop()
+    .scale(scales.rr_x)
+    .ticks(5)
+    .tickSizeOuter(0);
+
+  const rr_axis = g.selectAppend("g.rr_intervals_axis")
+    .call(axis_drawing_func);
+
+  rr_axis.selectAll("text")
+    .at({
+      x: 2, y: -4,
+      textAnchor: 'start',
+      opacity: 0.5,
+    });
+
+  // Guide line at RR = 1 for reference of 'null'
+  rr_axis.selectAll('.tick line')
+    .at({
+      y1: d => d === 1 ? sizes.matrix_plot_h: 0,
+      opacity: 0.5,
+    });
+
+  // Now draw the intervals
+  const rr_intervals = g.selectAll('.rr_intervals')
+    .data(patterns)
+    .enter().append('g.rr_intervals')
+    .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2]);
+
+  rr_intervals
+    .selectAppend('line')
+    .at({
+      x1: d => scales.rr_x(d.lower),
+      x2: d => scales.rr_x(d.upper),
+      stroke: d => d.pointEst === 0 ? 'darkgrey': 'orangered',
+      strokeWidth: ciThickness,
+    });
+
+  rr_intervals
+    .selectAppend('circle')
+    .at({
+      cx: d => scales.rr_x(d.pointEst),
+      r: ciThickness*1.5,
+      fill: d => d.pointEst === 0 ? 'darkgrey': 'orangered',
+    });
+
+
+
+}
+
+function draw_code_marginal_bars(g, marginals, scales, sizes){
+  // Now draw the intervals
+  const code_marginal_bars = g.selectAll('.code_marginal_bar')
+    .data(marginals)
+    .enter().append('g.marginal_bar')
+    .translate((d,i) => [scales.matrix_width_scale(d.code), sizes.margin_count_h - scales.marginal_y(d.count)]);
+
+  code_marginal_bars.selectAppend('rect')
+    .at({
+      height: d => scales.marginal_y(d.count),
+      fill: 'orangered',
+      width: scales.matrix_column_width,
+    });
+
+  code_marginal_bars.selectAppend('text')
+    .text(d => countFormat(d.count))
+    .at({
+      x: scales.matrix_column_width/2,
+      textAnchor: 'middle',
+      alignmentBaseline: 'hanging',
+      fill: 'white',
+      y: 2,
+    })
+
+}
+
+function create_pattern_interaction_layer(g, patterns, scales, sizes, onMouseover){
+  // Draws invisible selection rectangles over the horizontal patterns
+  // That enable various interaction popups etc.
+  const pattern_rows = g.selectAll('.pattern_row')
+    .data(patterns)
+    .enter().append('g.pattern_row')
+    .translate((d,i) => [-sizes.padding, scales.pattern_y(i)] )
+    .selectAppend('rect')
+      .at({
+        width: sizes.w + 2*sizes.padding,
+        height: scales.matrix_row_height,
+        fill: 'green',
+        opacity: 0,
+        rx: 5,
+        stroke: 'grey',
+        strokeWidth: 1,
+      });
+
+  pattern_rows.on('mouseover', onMouseover);
+}
+
+function create_code_interaction_layer(g, marginals, scales, sizes, onMouseover){
+  // Draws invisible selection rectangles over the vertical patterns
+  const code_cols = g.selectAll('.code_col')
+    .data(marginals)
+    .enter().append('g.code_col')
+    .translate((d,i) => [scales.matrix_width_scale(d.code), -sizes.padding])
+    .selectAppend('rect')
+      .at({
+        width: scales.matrix_column_width,
+        height: sizes.h + sizes.margin.bottom + sizes.padding,
+        fill: 'purple',
+        opacity: 0,
+        rx: 5,
+        stroke: 'grey',
+        strokeWidth: 1,
+      });
+
+  code_cols.on('mouseover', onMouseover);
+}
+
+function pattern_moused_over(d){
+  console.log('moused over a pattern!');
+}
+
+function code_moused_over(d){
+  console.log('moused over a code!');
+}
 
 // Function to draw upset plot given filtered data and scales
-function render_plot(patterns, marginals, sizes){
+function render_plot(patterns, marginals, sizes, have_snps = true){
 
   // Setup the scales
   const scales = setup_scales(patterns, marginals, sizes);
@@ -152,197 +372,36 @@ function render_plot(patterns, marginals, sizes){
   // Chart Components
   // ----------------------------------------------------------------------
   const matrix_chart = g.selectAppend('g.matrix_chart')
-    .translate([sizes.set_size_bars_w,0]);
+    .translate([sizes.set_size_bars_w,sizes.margin_count_h])
+    .call(draw_pattern_matrix, patterns, scales, sizes);
 
-  matrix_chart.selectAll('.currentRow')
-    .data(patterns)
-    .enter().append('g.currentRow')
-    .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2] )
-    .each(function(currentEntry, i){
+  const pattern_size_bars = g.selectAppend('g.pattern_size_bars')
+    .translate([0, sizes.margin_count_h])
+    .call(draw_pattern_count_bars, patterns, scales, sizes);
 
-      // Initially hidden box for highlighting purposes.
-      const highlight_rect = d3.select(this)
-        .selectAppend('rect.highlight_rect')
-        .at({
-          width: sizes.w + sizes.padding*2,
-          x: -(sizes.set_size_bars_w + sizes.padding),
-          y: -scales.matrix_row_height/2,
-          height: scales.set_size_bar_height + sizes.padding,
-          fillOpacity: 0.3,
-          fill: highlightColor,
-          stroke: 'black',
-          rx: 5,
-          opacity: 0.2,
-          class: 'hoverInfo'
-        });
+  const rr_intervals = g.selectAppend('g.rr_intervals')
+    .translate([sizes.set_size_bars_w + sizes.matrix_plot_w, sizes.margin_count_h])
+    .call(draw_rr_intervals, patterns, scales, sizes);
 
-      const matrixRow = d3.select(this).selectAppend('g.matrixRow');
+  const code_marginal_bars = g.selectAppend('g.code_marginal_bars')
+    .translate([sizes.set_size_bars_w,0])
+    .call(draw_code_marginal_bars, marginals, scales, sizes);
 
-      // Background greyed out dots
-      const allCodes = matrixRow
-        .selectAll('.allCodes')
-        .data(marginals.map(d => d.code))
-        .enter().append('circle')
-        .attr('class', 'allCodes')
-        .at({
-          cx: d => scales.matrix_width_scale(d) + scales.matrix_width_scale.bandwidth()/2,
-          r: scales.matrix_dot_size,
-          fill: matrixMissingColor,
-          fillOpacity: 0.3,
-        });
+  const code_interaction_layer = g.selectAppend('g.code_interaction_layer')
+    .translate([sizes.set_size_bars_w,0])
+    .call(create_code_interaction_layer, marginals, scales, sizes, code_moused_over);
 
-      // Thin lines that span code range
-      const code_positions = currentEntry.pattern
-        .split('-')
-        .map(d => scales.matrix_width_scale(d) + scales.matrix_width_scale.bandwidth()/2);
-
-      const range_of_pattern = d3.extent(code_positions);
-
-      matrixRow.append('line')
-        .at({
-          x1: range_of_pattern[0],
-          x2: range_of_pattern[1],
-          stroke: matrixPresentColor,
-          strokeWidth: scales.matrix_dot_size/2
-        });
-
-      // Shaded present-codes dots
-      const presentCodes = matrixRow
-        .selectAll('.presentCodes')
-        .data(code_positions)
-        .enter().append('circle')
-        .at({
-          class: 'presentCodes',
-          cx: d => d,
-          r: scales.matrix_dot_size,
-          fill: matrixPresentColor,
-        });
-
-
-      // If we have snp info lets draw relative risk bars
-      //if(snp_status === 'all'){
-      if(true){
-        const rr_interval = d3.select(this).selectAppend('g.rr_interval')
-          .translate([sizes.matrix_plot_w, 0]);
-
-        const interval_line = rr_interval
-          .selectAppend('line')
-          .at({
-            x1: scales.rr_x(currentEntry.lower),
-            x2: scales.rr_x(currentEntry.upper),
-            stroke: currentEntry.pointEst === 0 ? 'darkgrey': 'orangered',
-            strokeWidth: ciThickness,
-          });
-
-        const interval_point = rr_interval
-          .selectAppend('circle')
-          .at({
-            cx: scales.rr_x(currentEntry.pointEst),
-            r: ciThickness*1.5,
-            fill:currentEntry.pointEst === 0 ? 'darkgrey': 'orangered',
-          });
-
-        // Append some invisible text that can get shown when mouseover
-        rr_interval
-          .selectAppend('text.point_est')
-          .html(d => `<tspan>Relative Risk:</tspan> ${pValFormat(currentEntry.pointEst)}`)
-          .at({
-            x: 50,
-            y: -scales.pattern_y(i) + sizes.margin_count_h/3.5,
-            opacity: 0,
-            fontSize: 22,
-            textAnchor: 'start',
-            class: 'hoverInfo'
-          });
-
-       rr_interval
-         .selectAppend('text.ci')
-         .html(d => `<tspan>CI:</tspan> (${CiFormat(currentEntry.lower)},${CiFormat(currentEntry.upper)})`)
-         .at({
-           x: 50,
-           y: -scales.pattern_y(i) + sizes.margin_count_h/2,
-           opacity: 0,
-           fontSize: 22,
-           textAnchor: 'start',
-           'class': 'hoverInfo'
-         });
-      } // end snp status if block
-
-      // Draw pattern size/count bars
-      const count_bar = d3.select(this).selectAppend('g.count_bar')
-        .translate([-sizes.set_size_bars_w,0]);
-
-      count_bar.selectAppend('rect')
-        .at({
-          fill: 'steelblue',
-          height: scales.set_size_bar_height,
-          x: scales.set_size_x(currentEntry.count),
-          y: -scales.set_size_bar_height/2,
-          width: scales.set_size_x(0) - scales.set_size_x(currentEntry.count),
-        });
-
-      const popup_text_pos = sizes.margin_count_h*(4/5) - scales.set_size_bar_height/2;
-
-      count_bar.selectAppend('text')
-        .text(countFormat(currentEntry.count))
-        .at({
-          x: scales.set_size_x(currentEntry.count) - 1,
-          y: -scales.pattern_y(i) + popup_text_pos,
-          alignmentBaseline: 'middle',
-          textAnchor: 'end',
-          fontWeight: 'bold',
-          opacity: 0,
-          class: 'hoverInfo'
-        });
-
-      // Line drawn on axis to show exactly where value fals
-       count_bar.selectAppend('line')
-        .at({
-          x1: scales.set_size_x(currentEntry.count),
-          x2: scales.set_size_x(currentEntry.count),
-          y1: -scales.pattern_y(i) + popup_text_pos,
-          y2: -scales.pattern_y(i) + sizes.margin_count_h - scales.set_size_bar_height/2,
-          stroke: 'black',
-          opacity: 0,
-          class: 'hoverInfo'
-        });
-
-    })
-    .on('mouseover', function(d){
-      d3.select(this).selectAll('.hoverInfo').attr('opacity', 1);
-    })
-    .on('mouseout', function(d){
-      d3.select(this).selectAll('.hoverInfo').attr('opacity', 0);
-    });
-
-  // ----------------------------------------------------------------------
-  // Axes
-  // ----------------------------------------------------------------------
-  const matrix_axis = matrix_chart.append("g")
-    .call(d3.axisBottom().scale(scales.matrix_width_scale))
-    .translate([0, sizes.h]);
-
-  // Shift text for legibility
-  matrix_axis
-    .selectAll("text")
-    .at({
-      x: -7,
-      y: -1,
-      textAnchor: 'end',
-      transform: 'rotate(-60)',
-      fontSize:12
-    });
-
-  // remove horizontal bar
-  matrix_axis.select('.domain').remove();
+  const pattern_interaction_layer = g.selectAppend('g.pattern_interaction_layer')
+    .translate([0, sizes.margin_count_h])
+    .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_moused_over);
 
 }
 
 
+const min_set_size = 100;
+const {patterns, marginals} = filter_set_size(data, options.marginalData, min_set_size);
+const chart_sizes = setup_chart_sizes(width, height, margin);
 
-
-// empty old svg content
-svg.html('');
 
 if(data.length < 2){
 
@@ -354,452 +413,5 @@ if(data.length < 2){
     .attr('y', height/2);
 
 } else {
-  //draw_upset();
+  render_plot(patterns, marginals, chart_sizes);
 }
-
-
-const min_set_size = 100;
-
-const chart_sizes = setup_chart_sizes(width, height, margin);
-
-const {patterns, marginals} = filter_set_size(data, options.marginalData, min_set_size);
-
-
-// draw plot with size info
-render_plot(patterns, marginals, chart_sizes);
-
-
-function draw_upset(min_set_size = 100) {
-  const {patterns: pattern_data, marginals: marginal_data} = filter_set_size(data, options.marginalData, min_set_size);
-
-  // Check if we are looking at a just snp version of the plot record it so we can draw accordingly later.
-  const num_snp_eq_total = pattern_data.map(d => +(d.count === d.num_snp)).reduce((running, cur) => running + cur);
-  const snp_status = num_snp_eq_total === pattern_data.length ? 'just_snp': 'all';
-
-  const h = height - margin.top - margin.bottom;
-  const w = width - margin.left - margin.right;
-
-  const chart_sizes = {
-    set_size_bars_w: w*(set_size_bars_units/total_width_units),
-    rr_plot_w: w*(rr_plot_units/total_width_units),
-    matrix_plot_w: w*(matrix_plot_units/total_width_units),
-    matrix_plot_h: h*marginal_count_prop,
-    margin_count_h: h*(1 - marginal_count_prop),
-    matrix_padding: 5,
-    padding: 10,
-    w,
-    h,
-    margin,
-  };
-
-
-  // draw plot with size info
-  render_plot(pattern_data, marginal_data, chart_sizes);
-
-  // Setup the scales
-  //const scales = setup_scales(pattern_data, marginal_data, chart_sizes);
-
-
-  const proportionPlotUnits = proportionPlotUnits_opts[snp_status];
-  const matrixPlotUnits  = matrixPlotUnits_opts[snp_status];
-  const countBarUnits = countBarUnits_opts[snp_status];
-
-  // Calculated constants
-  const totalWidthUnits = proportionPlotUnits + matrixPlotUnits + countBarUnits;
-  const proportionPlotWidth = w*(proportionPlotUnits/totalWidthUnits);
-  const matrixPlotWidth = w*(matrixPlotUnits/totalWidthUnits);
-  const countBarWidth = w*(countBarUnits/totalWidthUnits);
-  const marginalChartHeight = h*marginalChartRatio;
-  const matrixDotSize = Math.min(
-    (matrixPlotWidth )/(pattern_data.length),
-    matrixSize
-  );
-
-
-  // Parent padded g element.
-  const padded = svg.append('g')
-    .translate([margin.left, margin.top]);
-
-  // get unique codes present in the data.
-  const codeList = Object.keys(
-    pattern_data
-    .reduce(
-      (all, current) => [...all, ...(current.pattern.split('-'))],
-      []
-    ).reduce(
-      (codeDict, currentCode) => Object.assign(codeDict, {[currentCode]: 1}),
-      {}
-    )
-  );
-
-
-  // ----------------------------------------------------------------------
-  // Scales
-  // ----------------------------------------------------------------------
-  const matrix_width_scale = d3.scaleBand()
-    .domain(codeList)
-    .range([matrixPadding,matrixPlotWidth - matrixPadding])
-    .round(true)
-    .padding(0.05); // goes from right to left into left margin.
-
-  const horizontalSpace = matrix_width_scale.bandwidth();
-
-  const marginBarWidth = horizontalSpace - 2*marginalBarPadding;
-
-  const countX = d3.scaleLinear()
-    .range([countBarWidth, countBarLeftPad])
-    .domain([0, d3.max(pattern_data, d=> d.count)]);
-
-  const proportionX = d3.scaleLinear()
-    .range([0,proportionPlotWidth])
-    .domain([0,d3.max(pattern_data, d => d.upper)]);
-
-  const y = d3.scaleLinear()
-    .range([marginalChartHeight, h])
-    .domain([0, pattern_data.length]);
-
-  const verticalSpace = y(1) - y(0);   // how big of a gap each pattern gets
-  const barHeight = verticalSpace - 2*countBarPadding;
-
-  const marginalY = d3.scaleLinear()
-    .range([marginalChartHeight-marginalBottomPadding, 0])
-    .domain([0, d3.max(options.marginalData, d => d.count)]);
-
-  // ----------------------------------------------------------------------
-  // Chart Components
-  // ----------------------------------------------------------------------
-  const matrixChart = padded.append('g.matrixChart')
-    .translate([countBarWidth,0]);
-  matrixChart.selectAll('.currentRow')
-    .data(pattern_data)
-    .enter().append('g.currentRow')
-    .translate((d,i) => [0, y(i)] )
-    .each(function(currentEntry, i){
-
-      // Initially hidden box for highlighting purposes.
-      const highlightRect = d3.select(this)
-        .selectAppend('rect.highlightRect')
-        .at({
-          width: w + 20,
-          x: -(countBarWidth + countBarPadding*2),
-          height: barHeight + countBarPadding,
-          fillOpacity: 0.3,
-          fill: highlightColor,
-          stroke: 'black',
-          rx: 5,
-          opacity: 0,
-          'class': 'hoverInfo'
-        });
-
-      // Matrix key
-      const matrixRow = d3.select(this).append('g.matrixRow');
-
-      const allCodes = matrixRow
-        .selectAll('.allCodes')
-        .data(codeList)
-        .enter().append('circle')
-        .attr('class', 'allCodes')
-        .at({
-          cx: d => matrix_width_scale(d) + matrix_width_scale.bandwidth()/2,
-          cy: verticalSpace/2,
-          r: matrixDotSize,
-          fill: matrixMissingColor,
-          fillOpacity: 0.3,
-        });
-
-      // bars that go accross
-      const codePositions = currentEntry.pattern
-        .split('-')
-        .map(d => matrix_width_scale(d) + matrix_width_scale.bandwidth()/2);
-
-      const rangeOfPattern = d3.extent(codePositions);
-
-      matrixRow.append('line')
-        .at({
-          x1: rangeOfPattern[0],
-          x2: rangeOfPattern[1],
-          y1: verticalSpace/2,
-          y2: verticalSpace/2,
-          stroke: matrixPresentColor,
-          strokeWidth: matrixDotSize/2
-        });
-
-      const presentCodes = matrixRow
-        .selectAll('.presentCodes')
-        .data(codePositions)
-        .enter().append('circle')
-        .attr('class', 'presentCodes')
-        .at({
-          cx: d => d,
-          cy: verticalSpace/2,
-          r: matrixDotSize,
-          fill: matrixPresentColor,
-        });
-
-
-      // Proportion Intervals
-
-      if(snp_status === 'all'){
-        const proportionLine = d3.select(this).append('g.proportionLine')
-          .translate([matrixPlotWidth, 0]);
-
-        const intervalBar = proportionLine
-          .append('line')
-          .at({
-            x1: proportionX(currentEntry.lower),
-            x2: proportionX(currentEntry.upper),
-            y1: verticalSpace/2, y2: verticalSpace/2,
-            stroke: currentEntry.pointEst === 0 ? 'darkgrey': 'orangered',
-            strokeWidth: ciThickness,
-          });
-
-      const pointEst = proportionLine
-        .append('circle')
-        .at({
-          cx: proportionX(currentEntry.pointEst),
-          cy: verticalSpace/2,
-          r: propPointSize,
-          fill:currentEntry.pointEst === 0 ? 'darkgrey': 'orangered',
-          stroke: 'black',
-          strokeWidth: 0.5,
-        });
-
-      proportionLine
-        .append('text')
-        .html(d => `<tspan>Relative Risk:</tspan> ${pValFormat(currentEntry.pointEst)}`)
-        .at({
-          x: 50,
-          y: -y(i) + marginalChartHeight/3.5,
-          opacity: 0,
-          fontSize: 22,
-          textAnchor: 'start',
-          'class': 'hoverInfo'
-        });
-
-      proportionLine
-        .append('text')
-        .html(d => `<tspan>CI:</tspan> (${CiFormat(currentEntry.lower)},${CiFormat(currentEntry.upper)})`)
-        .at({
-          x: 50,
-          y: -y(i) + marginalChartHeight/2,
-          opacity: 0,
-          fontSize: 22,
-          textAnchor: 'start',
-          'class': 'hoverInfo'
-        });
-      }
-
-
-      // Count Bars
-      const countBar = d3.select(this).append('g.countBar')
-        .translate([-countBarWidth,0]);
-
-      countBar.append('rect')
-        .at({
-          fill: 'steelblue',
-          height: barHeight,
-          x: countX(currentEntry.count),
-          y: countBarPadding/2,
-          width: countX(0) - countX(currentEntry.count),
-        })
-
-      countBar.append('text')
-        .text(countFormat(currentEntry.count))
-        .at({
-          x: countX(currentEntry.count) - 1,
-          y: -y(i) + marginalChartHeight - 28,
-          alignmentBaseline: 'middle',
-          textAnchor: 'end',
-          fontWeight: 'bold',
-          opacity: 0,
-          'class': 'hoverInfo'
-        })
-
-       countBar.append('line')
-        .at({
-          x1: countX(currentEntry.count),
-          x2: countX(currentEntry.count),
-          y1: -y(i) + marginalChartHeight - 28,
-          y2: -y(i) + marginalChartHeight,
-          stroke: 'black',
-          opacity: 0,
-          'class': 'hoverInfo'
-        })
-    })
-    .on('mouseover', function(d){
-      d3.select(this).selectAll('.hoverInfo').attr('opacity', 1)
-    })
-    .on('mouseout', function(d){
-      d3.select(this).selectAll('.hoverInfo').attr('opacity', 0)
-    })
-  // ----------------------------------------------------------------------
-  // Axes
-  // ----------------------------------------------------------------------
-
-  const matrixAxis = matrixChart.append("g")
-    .call(d3.axisBottom().scale(matrix_width_scale))
-    .translate([0, h]);
-
-  matrixAxis
-    .selectAll("text")
-    .at({
-      x: -7,
-      y: -1,
-      textAnchor: 'end',
-      transform: 'rotate(-60)',
-      fontSize:12
-    });
-
-  matrixAxis.select('.domain').remove()
-
-
-  if(snp_status === 'all'){
-    const proportionAxis = padded.append('g.proportionAxis')
-      .translate([matrixPlotWidth + countBarWidth, marginalChartHeight - marginalBottomPadding])
-
-    proportionAxis.append("g")
-      .call(d3.axisTop().scale(proportionX).ticks(5))
-      .selectAll("text")
-      .at({
-        textAnchor: 'start',
-        x: 2,
-        y: -5,
-        opacity: 0.5,
-      });
-
-    proportionAxis.select('.tick').select('line')
-      .at({
-        y1: h-marginalChartHeight
-      });
-
-    proportionAxis.append('text')
-      .at({
-        x: proportionPlotWidth/2,
-        y: h - marginalChartHeight+ 20,
-      })
-      .classed('axisTitles', true)
-      .text('Relative Risk')
-
-    // Add a line to show overall snp proportions
-    proportionAxis.append('line')
-      .at({
-        x1: proportionX(1),
-        x2: proportionX(1),
-        y1: 0,
-        y2: h - marginalChartHeight,
-        stroke: 'black',
-        opacity: 0.8,
-      })
-
-  }
-
-
-  const countAxis = padded.append('g.countAxis')
-   .translate([0, marginalChartHeight - marginalBottomPadding]);
-
-  countAxis.append("g")
-    .call(d3.axisTop().scale(countX).ticks(5).tickSizeOuter(0))
-    .selectAll("text")
-    .at({
-      x: -2,
-      textAnchor: 'end',
-      opacity: 0.5
-    });
-
-  countAxis.select('.tick').select('line')
-    .at({
-      y1: h-marginalChartHeight
-    });
-
-  countAxis.append('text')
-    .at({
-      x: countBarWidth/2,
-      y: h - marginalChartHeight+ 20,
-    })
-    .classed('axisTitles', true)
-    .text('Set size')
-
-
-  const marginalCountAxis = padded.append("g")
-    .translate([countBarWidth,0])
-    .call(d3.axisLeft().scale(marginalY).ticks(4).tickSizeOuter(0));
-
-  marginalCountAxis.selectAll("text")
-    .attr('text-anchor', 'end')
-    .attr('opacity', 0.5);
-
-  marginalCountAxis.select('text').remove() // hides the first zero so we can double use the one from the proportion chart. Hacky.
-
-  // ----------------------------------------------------------------------
-  // Marginal bars.
-  // ----------------------------------------------------------------------
-  const marginalCountsChart = padded.append('g.marginalCountsChart')
-    .translate([countBarWidth,0]);
-
-  const marginalBars = marginalCountsChart.selectAll('.marginalCounts')
-    .data(options.marginalData)
-    .enter().append('g')
-    .translate(d => [matrix_width_scale(d.code), marginalY(d.count)])
-    .on('mouseover',function(d){
-      d3.select(this).selectAll('.margingMouseoverInfo').attr('opacity', 1);
-    })
-    .on('mouseout',function(d){
-      d3.select(this).selectAll('.margingMouseoverInfo').attr('opacity', 0);
-    })
-
-  marginalBars.append('rect')
-    .at({
-      height: d => marginalY(0) - marginalY(d.count),
-      width: matrix_width_scale.bandwidth(),
-      fill: 'orangered'
-    })
-
-  marginalBars.append('rect')
-    .at({
-      y: d => -marginalY(d.count)-marginalBottomPadding,
-      height: h,
-      width: matrix_width_scale.bandwidth(),
-      fillOpacity: 0.3,
-      fill: highlightColor,
-      stroke: 'black',
-      rx: 5,
-      opacity: 0,
-      "class": "margingMouseoverInfo"
-    })
-
-
-  marginalBars.append('text')
-    .text(d => countFormat(d.count))
-    .at({
-      y: 0,
-      x: d => -matrix_width_scale(d.code) - 20,
-      textAnchor: 'end',
-      fontWeight: 'bold',
-      opacity: 0,
-      "class": "margingMouseoverInfo"
-    })
-
-  marginalBars.append('line')
-    .text(d => countFormat(d.count))
-    .at({
-      y1: 0,y2:0,
-      x1: d => -matrix_width_scale(d.code) - 20,
-      x2: d => -matrix_width_scale(d.code),
-      stroke: 'black',
-      opacity: 0,
-      "class": "margingMouseoverInfo"
-    })
-
-  marginalBars.append('text')
-    .html(d => `<tspan>Code:</tspan> ${d.code}`)
-    .at({
-      y: d => -marginalY(d.count) + marginalChartHeight/3,
-      x: d => -matrix_width_scale(d.code) - countBarWidth,
-      fontSize: 24,
-      textAnchor: 'start',
-      opacity: 0,
-      "class": "margingMouseoverInfo"
-    })
-}// end of draw_upset() call.
-
-
