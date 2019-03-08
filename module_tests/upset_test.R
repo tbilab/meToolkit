@@ -14,7 +14,7 @@ ui <- shinyUI(
   tagList(
     h1('Upset module test'),
     tags$style(HTML("
-      .my_upset {height: calc(90vh - 133px) !important;}
+      .my_upset {height: calc(85vh) !important;}
     ")),
     upset_UI('upsetPlot', div_class = 'my_upset')
   )

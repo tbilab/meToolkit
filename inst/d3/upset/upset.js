@@ -25,8 +25,6 @@ const interaction_box_styles = {
   strokeWidth: 1
 };
 
-// proportion plot settings
-const ciThickness = 4;   // how thick is the CI?
 
 // new layout grid
 const set_size_bars_units = 3;
@@ -272,6 +270,9 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
 function draw_rr_intervals(g, patterns, scales, sizes){
   g.html('');
 
+  const size_of_pe = Math.min(scales.matrix_row_height/2, 7);
+  const size_of_interval_line = Math.max(1, size_of_pe/2);
+
   // Axis
   const axis_drawing_func = d3.axisTop()
     .scale(scales.rr_x)
@@ -308,14 +309,14 @@ function draw_rr_intervals(g, patterns, scales, sizes){
       x1: d => scales.rr_x(d.lower),
       x2: d => scales.rr_x(d.upper),
       stroke: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
-      strokeWidth: ciThickness,
+      strokeWidth: size_of_interval_line,
     });
 
   rr_intervals
     .selectAppend('circle')
     .at({
       cx: d => scales.rr_x(d.pointEst),
-      r: ciThickness*1.5,
+      r: size_of_pe,
       fill: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
     });
 
