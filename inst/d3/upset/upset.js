@@ -216,20 +216,27 @@ function draw_pattern_matrix(g, patterns, marginals, scales, sizes){
 }
 
 function draw_pattern_count_bars(g, patterns, scales, sizes){
-  g.html('');
+  const t = d3.transition().duration(500);
 
-  const pattern_count_bars = g
-    .selectAll('.pattern_count_bars')
-      .data(patterns)
-      .enter().append('g.pattern_count_bars')
-      .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2]);
+  const pattern_count_bars = g.selectAll('.pattern_count_bars')
+    .data(patterns);
 
-  pattern_count_bars
-    .selectAppend('rect')
+  // Exit
+  pattern_count_bars.exit().remove();
+
+  // Append-Update
+  pattern_count_bars.enter()
+    .append('rect.pattern_count_bars')
     .at({
+      y: (d,i) => scales.pattern_y(i) + scales.matrix_row_height/2 - scales.set_size_bar_height/2,
       fill: colors.pattern_count_bars,
+      x: sizes.set_size_bars_w,
+    })
+    .merge(pattern_count_bars)
+    .transition(t)
+    .at({
+      y: (d,i) => scales.pattern_y(i) + scales.matrix_row_height/2 - scales.set_size_bar_height/2,
       height: scales.set_size_bar_height,
-      y: -scales.set_size_bar_height/2,
       x: d => scales.set_size_x(d.count),
       width: d => scales.set_size_x(0) - scales.set_size_x(d.count),
     });
@@ -324,7 +331,6 @@ function draw_rr_intervals(g, patterns, scales, sizes){
 }
 
 function draw_code_marginal_bars(g, marginals, scales, sizes){
-  //g.html('');
   const t = d3.transition().duration(500);
 
   // Now draw the intervals
@@ -347,7 +353,6 @@ function draw_code_marginal_bars(g, marginals, scales, sizes){
        y: sizes.margin_count_h,
        x: d => scales.matrix_width_scale(d.code),
        fill: colors.marginal_count_bars,
-       opacity: 0.3,
     })
     .merge(code_marginal_bars)
     .transition(t)
