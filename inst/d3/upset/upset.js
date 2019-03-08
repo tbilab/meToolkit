@@ -5,7 +5,7 @@
 let min_set_size = 100;
 
 // Constants
-const margin = {right: 25, left: 25, top: 20, bottom: 50}; // margins on side of chart
+const margin = {right: 25, left: 25, top: 20, bottom: 70}; // margins on side of chart
 
 const colors = {
   marginal_count_bars: 'orangered',
@@ -36,7 +36,6 @@ const rr_plot_units = 3;
 const matrix_plot_units = 3;
 const total_width_units = set_size_bars_units + rr_plot_units + matrix_plot_units;
 const marginal_count_prop = 0.3;
-
 
 // Function to filter data down to the minimum desired set size
 function filter_set_size(data, marginal_data, min_set_size = 100){
@@ -262,12 +261,15 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
 
    // Title subplot
   g.selectAppend('text.title')
-    .text("Size of pattern")
     .at({
       textAnchor: 'middle',
-      y: sizes.matrix_plot_h + sizes.padding*2,
-      x: sizes.set_size_bars_w/2,
-    });
+      y: sizes.matrix_plot_h + sizes.margin.bottom - sizes.padding*2.5,
+    })
+    .html(`<tspan>Size of pattern</tspan>
+           <tspan font-size='13px' dy='15'>(drag bar to change)</tspan>`)
+    .selectAll('tspan')
+      .attr('x', sizes.set_size_bars_w/2)
+;
 }
 
 function draw_rr_intervals(g, patterns, scales, sizes){
@@ -325,12 +327,9 @@ function draw_rr_intervals(g, patterns, scales, sizes){
     .text("Relative risk")
     .at({
       textAnchor: 'middle',
-      y: sizes.matrix_plot_h + sizes.padding*2,
+      y: sizes.matrix_plot_h + sizes.margin.bottom - sizes.padding*2.5,
       x: sizes.rr_plot_w/2,
-    })
-
-
-
+    });
 }
 
 function draw_code_marginal_bars(g, marginals, scales, sizes){
@@ -490,13 +489,32 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
   let below_max = true;
   let above_min = true;
 
-  const handle_r = 5;
-  const handle_selected_r = handle_r*1.5;
-  const handle = g.selectAppend('circle.handle')
+  const handle_w = 15;
+  const handle_h = 28;
+
+  const handle_attrs = {
+    width: handle_w,
+    height: handle_h,
+    fill: colors.silder_handle,
+    rx: 5,
+    strokeWidth: 0,
+    stroke: 'black',
+  };
+
+  const handle = g.selectAppend('g.handle')
+    .translate([set_size_x(min_set_size) - handle_w/2,0]);
+
+  const handle_rect = handle.selectAppend('rect')
+    .at(handle_attrs);
+
+  handle.selectAppend('line')
     .at({
-      r: handle_r,
-      fill: colors.silder_handle,
-      cx: set_size_x(min_set_size),
+      x1: handle_w/2,
+      x2: handle_w/2,
+      y1: 0,
+      y2: handle_h,
+      stroke: 'white',
+      strokeWidth: 2,
     });
 
   handle.call(d3.drag()
@@ -505,7 +523,7 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
         .on("end", dragended));
 
   function dragstarted(d) {
-    handle.attr('r', handle_selected_r);
+    handle_rect.attr('stroke-width', 2);
   }
 
   function dragged(d) {
@@ -514,19 +532,18 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
     above_min = desired_size > range_min;
 
     if(below_max && above_min){
-      d3.select(this).attr("cx", d3.event.x);
+      d3.select(this).translate([d3.event.x - handle_w/2, 0]);
     }else {
       desired_size = !above_min ? range_min : range_max;
     }
   }
 
   function dragended(d) {
-    handle.attr('r', handle_r);
+    handle_rect.at(handle_attrs);
     const new_desired_size = set_size_x.invert(d3.event.x);
     on_release(desired_size);
   }
 }
-
 
 function draw_with_set_size(g, set_size, sizes, set_size_x){
 
