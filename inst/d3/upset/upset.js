@@ -491,22 +491,23 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
 
   const handle_w = 15;
   const handle_h = 28;
+  const padding_top = 3;
 
-  const handle_attrs = {
-    width: handle_w,
-    height: handle_h,
-    fill: colors.silder_handle,
-    rx: 5,
-    strokeWidth: 0,
-    stroke: 'black',
-  };
+  // Setup handle container
+  const handle = g.selectAppend('g.handle');
 
-  const handle = g.selectAppend('g.handle')
-    .translate([set_size_x(min_set_size) - handle_w/2,0]);
-
+  // Add a rectangle background
   const handle_rect = handle.selectAppend('rect')
-    .at(handle_attrs);
+    .at({
+      width: handle_w,
+        height: handle_h,
+        fill: colors.silder_handle,
+        rx: 5,
+        strokeWidth: 0,
+        stroke: 'black',
+      });
 
+  // Add vertical line marking exact cutoff position
   handle.selectAppend('line')
     .at({
       x1: handle_w/2,
@@ -517,13 +518,30 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
       strokeWidth: 2,
     });
 
+
+  // Add text that shows value while dragging
+  const handle_text = handle.selectAppend('text')
+    .at({
+      textAnchor: 'end',
+      y: handle_h/2 + 2,
+      x: -2,
+      alignmentBaseline: 'middle',
+      opacity: 0,
+    });
+
+  // Function to move handle in x-direction
+  const move_handle = x => handle.translate([x - handle_w/2, padding_top]);
+
   handle.call(d3.drag()
         .on("start", dragstarted)
         .on("drag",dragged)
         .on("end", dragended));
 
   function dragstarted(d) {
+    // Put a outline around handle to show it was selected
     handle_rect.attr('stroke-width', 2);
+    // Show the min-size text for precision changing
+    handle_text.attr('opacity', 1);
   }
 
   function dragged(d) {
@@ -532,17 +550,25 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
     above_min = desired_size > range_min;
 
     if(below_max && above_min){
-      d3.select(this).translate([d3.event.x - handle_w/2, 0]);
+      move_handle(d3.event.x);
+      handle_text.text(`size > ${countFormat(desired_size)}`);
     }else {
       desired_size = !above_min ? range_min : range_max;
     }
   }
 
   function dragended(d) {
-    handle_rect.at(handle_attrs);
+    // Reset outline of handle
+    handle_rect.attr('stroke-width', 0);
+    // Hide text again
+    handle_text.attr('opacity', 0);
+
     const new_desired_size = set_size_x.invert(d3.event.x);
     on_release(desired_size);
   }
+
+  // Initialize handle position
+  move_handle(set_size_x(min_set_size));
 }
 
 function draw_with_set_size(g, set_size, sizes, set_size_x){
@@ -645,8 +671,6 @@ const g = svg.selectAppend('g.padding')
 
 const viz_g = g.selectAppend('g.viz');
 
-
-
 if(data.length < 2){
 
   const lead_message = data.length === 1 ? "Only one group meets" : "No groups meet";
@@ -663,12 +687,6 @@ if(data.length < 2){
     .call(make_set_size_slider, set_size_x, sizes, (new_size) => draw_with_set_size(viz_g, new_size, sizes, set_size_x));
 
   draw_with_set_size(viz_g, min_set_size, sizes, set_size_x);
-
 }
 
-function remove_zero_tick(axis){
-  // Get rid of the zero tick value for cleanliness
-  axis.selectAll('.tick')
-    .filter(d => d === 0)
-    .remove();
-}
+

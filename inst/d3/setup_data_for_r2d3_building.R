@@ -1,4 +1,5 @@
 library(here)
+library(tidyverse)
 # Load data for running upset in r2d3 preview
 data_for_upset <- here('module_tests/data/upset_r2d3_data.rds') %>% read_rds()
 r2d3::r2d3(
