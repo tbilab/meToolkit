@@ -41,13 +41,16 @@ const marginal_count_prop = 0.3;
 // Function to filter data down to the minimum desired set size
 function filter_set_size(data, marginal_data, min_set_size = 100){
   // Filter the main dataset down
-  const filtered_data = data.filter(d => d.count >= min_set_size);
+  const filtered_data = data
+    .filter(d => d.count >= min_set_size)
+    .sort((a,b) => b.count - a.count);
 
   // Get the remaining codes present after filtering
   const distinct_codes = unique(filtered_data.map(d => d.pattern).join('-').split('-'));
 
   // Filter the marginal data down to just the remaining codes
-  const filtered_marginals = marginal_data.filter(d => distinct_codes.includes(d.code) );
+  const filtered_marginals = marginal_data
+    .filter(d => distinct_codes.includes(d.code));
 
   return {
     patterns: filtered_data,
@@ -380,7 +383,6 @@ function draw_code_marginal_bars(g, marginals, scales, sizes){
       y: -5,
       x: -4,
     });
-
 
 }
 
