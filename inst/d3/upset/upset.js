@@ -491,7 +491,8 @@ function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_releas
   const padding_top = 3;
 
   // Setup handle container
-  const handle = g.selectAppend('g.handle');
+  const handle = g.selectAppend('g.handle')
+    .style('cursor', 'grab'); // Make cursor a hand to emphasize grabability of handle
 
   // Add a rectangle background
   const handle_rect = handle.selectAppend('rect')
