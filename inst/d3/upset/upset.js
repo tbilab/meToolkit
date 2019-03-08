@@ -154,6 +154,7 @@ function get_pattern_info(d, scales) {
 }
 
 function draw_pattern_matrix(g, patterns, marginals, scales, sizes){
+  g.html('');
 
   const matrix_rows = g.selectAll('.matrix_row')
     .data(patterns)
@@ -215,6 +216,7 @@ function draw_pattern_matrix(g, patterns, marginals, scales, sizes){
 }
 
 function draw_pattern_count_bars(g, patterns, scales, sizes){
+  g.html('');
 
   const pattern_count_bars = g
     .selectAll('.pattern_count_bars')
@@ -259,6 +261,8 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
 }
 
 function draw_rr_intervals(g, patterns, scales, sizes){
+  g.html('');
+
   // Axis
   const axis_drawing_func = d3.axisTop()
     .scale(scales.rr_x)
@@ -320,17 +324,38 @@ function draw_rr_intervals(g, patterns, scales, sizes){
 }
 
 function draw_code_marginal_bars(g, marginals, scales, sizes){
+  //g.html('');
+  const t = d3.transition().duration(500);
+
   // Now draw the intervals
   const code_marginal_bars = g.selectAll('.code_marginal_bar')
-    .data(marginals)
-    .enter().append('g.marginal_bar')
-    .translate((d,i) => [scales.matrix_width_scale(d.code), scales.marginal_y(d.count)]);
+    .data(marginals, d => d.code);
 
-  code_marginal_bars.selectAppend('rect')
+  // Exit
+  code_marginal_bars.exit()
+    .transition(t)
     .at({
-      height: d => sizes.margin_count_h - scales.marginal_y(d.count),
-      fill: colors.marginal_count_bars,
+      y: sizes.margin_count_h,
+      height: 0,
+    })
+    .remove();
+
+  // Append
+  code_marginal_bars.enter()
+    .append('rect.code_marginal_bar')
+    .at({
+       y: sizes.margin_count_h,
+       x: d => scales.matrix_width_scale(d.code),
+       fill: colors.marginal_count_bars,
+       opacity: 0.3,
+    })
+    .merge(code_marginal_bars)
+    .transition(t)
+    .at({
+      x: d => scales.matrix_width_scale(d.code),
+      y: d => scales.marginal_y(d.count),
       width: scales.matrix_column_width,
+      height: d => sizes.margin_count_h - scales.marginal_y(d.count),
     });
 
    // Axis
@@ -355,6 +380,8 @@ function draw_code_marginal_bars(g, marginals, scales, sizes){
 }
 
 function create_pattern_interaction_layer(g, patterns, scales, sizes, callbacks){
+  g.html('');
+
   // Draws invisible selection rectangles over the horizontal patterns
   // That enable various interaction popups etc.
   const pattern_rows = g.selectAll('.pattern_row')
@@ -375,6 +402,8 @@ function create_pattern_interaction_layer(g, patterns, scales, sizes, callbacks)
 }
 
 function create_code_interaction_layer(g, marginals, scales, sizes, callbacks){
+  g.html('');
+
   // Draws invisible selection rectangles over the vertical patterns
   const code_cols = g.selectAll('.code_col')
     .data(marginals)
@@ -494,7 +523,7 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
 
 function draw_with_set_size(g, set_size, sizes, set_size_x){
 
-  g.html('');
+  //g.html('');
 
   const {patterns, marginals} = filter_set_size(data, options.marginalData, set_size);
 
@@ -592,11 +621,6 @@ const g = svg.selectAppend('g.padding')
 
 const viz_g = g.selectAppend('g.viz');
 
-const set_size_slider =  g.selectAppend('g.set_size_slider')
-  .translate([0, sizes.h])
-  .call(make_set_size_slider, set_size_x, sizes, (new_size) => draw_with_set_size(viz_g, new_size, sizes, set_size_x));
-
-draw_with_set_size(viz_g, min_set_size, sizes, set_size_x);
 
 
 if(data.length < 2){
@@ -610,6 +634,12 @@ if(data.length < 2){
 
 } else {
   //render_plot(patterns, marginals, sizes);
+  const set_size_slider =  g.selectAppend('g.set_size_slider')
+    .translate([0, sizes.h])
+    .call(make_set_size_slider, set_size_x, sizes, (new_size) => draw_with_set_size(viz_g, new_size, sizes, set_size_x));
+
+  draw_with_set_size(viz_g, min_set_size, sizes, set_size_x);
+
 }
 
 function remove_zero_tick(axis){
