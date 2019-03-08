@@ -3,7 +3,7 @@ library(tidyverse)
 # Load data for running upset in r2d3 preview
 data_for_upset <- here('module_tests/data/upset_r2d3_data.rds') %>% read_rds()
 options <- data_for_upset$options
-options$min_set_size <- 50
+options$min_set_size <- 150
 
 r2d3::r2d3(
   data = data_for_upset$data, options = options,

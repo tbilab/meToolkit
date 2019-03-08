@@ -683,13 +683,18 @@ if(data.length < 2){
     .attr('y', height/2);
 
 } else {
+  const [min_count, max_count] = d3.extent(data, d => d.count);
+  // Make sure desired min set size is within reason
+  const starting_min_size = options.min_set_size < min_count ? min_count + 1 :
+                            options.min_set_size > max_count ? max_count -1  :
+                                                               options.min_set_size;
   // Setup the size slider
   const set_size_slider =  g.selectAppend('g.set_size_slider')
     .translate([0, sizes.h])
-    .call(make_set_size_slider, set_size_x, sizes, options.min_set_size, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
+    .call(make_set_size_slider, set_size_x, sizes, starting_min_size, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
 
   // Initialize viz
-  draw_with_set_size(g, options.min_set_size, sizes, set_size_x);
+  draw_with_set_size(g, starting_min_size, sizes, set_size_x);
 }
 
 
