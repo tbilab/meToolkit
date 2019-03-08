@@ -494,6 +494,8 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
 
 function draw_with_set_size(g, set_size, sizes, set_size_x){
 
+  g.html('');
+
   const {patterns, marginals} = filter_set_size(data, options.marginalData, set_size);
 
   // Setup the scales
@@ -581,7 +583,6 @@ function draw_with_set_size(g, set_size, sizes, set_size_x){
     .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
 }
 
-
 const sizes = setup_chart_sizes(width, height, margin);
 const set_size_x = setup_set_size_x_scale(data, sizes);
 
@@ -589,11 +590,13 @@ const set_size_x = setup_set_size_x_scale(data, sizes);
 const g = svg.selectAppend('g.padding')
   .translate([sizes.margin.left, sizes.margin.top]);
 
+const viz_g = g.selectAppend('g.viz');
+
 const set_size_slider =  g.selectAppend('g.set_size_slider')
   .translate([0, sizes.h])
-  .call(make_set_size_slider, set_size_x, sizes, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
+  .call(make_set_size_slider, set_size_x, sizes, (new_size) => draw_with_set_size(viz_g, new_size, sizes, set_size_x));
 
-draw_with_set_size(g, min_set_size, sizes, set_size_x);
+draw_with_set_size(viz_g, min_set_size, sizes, set_size_x);
 
 
 if(data.length < 2){
