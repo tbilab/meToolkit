@@ -2,6 +2,8 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 
+let min_set_size = 100;
+
 // Constants
 const margin = {right: 25, left: 25, top: 20, bottom: 50}; // margins on side of chart
 
@@ -14,6 +16,7 @@ const colors = {
   code_present: 'black',
   code_missing: 'lightgrey',
   interaction_box_border: 'grey',
+  silder_handle: 'green',
 };
 
 const interaction_box_styles = {
@@ -52,8 +55,15 @@ function filter_set_size(data, marginal_data, min_set_size = 100){
   };
 }
 
+function setup_set_size_x_scale(patterns, sizes){
+  // Setup the x-scale for counts of the patterns
+  return d3.scaleLinear()
+    .range([sizes.set_size_bars_w, 0])
+    .domain([0, d3.max(patterns, d=> d.count)]);
+}
+
 // Function to generate all scales from data and a given size plot
-function setup_scales(patterns, marginal, sizes){
+function setup_scales(patterns, marginal, sizes, set_size_x){
 
   const {set_size_bars_w,
          rr_plot_w,
@@ -74,9 +84,7 @@ function setup_scales(patterns, marginal, sizes){
   const matrix_column_width = matrix_width_scale.bandwidth();
 
   // Setup the x-scale for counts of the patterns
-  const set_size_x = d3.scaleLinear()
-    .range([set_size_bars_w, 0])
-    .domain([0, d3.max(patterns, d=> d.count)]);
+  //const set_size_x = setup_set_size_x_scale(patterns,sizes);
 
   // X scale for the relative risk intervals
   const rr_x = d3.scaleLinear()
@@ -94,7 +102,7 @@ function setup_scales(patterns, marginal, sizes){
 
   // Continuous y count scale for the code marginals
   const marginal_y = d3.scaleLinear()
-    .range([0, margin_count_h])
+    .range([margin_count_h, 0])
     .domain([0, d3.max(marginal, d => d.count)]);
 
   // How big should the dots be in matrix?
@@ -114,7 +122,7 @@ function setup_scales(patterns, marginal, sizes){
 }
 
 function setup_chart_sizes(width, height, margin){
-  const min_set_size = 100;
+ // const min_set_size = 100;
   const h = height - margin.top - margin.bottom;
   const w = width - margin.left - margin.right;
 
@@ -145,7 +153,7 @@ function get_pattern_info(d, scales) {
   };
 }
 
-function draw_pattern_matrix(g, patterns, scales, sizes){
+function draw_pattern_matrix(g, patterns, marginals, scales, sizes){
 
   const matrix_rows = g.selectAll('.matrix_row')
     .data(patterns)
@@ -197,7 +205,7 @@ function draw_pattern_matrix(g, patterns, scales, sizes){
       x: -7,
       y: -1,
       textAnchor: 'end',
-      transform: 'rotate(-60)',
+      transform: 'rotate(-75)',
       fontSize:12
     });
   // remove horizontal bar
@@ -225,22 +233,28 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
     });
 
   //// Pattern count bars axis
-  const pattern_size_axis = g.selectAppend("g.pattern_size_axis")
+  const axis = g.selectAppend("g.axis")
     .call(d3.axisTop()
             .scale(scales.set_size_x)
             .ticks(5)
             .tickSizeOuter(0) );
 
-  pattern_size_axis.selectAll("text")
+  axis.selectAll("text")
     .at({
       x: -2, y: -4,
       textAnchor: 'end',
-      opacity: 0.5
     });
 
-  pattern_size_axis.selectAll(".tick line")
+  // Get rid of the zero tick value for cleanliness
+  remove_zero_tick(axis);
+
+   // Title subplot
+  g.selectAppend('text.title')
+    .text("Size of pattern")
     .at({
-      opacity: 0.5,
+      textAnchor: 'middle',
+      y: sizes.matrix_plot_h + sizes.padding*2,
+      x: sizes.set_size_bars_w/2,
     });
 }
 
@@ -251,22 +265,23 @@ function draw_rr_intervals(g, patterns, scales, sizes){
     .ticks(5)
     .tickSizeOuter(0);
 
-  const rr_axis = g.selectAppend("g.rr_intervals_axis")
+  const axis = g.selectAppend("g.rr_intervals_axis")
     .call(axis_drawing_func);
 
-  rr_axis.selectAll("text")
+  axis.selectAll("text")
     .at({
       x: 2, y: -4,
       textAnchor: 'start',
-      opacity: 0.5,
     });
 
   // Guide line at RR = 1 for reference of 'null'
-  rr_axis.selectAll('.tick line')
+  axis.selectAll('.tick line')
     .at({
       y1: d => d === 1 ? sizes.matrix_plot_h: 0,
-      opacity: 0.5,
     });
+
+  // Get rid of the zero tick value for cleanliness
+  remove_zero_tick(axis);
 
   // Now draw the intervals
   const rr_intervals = g.selectAll('.rr_intervals')
@@ -291,6 +306,15 @@ function draw_rr_intervals(g, patterns, scales, sizes){
       fill: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
     });
 
+  // Title subplot
+  g.selectAppend('text.title')
+    .text("Relative risk")
+    .at({
+      textAnchor: 'middle',
+      y: sizes.matrix_plot_h + sizes.padding*2,
+      x: sizes.rr_plot_w/2,
+    })
+
 
 
 }
@@ -300,23 +324,34 @@ function draw_code_marginal_bars(g, marginals, scales, sizes){
   const code_marginal_bars = g.selectAll('.code_marginal_bar')
     .data(marginals)
     .enter().append('g.marginal_bar')
-    .translate((d,i) => [scales.matrix_width_scale(d.code), sizes.margin_count_h - scales.marginal_y(d.count)]);
+    .translate((d,i) => [scales.matrix_width_scale(d.code), scales.marginal_y(d.count)]);
 
   code_marginal_bars.selectAppend('rect')
     .at({
-      height: d => scales.marginal_y(d.count),
+      height: d => sizes.margin_count_h - scales.marginal_y(d.count),
       fill: colors.marginal_count_bars,
       width: scales.matrix_column_width,
     });
 
-  code_marginal_bars.selectAppend('text')
-    .text(d => countFormat(d.count))
+   // Axis
+  const axis = g.selectAppend("g.code_marginal_bars_axis")
+    .call(
+      d3.axisLeft()
+        .scale(scales.marginal_y)
+        .ticks(5)
+        .tickSizeOuter(0)
+    );
+
+  // Get rid of the zero tick value for cleanliness
+  remove_zero_tick(axis);
+
+  axis.selectAll("text")
     .at({
-      x: scales.matrix_column_width/2,
-      textAnchor: 'middle',
-      alignmentBaseline: 'hanging',
-      y: 2,
-    })
+      y: -5,
+      x: -4,
+    });
+
+
 }
 
 function create_pattern_interaction_layer(g, patterns, scales, sizes, callbacks){
@@ -367,7 +402,7 @@ function create_info_panel(g, panel_size, panel_padding = 5){
     .at({
       width: panel_size[0],
       height: panel_size[1],
-      fillOpacity: 0
+      fillOpacity: 0,
     });
 
   const panel_text = panel.selectAppend('text')
@@ -376,13 +411,18 @@ function create_info_panel(g, panel_size, panel_padding = 5){
       x:  panel_size[0]/2,
     })
     .st({
-      fontSize: '20px',
+      fontSize: panel_size[0] > 200 ? '22px': '18px', // make font size's mildly responsive to try and avoid overlapping axis
       alignmentBaseline: 'middle',
       textAnchor: 'middle',
     });
 
-  function update(content){
-    panel_text.html(content);
+  function update(content_array){
+    panel_text.html(content_array);
+
+    // If we have tspans make sure they are centered where they should be
+    panel_text.selectAll('tspan')
+      .attr('x', panel_size[0]/2);
+
     return this;
   }
   function hide(){
@@ -404,24 +444,67 @@ function create_info_panel(g, panel_size, panel_padding = 5){
   };
 }
 
+// Appends a small slider the user can use to filter what the minimumn size of the cases they want is
+function make_set_size_slider(g, set_size_x, sizes, on_release){
+  // How far we let the slider go in either direction
+  const [range_min, range_max] = set_size_x.domain();
+
+  // These are mutated to keep track of state of drag
+  let desired_size = min_set_size;
+  let below_max = true;
+  let above_min = true;
+
+  const handle_r = 5;
+  const handle_selected_r = handle_r*1.5;
+  const handle = g.selectAppend('circle.handle')
+    .at({
+      r: handle_r,
+      fill: colors.silder_handle,
+      cx: set_size_x(min_set_size),
+    });
+
+  handle.call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag",dragged)
+        .on("end", dragended));
+
+  function dragstarted(d) {
+    handle.attr('r', handle_selected_r);
+  }
+
+  function dragged(d) {
+    desired_size = set_size_x.invert(d3.event.x);
+    below_max = desired_size < range_max;
+    above_min = desired_size > range_min;
+
+    if(below_max && above_min){
+      d3.select(this).attr("cx", d3.event.x);
+    }else {
+      desired_size = !above_min ? range_min : range_max;
+    }
+  }
+
+  function dragended(d) {
+    handle.attr('r', handle_r);
+    const new_desired_size = set_size_x.invert(d3.event.x);
+    on_release(desired_size);
+  }
+}
 
 
-// Function to draw upset plot given filtered data and scales
-function render_plot(patterns, marginals, sizes, have_snps = true){
+function draw_with_set_size(g, set_size, sizes, set_size_x){
+
+  const {patterns, marginals} = filter_set_size(data, options.marginalData, set_size);
 
   // Setup the scales
-  const scales = setup_scales(patterns, marginals, sizes);
+  const scales = setup_scales(patterns, marginals, sizes, set_size_x);
 
-  // Add a g to pad chart
-  const g = svg.selectAppend('g.padding')
-    .translate([sizes.margin.left, sizes.margin.top]);
-
-  // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
   // Chart Components
   // ----------------------------------------------------------------------
   const matrix_chart = g.selectAppend('g.matrix_chart')
     .translate([sizes.set_size_bars_w,sizes.margin_count_h])
-    .call(draw_pattern_matrix, patterns, scales, sizes);
+    .call(draw_pattern_matrix, patterns, marginals, scales, sizes);
 
   const pattern_size_bars = g.selectAppend('g.pattern_size_bars')
     .translate([0, sizes.margin_count_h])
@@ -450,8 +533,15 @@ function render_plot(patterns, marginals, sizes, have_snps = true){
 
   const pattern_callbacks = {
     mouseover: function(d){
-      const rr_message = `RR: ${CiFormat(d.pointEst)} (${CiFormat(d.lower)}, ${CiFormat(d.upper)})`;
-      const size_message = `Pattern appears ${countFormat(d.count)} times`;
+      const line_height = 20;
+
+      const rr_message = `
+      <tspan>RR: ${CiFormat(d.pointEst)}</tspan>
+      <tspan dy="${line_height}">(${CiFormat(d.lower)}, ${CiFormat(d.upper)})</tspan>`;
+
+      const size_message = `
+      <tspan>Pattern appears</tspan>
+      <tspan dy="${line_height}">${countFormat(d.count)} times</tspan>`;
       const codes_in_pattern = d.pattern.split('-');
 
       // Update right panel with rr info
@@ -469,14 +559,15 @@ function render_plot(patterns, marginals, sizes, have_snps = true){
 
   const code_callbacks = {
     mouseover: function(d){
-      const message = `Code: ${d.code}`;
+      left_info_panel.update(`Code: ${d.code}`).show();
+      right_info_panel.update(`Appears ${countFormat(d.count)} times`).show();
 
-      left_info_panel.update(message).show();
       // highlight
       d3.select(this).attr('opacity', 0.7);
     },
     mouseout: function(d){
       left_info_panel.hide();
+      right_info_panel.hide();
       d3.select(this).attr('opacity', 0);
     }
   };
@@ -491,9 +582,18 @@ function render_plot(patterns, marginals, sizes, have_snps = true){
 }
 
 
-const min_set_size = 100;
-const {patterns, marginals} = filter_set_size(data, options.marginalData, min_set_size);
-const chart_sizes = setup_chart_sizes(width, height, margin);
+const sizes = setup_chart_sizes(width, height, margin);
+const set_size_x = setup_set_size_x_scale(data, sizes);
+
+// Add a g to pad chart
+const g = svg.selectAppend('g.padding')
+  .translate([sizes.margin.left, sizes.margin.top]);
+
+const set_size_slider =  g.selectAppend('g.set_size_slider')
+  .translate([0, sizes.h])
+  .call(make_set_size_slider, set_size_x, sizes, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
+
+draw_with_set_size(g, min_set_size, sizes, set_size_x);
 
 
 if(data.length < 2){
@@ -506,5 +606,12 @@ if(data.length < 2){
     .attr('y', height/2);
 
 } else {
-  render_plot(patterns, marginals, chart_sizes);
+  //render_plot(patterns, marginals, sizes);
+}
+
+function remove_zero_tick(axis){
+  // Get rid of the zero tick value for cleanliness
+  axis.selectAll('.tick')
+    .filter(d => d === 0)
+    .remove();
 }
