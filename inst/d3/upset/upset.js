@@ -1,8 +1,6 @@
-// !preview r2d3 data = data_for_upset$data, options = data_for_upset$options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
+// !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
 // r2d3: https://rstudio.github.io/r2d3
 //
-
-let min_set_size = 100;
 
 // Constants
 const margin = {right: 25, left: 25, top: 20, bottom: 70}; // margins on side of chart
@@ -124,7 +122,6 @@ function setup_scales(patterns, marginal, sizes, set_size_x){
 }
 
 function setup_chart_sizes(width, height, margin){
- // const min_set_size = 100;
   const h = height - margin.top - margin.bottom;
   const w = width - margin.left - margin.right;
 
@@ -480,12 +477,12 @@ function create_info_panel(g, panel_size, panel_padding = 5){
 }
 
 // Appends a small slider the user can use to filter what the minimumn size of the cases they want is
-function make_set_size_slider(g, set_size_x, sizes, on_release){
+function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_release){
   // How far we let the slider go in either direction
   const [range_min, range_max] = set_size_x.domain();
 
   // These are mutated to keep track of state of drag
-  let desired_size = min_set_size;
+  let desired_size = starting_min_size;
   let below_max = true;
   let above_min = true;
 
@@ -568,19 +565,17 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
   }
 
   // Initialize handle position
-  move_handle(set_size_x(min_set_size));
+  move_handle(set_size_x(starting_min_size));
 }
 
-function draw_with_set_size(g, set_size, sizes, set_size_x){
+function draw_with_set_size(g, min_set_size, sizes, set_size_x){
 
-  //g.html('');
-
-  const {patterns, marginals} = filter_set_size(data, options.marginalData, set_size);
+  const {patterns, marginals} = filter_set_size(data, options.marginalData, min_set_size);
 
   // Setup the scales
   const scales = setup_scales(patterns, marginals, sizes, set_size_x);
 
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   // Chart Components
   // ----------------------------------------------------------------------
   const matrix_chart = g.selectAppend('g.matrix_chart')
@@ -662,15 +657,22 @@ function draw_with_set_size(g, set_size, sizes, set_size_x){
     .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
 }
 
+
+// ----------------------------------------------------------------------
+// Start main visualization drawing
+// ----------------------------------------------------------------------
+
+// Setup the sizes of chart components
 const sizes = setup_chart_sizes(width, height, margin);
+
+// Get a set_size scale for use with slider
 const set_size_x = setup_set_size_x_scale(data, sizes);
 
 // Add a g to pad chart
 const g = svg.selectAppend('g.padding')
   .translate([sizes.margin.left, sizes.margin.top]);
 
-const viz_g = g.selectAppend('g.viz');
-
+// Check if we have enough data to make a meaningful upset chart
 if(data.length < 2){
 
   const lead_message = data.length === 1 ? "Only one group meets" : "No groups meet";
@@ -681,12 +683,13 @@ if(data.length < 2){
     .attr('y', height/2);
 
 } else {
-  //render_plot(patterns, marginals, sizes);
+  // Setup the size slider
   const set_size_slider =  g.selectAppend('g.set_size_slider')
     .translate([0, sizes.h])
-    .call(make_set_size_slider, set_size_x, sizes, (new_size) => draw_with_set_size(viz_g, new_size, sizes, set_size_x));
+    .call(make_set_size_slider, set_size_x, sizes, options.min_set_size, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
 
-  draw_with_set_size(viz_g, min_set_size, sizes, set_size_x);
+  // Initialize viz
+  draw_with_set_size(g, options.min_set_size, sizes, set_size_x);
 }
 
 
