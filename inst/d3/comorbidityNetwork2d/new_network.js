@@ -169,20 +169,27 @@ function sim_webworker(){
     const links = event.data.links;
 
     const simulation = d3.forceSimulation(nodes)
-      .force("link",
+      .force(
+        "link",
         d3.forceLink(links)
           .id(d => d.id)
-          .distance(1)
-          .strength(0.6)
+          .distance(5)
+          .strength(0.9)
       )
-      .force("charge",
+      .force(
+        "charge",
         d3.forceManyBody()
-          .strength(-8)
+          .strength(-50)
+          .distanceMax(150)
       )
+      .force("x", d3.forceX())
+      .force("y", d3.forceY())
       .stop();
 
-    for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
-      postMessage({type: "tick", progress: i / n});
+    const num_itts = Math.ceil(2*Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()));
+    let i;
+    for (i = 0; i < num_itts; ++i) {
+      postMessage({type: "tick", progress: i / num_itts});
       simulation.tick();
     }
 
@@ -256,11 +263,6 @@ function draw_svg_nodes(nodes, scales, svg, C){
       cy: d => Math.random()*C.h,
     })
     .merge(node_circles)
-    .transition(
-       d3.transition()
-        .duration(1750)
-        .ease(d3.easeLinear)
-    )
     .at({
       r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
       cx: d => scales.X(d.x),
@@ -269,6 +271,27 @@ function draw_svg_nodes(nodes, scales, svg, C){
       strokeWidth: d => d.inverted ? 3: 0,
       fill: d => d.inverted ? 'white': d.color,
     });
+}
+
+// Function to setup zoom and pan behavior
+function setup_zoom(svg, update_network, C){
+
+  const zoom = d3.zoom()
+    .scaleExtent([0.5, 5])
+    .on("zoom", function(){
+      const current_transform = d3.event.transform;
+
+      // Update scales
+      const new_scales = {
+        X: current_transform.rescaleX(scales.X),
+        Y: current_transform.rescaleY(scales.Y),
+      };
+
+      // Redraw network with this new scale
+      update_network(layout_nodes, layout_links, new_scales);
+    });
+
+  svg.call(zoom);
 }
 
 // Function to extract webworker data and kickoff the viz
@@ -299,9 +322,16 @@ function draw_network(layout_nodes, layout_links, scales){
   draw_canvas_links(layout_links, scales, canvas, C);
 }
 
+
+//------------------------------------------------------------
+// Where things get run
+//------------------------------------------------------------
+
 // Setup basic components of viz.
 const {svg, canvas, context} = setup_canvas_and_svg(div, C);
 const progress_meter = setup_progress_meter(svg, C);
 
 // Launch webworker to calculate layout and kickoff network viz after finishing
 launch_webworker(sanitize_data(data), progress_meter, start_viz);
+
+setup_zoom(svg, draw_network, C);
