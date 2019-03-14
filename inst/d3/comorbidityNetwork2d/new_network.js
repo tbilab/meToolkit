@@ -6,12 +6,13 @@
 const margin = {right: 25, left: 25, top: 20, bottom: 70};
 
 // These hold the layout calculated network info once the webworker returns them
-let layout_nodes, layout_links, scales;
+let layout_nodes, layout_links, scales, tooltip;
 
 // Constants object for viz.
 const C = {
   padding: 20,
-  tooltip_offset: 15,
+  tooltip_offset: 13,
+  tooltip_height: 60,
   w: width - (margin.left + margin.right),
   h: height - (margin.top + margin.bottom),
   margin: margin,
@@ -56,6 +57,50 @@ function setup_canvas_and_svg(div, C){
   const context = canvas.node().getContext('2d');
 
   return {svg, canvas, context}
+}
+
+// Function to initialize a tooltip for showing mousover info
+// Appends a tooltip to a div and opens up methods to move it around, show, hide, and update contents.
+function setup_tooltip(div, C){
+
+  const tip = div.selectAppend('div.tooltip')
+    .st({
+      background: 'white',
+      borderRadius: '10px',
+      padding: '0px 15px',
+      boxShadow: '1px 1px 3px black',
+      position: 'absolute',
+    });
+
+  const tip_body = tip.selectAppend('div.body');
+
+  const move = function(pos){
+    tip
+      .style('left', `${pos[0] + C.tooltip_offset}px`)
+      .style('top',  `${pos[1]}px`);
+
+    return this;
+  };
+
+  const show = function(){
+    tip.style('display', 'block');
+    return this;
+  };
+
+  const hide = function(){
+    tip.style('display', 'none');
+    return this;
+  };
+
+  const update = function(content){
+    tip_body.html(content);
+    return this;
+  };
+
+  // start with tooltip hidden
+  hide();
+
+  return {move, show, hide, update};
 }
 
 // Function to setup scales for drawing to screen
@@ -179,8 +224,7 @@ function sim_webworker(){
       .force(
         "charge",
         d3.forceManyBody()
-          .strength(-50)
-          .distanceMax(150)
+          .distanceMax(100)
       )
       .force("x", d3.forceX())
       .force("y", d3.forceY())
@@ -255,7 +299,7 @@ function draw_svg_nodes(nodes, scales, svg, C){
   const node_circles = svg.selectAll('circle')
     .data(nodes, d => d.id);
 
-  node_circles.enter()
+  const all_nodes = node_circles.enter()
     .append('circle')
     .at({
       r: 0,
@@ -271,6 +315,22 @@ function draw_svg_nodes(nodes, scales, svg, C){
       strokeWidth: d => d.inverted ? 3: 0,
       fill: d => d.inverted ? 'white': d.color,
     });
+
+
+  // Add mouseover behavior for nodes that are selectable
+  all_nodes.filter(d => d.selectable)
+    .on('mouseover', function(d){
+      tooltip
+        .move([scales.X(d.x), scales.Y(d.y)])
+        .update(d.tooltip)
+        .show();
+    })
+    .on('mouseout', function(d){
+      tooltip.hide();
+    });
+
+
+
 }
 
 // Function to setup zoom and pan behavior
@@ -322,13 +382,14 @@ function draw_network(layout_nodes, layout_links, scales){
   draw_canvas_links(layout_links, scales, canvas, C);
 }
 
-
 //------------------------------------------------------------
 // Where things get run
 //------------------------------------------------------------
 
 // Setup basic components of viz.
 const {svg, canvas, context} = setup_canvas_and_svg(div, C);
+tooltip = setup_tooltip(div, C);
+
 const progress_meter = setup_progress_meter(svg, C);
 
 // Launch webworker to calculate layout and kickoff network viz after finishing
