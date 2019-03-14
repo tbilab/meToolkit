@@ -6,7 +6,7 @@
 const margin = {right: 25, left: 25, top: 20, bottom: 70};
 
 // These hold the layout calculated network info once the webworker returns them
-let layout_nodes, layout_links, scales, tooltip, selected_codes = [];
+let layout_nodes, layout_links, scales, tooltip, message_buttons, selected_codes = [];
 
 // Default constants for the viz
 const default_constants = {
@@ -40,12 +40,16 @@ function sanitize_data(data){
 };
 
 // Function to send a message back to shiny
-function sendMessage(type, selected_codes, C){
+function send_to_shiny(type, codes, C){
+
+  // Only try and send a message if we have codes to do so.
+  if(codes.length === 0) return;
 
   // Build message
   const message_body = {
     type: type,
-    payload: sendCodeVector(selected_codes),
+    // append the date to the begining so sent value always changes.
+    payload: [Date.now().toString(), ...codes]
   };
 
   // Send message off to server
@@ -119,6 +123,70 @@ function setup_tooltip(div, C){
   hide();
 
   return {move, show, hide, update};
+}
+
+// Function to setup the message sending buttons to send codes to shiny
+function setup_message_buttons(div, C, message_send_func){
+  const button_span = {
+    border: "1px solid black",
+    padding: "5px",
+    borderRadius: "8px",
+    boxShadow: "black 1px 1px 0px",
+    background: "lightyellow",
+    cursor: "pointer",
+    paddingRight: "5px"
+  };
+
+  const hidden_style = {
+    display: 'none',
+    left: -1000
+  };
+
+  const displayed_style = {
+    bottom: '10px',
+    left: '10px',
+    display:'block'
+  };
+
+  const node_interaction_popup = div.selectAppend('div.node_message_buttons')
+    .attr('class', 'node_interaction_popup')
+    .st({
+      background:'white',
+      position:'absolute',
+      display: 'none'
+    });
+
+  const delete_codes_button = node_interaction_popup
+    .selectAppend('span#delete_button')
+    .attr('id', 'delete_button')
+    .st(button_span)
+    .text('Delete Codes')
+    .on('click', () => {
+      message_send_func('delete');
+    });
+
+  const isolate_codes_button = node_interaction_popup
+    .selectAppend('span#isolate_button')
+    .attr('id', 'isolate_button')
+    .st(button_span)
+    .text('Isolate Codes')
+    .on('click', () => {
+      message_send_func('isolate');
+    });
+
+  const invert_codes_button = node_interaction_popup
+    .selectAppend('span#invert_button')
+    .attr('id', 'invert_button')
+    .st(button_span)
+    .text('Invert Codes')
+    .on('click', () => {
+      message_send_func('invert');
+    });
+
+  return {
+    show: () => node_interaction_popup.st(displayed_style),
+    hide: () => node_interaction_popup.st(hidden_style),
+  };
 }
 
 // Function to setup scales for drawing to screen
@@ -365,16 +433,13 @@ function draw_svg_nodes(nodes, scales, svg, C){
       // Update code appearance accordingly
       d3.select(this).at(node_attrs);
 
-      //// do we have selected codes currently? If so display the action popup.
-      //if(selected_codes.length > 0){
-      //  node_interaction_popup.st(displayed_style);
-      //} else {
-      //  node_interaction_popup.st(hidden_style);
-      //}
+      // do we have selected codes currently? If so display the action popup.
+      if(selected_codes.length > 0){
+        message_buttons.show();
+      } else {
+        message_buttons.hide();
+      }
     });
-
-
-
 }
 
 // Function to setup zoom and pan behavior
@@ -433,6 +498,7 @@ function draw_network(layout_nodes, layout_links, scales){
 // Setup basic components of viz.
 const {svg, canvas, context} = setup_canvas_and_svg(div, C);
 tooltip = setup_tooltip(div, C);
+message_buttons = setup_message_buttons(div, C, (type) => send_to_shiny(type, selected_codes, C));
 
 const progress_meter = setup_progress_meter(svg, C);
 
