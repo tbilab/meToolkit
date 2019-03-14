@@ -13,7 +13,7 @@ setup_data <- function(){
     meToolkit::buildColorPalette(category)
 
   # Some constants
-  n_patients <- 200
+  n_patients <- 2000
   snp_prev <- 0.15
   inverted_codes <- c()
   snp_filter <- FALSE

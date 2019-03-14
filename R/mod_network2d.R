@@ -74,7 +74,7 @@ network2d <- function(input, output, session, network_data, snp_filter) {
     r2d3::r2d3(
       data = jsonlite::toJSON(network_data()),
       # script = here('inst/d3/comorbidityNetwork2d/index.js'),
-      script = system.file("d3/comorbidityNetwork2d/index.js", package = "meToolkit"),
+      script = system.file("d3/comorbidityNetwork2d/new_network.js", package = "meToolkit"),
       container = 'div',
       dependencies = "d3-jetpack",
       options = list(

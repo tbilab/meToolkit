@@ -20,7 +20,7 @@ const default_constants = {
   code_radius_mult: 4,
   case_opacity: 1,
   edge_color: '#aaa',
-  edge_opacity: 0.5,
+  edge_opacity: 0.3,
   progress_bar_height: 20,
   progress_bar_color: 'orangered',
   msg_loc: 'shiny_server',
@@ -217,6 +217,18 @@ function setup_progress_meter(svg, C){
   // Append a g for holding meter
   const meter = svg.append('g.progress_meter');
 
+  meter.selectAppend('text.message')
+    .text('Calculating network layout')
+    .at({
+      x: C.w/2,
+      y: C.progress_bar_height + 5,
+    })
+    .st({
+      alignmentBaseline: 'hanging',
+      textAnchor: 'middle',
+      fontSize: '1.5em',
+    });
+
   // Add a rectangle to act as background showing finishing point
   const background = meter.append('rect.background')
     .at({
@@ -279,9 +291,10 @@ function setup_progress_meter(svg, C){
       .transition(t)
       .attr('height', 0);
 
-    progress_text
+    meter.selectAll('text')
       .transition(t)
-      .attr('opacity', 0);
+      .attr('opacity', 0)
+      .text('');
   };
 
   return {update, hide};
