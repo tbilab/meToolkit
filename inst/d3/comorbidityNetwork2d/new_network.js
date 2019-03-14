@@ -6,10 +6,10 @@
 const margin = {right: 25, left: 25, top: 20, bottom: 70};
 
 // These hold the layout calculated network info once the webworker returns them
-let layout_nodes, layout_links, scales, tooltip;
+let layout_nodes, layout_links, scales, tooltip, selected_codes = [];
 
-// Constants object for viz.
-const C = {
+// Default constants for the viz
+const default_constants = {
   padding: 20,
   tooltip_offset: 13,
   tooltip_height: 60,
@@ -23,7 +23,12 @@ const C = {
   edge_opacity: 0.5,
   progress_bar_height: 20,
   progress_bar_color: 'orangered',
+  msg_loc: 'shiny_server',
 };
+
+// Constants object for viz, all can be overwritten if passed a different value
+// with the options argument of r2d3
+const C = Object.assign(default_constants, options);
 
 // Function to make sure data conforms to the format we want
 function sanitize_data(data){
@@ -32,6 +37,19 @@ function sanitize_data(data){
     nodes: data_props.includes('vertices') ? data.vertices : data.nodes,
     links: data_props.includes('edges') ? data.edges : data.links,
   };
+};
+
+// Function to send a message back to shiny
+function sendMessage(type, selected_codes, C){
+
+  // Build message
+  const message_body = {
+    type: type,
+    payload: sendCodeVector(selected_codes),
+  };
+
+  // Send message off to server
+  Shiny.onInputChange(C.msg_loc, message_body);
 };
 
 // Function to setup overlaid canvas and svg
@@ -295,6 +313,21 @@ function draw_canvas_links(links, scales, canvas, C){
 // Function to draw svg parts of network
 function draw_svg_nodes(nodes, scales, svg, C){
 
+  const choose_stroke_width = (d) => {
+    const selected = selected_codes.includes(d.name);
+
+    return d.inverted ? 3:
+           selected ? 2 : 0;
+  };
+  const node_attrs = {
+    r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
+    cx: d => scales.X(d.x),
+    cy: d => scales.Y(d.y),
+    stroke: d => d.inverted ?  d.color: 'black',
+    strokeWidth: choose_stroke_width,
+    fill: d => d.inverted ? 'white': d.color,
+  };
+
   // Bind data but only the phenotype nodes
   const node_circles = svg.selectAll('circle')
     .data(nodes, d => d.id);
@@ -307,15 +340,7 @@ function draw_svg_nodes(nodes, scales, svg, C){
       cy: d => Math.random()*C.h,
     })
     .merge(node_circles)
-    .at({
-      r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
-      cx: d => scales.X(d.x),
-      cy: d => scales.Y(d.y),
-      stroke: d => d.inverted ?  d.color: 'black',
-      strokeWidth: d => d.inverted ? 3: 0,
-      fill: d => d.inverted ? 'white': d.color,
-    });
-
+    .at(node_attrs);
 
   // Add mouseover behavior for nodes that are selectable
   all_nodes.filter(d => d.selectable)
@@ -327,6 +352,25 @@ function draw_svg_nodes(nodes, scales, svg, C){
     })
     .on('mouseout', function(d){
       tooltip.hide();
+    })
+    .on('click', function(d){
+      // Is code already selected?
+      if(selected_codes.includes(d.name)){
+        // pull code out of selected list
+        selected_codes = selected_codes.filter(code => code !== d.name);
+      } else {
+        // add code to selected codes list
+        selected_codes = [d.name, ...selected_codes];
+      }
+      // Update code appearance accordingly
+      d3.select(this).at(node_attrs);
+
+      //// do we have selected codes currently? If so display the action popup.
+      //if(selected_codes.length > 0){
+      //  node_interaction_popup.st(displayed_style);
+      //} else {
+      //  node_interaction_popup.st(hidden_style);
+      //}
     });
 
 
@@ -334,7 +378,7 @@ function draw_svg_nodes(nodes, scales, svg, C){
 }
 
 // Function to setup zoom and pan behavior
-function setup_zoom(svg, update_network, C){
+function setup_zoom(svg, update_network){
 
   const zoom = d3.zoom()
     .scaleExtent([0.5, 5])
@@ -395,4 +439,4 @@ const progress_meter = setup_progress_meter(svg, C);
 // Launch webworker to calculate layout and kickoff network viz after finishing
 launch_webworker(sanitize_data(data), progress_meter, start_viz);
 
-setup_zoom(svg, draw_network, C);
+setup_zoom(svg, draw_network);
