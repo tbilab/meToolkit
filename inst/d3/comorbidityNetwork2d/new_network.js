@@ -332,19 +332,21 @@ function sim_webworker(){
   onmessage = function(event) {
     const nodes = event.data.nodes;
     const links = event.data.links;
+    const centering_force = d => d.selectable ? 0.5: 0;
 
     const simulation = d3.forceSimulation(nodes)
       .force(
         "link",
         d3.forceLink(links)
           .id(d => d.id)
-          .distance(10)
-          //.strength(0.5)
+          .distance(.2)
+          .strength(0.8)
       )
       .force(
         'collision',
         d3.forceCollide()
           .radius(d => d.selectable ? 10: 3)
+          .strength(.4)
       )
       .force(
         "charge",
@@ -356,26 +358,34 @@ function sim_webworker(){
       //    .radius(d => d.selectable ? 25 : 40)
       //    .strength(d => d.selectable ? 0.9: 1.2)
       //)
-      //.force(
-      //  "X",
-      //  d3.forceX()
-      //    .strength(d => d.selectable ? 0.5: 0)
-      //)
+      .force(
+        "X",
+        d3.forceX()
+          .strength(centering_force)
+      )
       .force(
         "Y",
         d3.forceY()
-          .strength(0.2)
-      )
-      .stop();
+          .strength(centering_force)
+      );
 
-    const num_itts = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()));
-    let i;
-    for (i = 0; i < num_itts; ++i) {
+    const num_itts = Math.ceil((Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())));
+    let i = 0;
+
+    // How often in terms of number of iterations do we send current progress back?
+    const update_freq = 5;
+
+    simulation.on('tick', () => {
+      i++;
       postMessage({type: "tick", progress: i / num_itts});
-      simulation.tick();
-    }
+      if((i % update_freq) === 0){
+        postMessage({type: 'progress', nodes: nodes, links: links});
+      }
+    });
 
-    postMessage({type: "end", nodes: nodes, links: links});
+    simulation.on('end', () => {
+      postMessage({type: "end", nodes: nodes, links: links});
+    });
   };
 }
 
@@ -400,9 +410,14 @@ function launch_webworker(network_data, progress_meter, on_finish){
   worker.onmessage = function(event) {
     switch (event.data.type) {
       case "tick": return ticked(event.data);
-      case "end": return on_finish(event.data);
+      case "end": return on_finish(event.data, 'end');
+      case "progress": return on_finish(event.data, 'progress');
     }
   };
+
+  function progress_report(data){
+    console.log(data.message);
+  }
 
   function ticked(data) {
     // Update the progress meter with how far we are along in sim
@@ -526,11 +541,13 @@ function setup_zoom(svg, update_network){
 }
 
 // Function to extract webworker data and kickoff the viz
-function start_viz(data){
+function start_viz(data, type){
   // What to do after worker is done and has returned data
 
-  // Hide progress bar
-  progress_meter.hide();
+  // Hide progress bar if we're done with sim
+  if(type === 'end'){
+    progress_meter.hide();
+  }
 
   // Extract nodes and links
   layout_nodes = data.nodes;
@@ -565,10 +582,10 @@ message_buttons = setup_message_buttons(div, C, (type) => send_to_shiny(type, se
 const progress_meter = setup_progress_meter(svg, C);
 
 // Fixed to lines;
-//const data_for_viz = fix_nodes_to_line(sanitize_data(data), C);
+const data_for_viz = fix_nodes_to_line(sanitize_data(data), C);
 
 // Standard
-const data_for_viz = sanitize_data(data);
+//const data_for_viz = sanitize_data(data);
 
 // Launch webworker to calculate layout and kickoff network viz after finishing
 launch_webworker(data_for_viz, progress_meter, start_viz);
