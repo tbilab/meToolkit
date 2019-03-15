@@ -1,4 +1,4 @@
-// !preview r2d3 data=network_data, options = list(viz_type = 'free'), container = 'div', dependencies = 'd3-jetpack'
+// !preview r2d3 data=network_data, options = list(viz_type = 'free', update_freq = 5), container = 'div', dependencies = 'd3-jetpack'
 //
 // r2d3: https://rstudio.github.io/r2d3
 //
@@ -24,7 +24,8 @@ const default_constants = {
   progress_bar_height: 20,
   progress_bar_color: 'orangered',
   msg_loc: 'shiny_server',
-  viz_type: 'bipartite'
+  viz_type: 'bipartite',
+  update_freq: 5, // How often do we send back layout simulation progress?
 };
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -323,7 +324,7 @@ function setup_progress_meter(svg, C){
 }
 
 // Simulation webworker function
-function sim_webworker(){
+function sim_webworker(update_freq){
   importScripts("https://d3js.org/d3-collection.v1.min.js");
   importScripts("https://d3js.org/d3-dispatch.v1.min.js");
   importScripts("https://d3js.org/d3-quadtree.v1.min.js");
@@ -374,7 +375,6 @@ function sim_webworker(){
     let i = 0;
 
     // How often in terms of number of iterations do we send current progress back?
-    const update_freq = 5;
 
     simulation.on('tick', () => {
       i++;
@@ -396,7 +396,7 @@ function launch_webworker(network_data, progress_meter, on_finish){
   const links = network_data.links;
 
   // Wrap up function into a fake script to call
-  const worker_url = URL.createObjectURL(new Blob(['('+sim_webworker+')()']));
+  const worker_url = URL.createObjectURL(new Blob(['('+sim_webworker+`)(${C.update_freq})`]));
 
   // Initialize the worker
   const worker = new Worker(worker_url);
