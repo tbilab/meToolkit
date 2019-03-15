@@ -27,6 +27,7 @@ network2d_UI <- function(
       background: {color};")
   }
   header_style <- glue::glue("
+    height: 10%;
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 8px 10px;
@@ -35,7 +36,9 @@ network2d_UI <- function(
     border-color: grey; ")
 
   tagList(
-    div(class = div_class,
+    div(
+      class = div_class,
+      style = glue::glue("height: {height};"),
       div(style = header_style,
         div(
           checkboxInput(
@@ -51,7 +54,7 @@ network2d_UI <- function(
           span(style=rounded_span(snp_colors[3]), "2")
         )
       ),
-      r2d3::d3Output(ns("plot"), height = height)
+      r2d3::d3Output(ns("plot"), height = "90%")
     )
   )
 }
@@ -65,7 +68,7 @@ network2d_UI <- function(
 #'
 #' @examples
 #' callModule(info_panel, 'info_panel', snp_name, individual_data, subset_maf)
-network2d <- function(input, output, session, network_data, snp_filter) {
+network2d <- function(input, output, session, network_data, snp_filter, viz_type = 'free') {
 
   # send data and options to the 2d plot
   output$plot <- r2d3::renderD3({
@@ -79,7 +82,8 @@ network2d <- function(input, output, session, network_data, snp_filter) {
       dependencies = "d3-jetpack",
       options = list(
         just_snp = snp_filter(),
-        msg_loc = session$ns('message')
+        msg_loc = session$ns('message'),
+        viz_type = viz_type
       )
     )
   })

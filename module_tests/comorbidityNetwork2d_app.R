@@ -44,13 +44,17 @@ setup_data <- function(){
 ui <- shinyUI(
   tagList(
     h1('Network module test'),
-    network2d_UI('networkPlot',  height = '500px')
+    network2d_UI('networkPlot',  height = '700px')
   )
 )
 
 server <- function(input, output, session) {
 
-  networkPlot <- callModule(network2d, 'networkPlot', reactive(setup_data()), snp_filter=reactive(FALSE))
+  networkPlot <- callModule(
+    network2d, 'networkPlot',
+    reactive(setup_data()),
+    snp_filter = reactive(FALSE),
+    viz_type = 'bipartite')
 
   observeEvent(networkPlot(),{
     print("we have a message from the network!")

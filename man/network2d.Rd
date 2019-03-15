@@ -4,7 +4,8 @@
 \alias{network2d}
 \title{Server function of snp info panel}
 \usage{
-network2d(input, output, session, network_data, snp_filter)
+network2d(input, output, session, network_data, snp_filter,
+  viz_type = "free")
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}

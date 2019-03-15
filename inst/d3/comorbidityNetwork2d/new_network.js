@@ -3,7 +3,7 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 
-const margin = {right: 25, left: 25, top: 20, bottom: 70};
+const margin = {right: 20, left: 20, top: 20, bottom: 5};
 
 // These hold the layout calculated network info once the webworker returns them
 let layout_nodes, layout_links, scales, tooltip, message_buttons, selected_codes = [];
@@ -228,7 +228,7 @@ function setup_scales(nodes, C){
         .range([C.margin.left, C.w - C.margin.right]),
     Y: d3.scaleLinear()
         .domain(d3.extent(nodes, d => d.y))
-        .range([C.h - C.margin.top, C.margin.bottom]),
+        .range([C.h - C.margin.bottom, C.margin.top]),
   };
 }
 
@@ -289,6 +289,8 @@ function setup_progress_meter(svg, C){
 
   // Function to update meter with new progress
   const update = (prop_done) => {
+    // Raise meter to top of viz;
+    meter.raise();
 
     // Make sure all bars are visible
     all_bars.attr('height', C.progress_bar_height);
@@ -341,14 +343,14 @@ function sim_webworker(update_freq){
         "link",
         d3.forceLink(links)
           .id(d => d.id)
-          .distance(.2)
+          .distance(0.2)
           .strength(0.8)
       )
       .force(
         'collision',
         d3.forceCollide()
           .radius(d => d.selectable ? 10: 3)
-          .strength(.4)
+          .strength(0.4)
       )
       .force(
         "charge",
@@ -375,7 +377,6 @@ function sim_webworker(update_freq){
     let i = 0;
 
     // How often in terms of number of iterations do we send current progress back?
-
     simulation.on('tick', () => {
       i++;
       postMessage({type: "tick", progress: i / num_itts});
