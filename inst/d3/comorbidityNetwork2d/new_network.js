@@ -1,4 +1,4 @@
-// !preview r2d3 data=network_data, container = 'div', dependencies = 'd3-jetpack'
+// !preview r2d3 data=network_data, options = list(viz_type = 'free'), container = 'div', dependencies = 'd3-jetpack'
 //
 // r2d3: https://rstudio.github.io/r2d3
 //
@@ -24,6 +24,7 @@ const default_constants = {
   progress_bar_height: 20,
   progress_bar_color: 'orangered',
   msg_loc: 'shiny_server',
+  viz_type: 'bipartite'
 };
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -581,11 +582,10 @@ message_buttons = setup_message_buttons(div, C, (type) => send_to_shiny(type, se
 
 const progress_meter = setup_progress_meter(svg, C);
 
-// Fixed to lines;
-const data_for_viz = fix_nodes_to_line(sanitize_data(data), C);
-
-// Standard
-//const data_for_viz = sanitize_data(data);
+// Prepare data based upon the desired format from options
+const data_for_viz = C.viz_type === 'bipartite' ?
+  fix_nodes_to_line(sanitize_data(data), C):
+  sanitize_data(data);
 
 // Launch webworker to calculate layout and kickoff network viz after finishing
 launch_webworker(data_for_viz, progress_meter, start_viz);
