@@ -20,7 +20,7 @@ const default_constants = {
   code_radius_mult: 4,
   case_opacity: 1,
   edge_color: '#aaa',
-  edge_opacity: 0.3,
+  edge_opacity: d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(data.edges.length),
   progress_bar_height: 20,
   progress_bar_color: 'orangered',
   msg_loc: 'shiny_server',
@@ -33,11 +33,25 @@ const C = Object.assign(default_constants, options);
 // Function to make sure data conforms to the format we want
 function sanitize_data(data){
   const data_props = Object.keys(data);
+
   return {
     nodes: data_props.includes('vertices') ? data.vertices : data.nodes,
     links: data_props.includes('edges') ? data.edges : data.links,
   };
 };
+
+// Function to add a dx or dy point to nodes for fixing them on a line in force simulation
+function fix_nodes_to_line(data, C){
+  data.nodes.forEach(d => {
+    if(d.selectable){
+      d.fx = -1
+    } else {
+      d.fx = 1
+    }
+
+  });
+  return data;
+}
 
 // Function to send a message back to shiny
 function send_to_shiny(type, codes, C){
@@ -317,19 +331,37 @@ function sim_webworker(){
         "link",
         d3.forceLink(links)
           .id(d => d.id)
-          .distance(5)
-          .strength(0.9)
+          .distance(10)
+          //.strength(0.5)
+      )
+      .force(
+        'collision',
+        d3.forceCollide()
+          .radius(d => d.selectable ? 10: 3)
       )
       .force(
         "charge",
         d3.forceManyBody()
-          .distanceMax(100)
       )
-      .force("x", d3.forceX())
-      .force("y", d3.forceY())
+      //.force(
+      //  "radial",
+      //  d3.forceRadial()
+      //    .radius(d => d.selectable ? 25 : 40)
+      //    .strength(d => d.selectable ? 0.9: 1.2)
+      //)
+      //.force(
+      //  "X",
+      //  d3.forceX()
+      //    .strength(d => d.selectable ? 0.5: 0)
+      //)
+      .force(
+        "Y",
+        d3.forceY()
+          .strength(0.2)
+      )
       .stop();
 
-    const num_itts = Math.ceil(2*Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()));
+    const num_itts = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()));
     let i;
     for (i = 0; i < num_itts; ++i) {
       postMessage({type: "tick", progress: i / num_itts});
@@ -515,7 +547,13 @@ message_buttons = setup_message_buttons(div, C, (type) => send_to_shiny(type, se
 
 const progress_meter = setup_progress_meter(svg, C);
 
+// Fixed to lines;
+const data_for_viz = fix_nodes_to_line(sanitize_data(data), C);
+
+// Standard
+//const data_for_viz = sanitize_data(data);
+
 // Launch webworker to calculate layout and kickoff network viz after finishing
-launch_webworker(sanitize_data(data), progress_meter, start_viz);
+launch_webworker(data_for_viz, progress_meter, start_viz);
 
 setup_zoom(svg, draw_network);
