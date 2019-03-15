@@ -53,6 +53,13 @@ function fix_nodes_to_line(data, C){
   return data;
 }
 
+// Function to find all nodes that a given node is connected to.
+function find_connections(node_id, edges){
+  return edges
+    .filter(d => (d.target.name === node_id) || (d.source.name === node_id))
+    .map(d => d.source.name === node_id ? d.target.name : d.source.name);
+}
+
 // Function to send a message back to shiny
 function send_to_shiny(type, codes, C){
 
@@ -456,8 +463,15 @@ function draw_svg_nodes(nodes, scales, svg, C){
     .at(node_attrs);
 
   // Add mouseover behavior for nodes that are selectable
-  all_nodes.filter(d => d.selectable)
+  all_nodes
     .on('mouseover', function(d){
+      const connected_nodes = find_connections(d.name, layout_links);
+      // Highlight connected nodes by making them 1.5 times larger than default
+      all_nodes
+        .filter(n => connected_nodes.includes(n.name))
+        .attr('r', function(){return d3.select(this).attr('r')*1.5})
+        .at('stroke-width', 1);
+
       tooltip
         .move([scales.X(d.x), scales.Y(d.y)])
         .update(d.tooltip)
@@ -465,6 +479,9 @@ function draw_svg_nodes(nodes, scales, svg, C){
     })
     .on('mouseout', function(d){
       tooltip.hide();
+
+      // Reset nodes that may have been highlighted
+      all_nodes.at(node_attrs);
     })
     .on('click', function(d){
       // Is code already selected?
@@ -548,10 +565,10 @@ message_buttons = setup_message_buttons(div, C, (type) => send_to_shiny(type, se
 const progress_meter = setup_progress_meter(svg, C);
 
 // Fixed to lines;
-const data_for_viz = fix_nodes_to_line(sanitize_data(data), C);
+//const data_for_viz = fix_nodes_to_line(sanitize_data(data), C);
 
 // Standard
-//const data_for_viz = sanitize_data(data);
+const data_for_viz = sanitize_data(data);
 
 // Launch webworker to calculate layout and kickoff network viz after finishing
 launch_webworker(data_for_viz, progress_meter, start_viz);
