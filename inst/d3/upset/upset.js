@@ -1,6 +1,5 @@
 // !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
-// r2d3: https://rstudio.github.io/r2d3
-//
+
 
 // Constants
 const margin = {right: 25, left: 25, top: 20, bottom: 70}; // margins on side of chart
