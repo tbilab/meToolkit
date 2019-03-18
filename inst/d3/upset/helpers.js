@@ -10,3 +10,9 @@ function unique(data, key){
   return d3.set(data).values();
 };
 
+function remove_zero_tick(axis){
+  // Get rid of the zero tick value on an axis for cleanliness
+  axis.selectAll('.tick')
+    .filter(d => d === 0)
+    .remove();
+}

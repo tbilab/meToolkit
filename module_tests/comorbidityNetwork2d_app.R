@@ -13,7 +13,7 @@ setup_data <- function(){
     meToolkit::buildColorPalette(category)
 
   # Some constants
-  n_patients <- 200
+  n_patients <- 2000
   snp_prev <- 0.15
   inverted_codes <- c()
   snp_filter <- FALSE
@@ -50,7 +50,13 @@ ui <- shinyUI(
 
 server <- function(input, output, session) {
 
-  networkPlot <- callModule(network2d, 'networkPlot', reactive(setup_data()), snp_filter=reactive(FALSE))
+  networkPlot <- callModule(
+    network2d, 'networkPlot',
+    reactive(setup_data()),
+    snp_filter = reactive(FALSE),
+    viz_type = 'free',
+    update_freq = 15
+  )
 
   observeEvent(networkPlot(),{
     print("we have a message from the network!")

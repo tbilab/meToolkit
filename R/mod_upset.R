@@ -13,13 +13,6 @@ upset_UI <- function(id, div_class = 'upset_plot') {
     div(
       div(class = div_class,
         r2d3::d3Output(ns('chart'), height = '100%')
-      ),
-      div(
-        shiny::sliderInput(
-          ns("setSize"), "Min Size of Set:",
-          min = 1, max = 1000,
-          value = 20
-        )
       )
     )
   )
@@ -64,9 +57,6 @@ upset <- function(input, output, session, individual_data, all_patient_snps) {
         num_snp = sum(snp)
       )
 
-    # Find largest pattern support at make upper limit of size slider
-    updateSliderInput(session, "setSize", max = max(unique_patterns$count))
-
     # Function that returns enrichment info for a given pattern
     testEnrichment <- function(currentPattern){
 
@@ -98,7 +88,6 @@ upset <- function(input, output, session, individual_data, all_patient_snps) {
 
     # Calculate enrichment on each unique pattern
     pattern_to_enrichment <- unique_patterns %>%
-      dplyr::filter(count > input$setSize) %>%
       dplyr::arrange(size, desc(count)) %>%
       dplyr::bind_cols(purrr::map_df(.$pattern, testEnrichment))
 
@@ -119,13 +108,14 @@ upset <- function(input, output, session, individual_data, all_patient_snps) {
       ) %>%
       jsonlite::toJSON()
 
+
     # Send everything to the upset javascript code
     r2d3::r2d3(
       data = pattern_to_enrichment,
-      options = list(marginalData = code_marginal_data, overallMaRate = overall_ma_freq),
+      options = list(marginalData = code_marginal_data, overallMaRate = overall_ma_freq, min_set_size = 20),
       script = system.file("d3/upset/upset.js", package = "meToolkit"),
       css = system.file("d3/upset/upset.css", package = "meToolkit"),
-      dependencies = "d3-jetpack"
+      dependencies = c("d3-jetpack",system.file("d3/upset/helpers.js", package = "meToolkit"))
     )
   }) # End renderD3
 }

@@ -1,8 +1,5 @@
-// !preview r2d3 data = data_for_upset$data, options = data_for_upset$options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
-// r2d3: https://rstudio.github.io/r2d3
-//
+// !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
 
-let min_set_size = 100;
 
 // Constants
 const margin = {right: 25, left: 25, top: 20, bottom: 70}; // margins on side of chart
@@ -27,8 +24,6 @@ const interaction_box_styles = {
   strokeWidth: 1
 };
 
-// proportion plot settings
-const ciThickness = 4;   // how thick is the CI?
 
 // new layout grid
 const set_size_bars_units = 3;
@@ -124,7 +119,6 @@ function setup_scales(patterns, marginal, sizes, set_size_x){
 }
 
 function setup_chart_sizes(width, height, margin){
- // const min_set_size = 100;
   const h = height - margin.top - margin.bottom;
   const w = width - margin.left - margin.right;
 
@@ -275,6 +269,9 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
 function draw_rr_intervals(g, patterns, scales, sizes){
   g.html('');
 
+  const size_of_pe = Math.min(scales.matrix_row_height/2, 7);
+  const size_of_interval_line = Math.max(1, size_of_pe/2);
+
   // Axis
   const axis_drawing_func = d3.axisTop()
     .scale(scales.rr_x)
@@ -311,14 +308,14 @@ function draw_rr_intervals(g, patterns, scales, sizes){
       x1: d => scales.rr_x(d.lower),
       x2: d => scales.rr_x(d.upper),
       stroke: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
-      strokeWidth: ciThickness,
+      strokeWidth: size_of_interval_line,
     });
 
   rr_intervals
     .selectAppend('circle')
     .at({
       cx: d => scales.rr_x(d.pointEst),
-      r: ciThickness*1.5,
+      r: size_of_pe,
       fill: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
     });
 
@@ -480,33 +477,35 @@ function create_info_panel(g, panel_size, panel_padding = 5){
 }
 
 // Appends a small slider the user can use to filter what the minimumn size of the cases they want is
-function make_set_size_slider(g, set_size_x, sizes, on_release){
+function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_release){
   // How far we let the slider go in either direction
   const [range_min, range_max] = set_size_x.domain();
 
   // These are mutated to keep track of state of drag
-  let desired_size = min_set_size;
+  let desired_size = starting_min_size;
   let below_max = true;
   let above_min = true;
 
   const handle_w = 15;
   const handle_h = 28;
+  const padding_top = 3;
 
-  const handle_attrs = {
-    width: handle_w,
-    height: handle_h,
-    fill: colors.silder_handle,
-    rx: 5,
-    strokeWidth: 0,
-    stroke: 'black',
-  };
-
+  // Setup handle container
   const handle = g.selectAppend('g.handle')
-    .translate([set_size_x(min_set_size) - handle_w/2,0]);
+    .style('cursor', 'grab'); // Make cursor a hand to emphasize grabability of handle
 
+  // Add a rectangle background
   const handle_rect = handle.selectAppend('rect')
-    .at(handle_attrs);
+    .at({
+      width: handle_w,
+        height: handle_h,
+        fill: colors.silder_handle,
+        rx: 5,
+        strokeWidth: 0,
+        stroke: 'black',
+      });
 
+  // Add vertical line marking exact cutoff position
   handle.selectAppend('line')
     .at({
       x1: handle_w/2,
@@ -517,13 +516,30 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
       strokeWidth: 2,
     });
 
+
+  // Add text that shows value while dragging
+  const handle_text = handle.selectAppend('text')
+    .at({
+      textAnchor: 'end',
+      y: handle_h/2 + 2,
+      x: -2,
+      alignmentBaseline: 'middle',
+      opacity: 0,
+    });
+
+  // Function to move handle in x-direction
+  const move_handle = x => handle.translate([x - handle_w/2, padding_top]);
+
   handle.call(d3.drag()
         .on("start", dragstarted)
         .on("drag",dragged)
         .on("end", dragended));
 
   function dragstarted(d) {
+    // Put a outline around handle to show it was selected
     handle_rect.attr('stroke-width', 2);
+    // Show the min-size text for precision changing
+    handle_text.attr('opacity', 1);
   }
 
   function dragged(d) {
@@ -532,29 +548,35 @@ function make_set_size_slider(g, set_size_x, sizes, on_release){
     above_min = desired_size > range_min;
 
     if(below_max && above_min){
-      d3.select(this).translate([d3.event.x - handle_w/2, 0]);
+      move_handle(d3.event.x);
+      handle_text.text(`size > ${countFormat(desired_size)}`);
     }else {
       desired_size = !above_min ? range_min : range_max;
     }
   }
 
   function dragended(d) {
-    handle_rect.at(handle_attrs);
+    // Reset outline of handle
+    handle_rect.attr('stroke-width', 0);
+    // Hide text again
+    handle_text.attr('opacity', 0);
+
     const new_desired_size = set_size_x.invert(d3.event.x);
     on_release(desired_size);
   }
+
+  // Initialize handle position
+  move_handle(set_size_x(starting_min_size));
 }
 
-function draw_with_set_size(g, set_size, sizes, set_size_x){
+function draw_with_set_size(g, min_set_size, sizes, set_size_x){
 
-  //g.html('');
-
-  const {patterns, marginals} = filter_set_size(data, options.marginalData, set_size);
+  const {patterns, marginals} = filter_set_size(data, options.marginalData, min_set_size);
 
   // Setup the scales
   const scales = setup_scales(patterns, marginals, sizes, set_size_x);
 
-    // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   // Chart Components
   // ----------------------------------------------------------------------
   const matrix_chart = g.selectAppend('g.matrix_chart')
@@ -636,17 +658,22 @@ function draw_with_set_size(g, set_size, sizes, set_size_x){
     .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
 }
 
+
+// ----------------------------------------------------------------------
+// Start main visualization drawing
+// ----------------------------------------------------------------------
+
+// Setup the sizes of chart components
 const sizes = setup_chart_sizes(width, height, margin);
+
+// Get a set_size scale for use with slider
 const set_size_x = setup_set_size_x_scale(data, sizes);
 
 // Add a g to pad chart
 const g = svg.selectAppend('g.padding')
   .translate([sizes.margin.left, sizes.margin.top]);
 
-const viz_g = g.selectAppend('g.viz');
-
-
-
+// Check if we have enough data to make a meaningful upset chart
 if(data.length < 2){
 
   const lead_message = data.length === 1 ? "Only one group meets" : "No groups meet";
@@ -657,18 +684,18 @@ if(data.length < 2){
     .attr('y', height/2);
 
 } else {
-  //render_plot(patterns, marginals, sizes);
+  const [min_count, max_count] = d3.extent(data, d => d.count);
+  // Make sure desired min set size is within reason
+  const starting_min_size = options.min_set_size < min_count ? min_count + 1 :
+                            options.min_set_size > max_count ? max_count -1  :
+                                                               options.min_set_size;
+  // Setup the size slider
   const set_size_slider =  g.selectAppend('g.set_size_slider')
     .translate([0, sizes.h])
-    .call(make_set_size_slider, set_size_x, sizes, (new_size) => draw_with_set_size(viz_g, new_size, sizes, set_size_x));
+    .call(make_set_size_slider, set_size_x, sizes, starting_min_size, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
 
-  draw_with_set_size(viz_g, min_set_size, sizes, set_size_x);
-
+  // Initialize viz
+  draw_with_set_size(g, starting_min_size, sizes, set_size_x);
 }
 
-function remove_zero_tick(axis){
-  // Get rid of the zero tick value for cleanliness
-  axis.selectAll('.tick')
-    .filter(d => d === 0)
-    .remove();
-}
+
