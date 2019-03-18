@@ -1,6 +1,6 @@
-// !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
+// !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/pattern_network/helpers.js')), css=here('inst/d3/upset/upset.css')
 
-console.log('im here!')
+console.log('im here!');
 
 // Constants
 const margin = {right: 25, left: 25, top: 20, bottom: 70}; // margins on side of chart
@@ -31,12 +31,17 @@ function make_dist_funct(marginals){
     {}
   );
 
-
-
   return (pattern_a, pattern_b) => {
-  // Find union of the two patterns
+    // Find union of the two patterns
+    const common_codes = union(pattern_a.split('-'), pattern_b.split('-'));
 
-  // return weighted sum using inverse proportions
+    // return weighted sum using inverse proportions
+    return common_codes.reduce((dist,code) => dist + code_to_weight[code], 0);
   };
 }
-make_dist_funct(options.marginalData);
+
+
+const calc_dist = make_dist_funct(options.marginalData);
+
+calc_dist(data[5].pattern, data[7].pattern)
+
