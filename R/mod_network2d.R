@@ -65,11 +65,13 @@ network2d_UI <- function(
 #' @param snp_filter Reactive object containing boolean containing info on if we've filtered by snp or not.
 #' @param viz_type Character string containing info on which type of network we want to draw. "bipartite" for a plot that puts one node type on either size, or free for a traditional force directed layout. Defaults to \code{'free'}.
 #' @param update_freq How many iterations of the layout simulation are run between redrawing the viz. Set to lower value for a smoother animation, higher for better performance. Default is \code{15} frames.
-#' @return
+#' @param action_object A \code{reactiveVal} that will be updated by the module upon isolation, deletion, or snp_filtering.
+#' @return Server component of interactive network plot. Returns type-payload list with the type \code{"isolation, deletion, snp_filtering"} to the passed \code{action_object} for updating app state.
 #' @export
 #'
 #' @examples
 #' callModule(info_panel, 'info_panel', snp_name, individual_data, subset_maf)
+
 network2d <- function(input, output, session, network_data, snp_filter, viz_type = 'free', update_freq = 15) {
 
   # send data and options to the 2d plot
@@ -95,13 +97,12 @@ network2d <- function(input, output, session, network_data, snp_filter, viz_type
     updateCheckboxInput(session, "snp_filter", value = snp_filter())
   })
 
-  filtering_action <- reactiveVal()
 
   # If we've received a message from the network viz package
   # it into the returned reactive value
   observeEvent(input$message, {
     validate(need(input$message, message = FALSE))
-    filtering_action(input$message)
+    action_object(input$message)
   })
 
   # If the snp filter toggle has been changed, send the message
@@ -112,8 +113,6 @@ network2d <- function(input, output, session, network_data, snp_filter, viz_type
       type = 'snp_filter_change',
       payload = input$snp_filter
     )
-    filtering_action(to_return)
+    action_object(to_return)
   })
-
-  return(filtering_action)
 }
