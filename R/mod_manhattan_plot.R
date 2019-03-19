@@ -17,7 +17,8 @@ manhattan_plot_UI <- function(id) {
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
 #' @param selected_codes A reactive variable containing array of code \code{id}s that are currently selected in the app.
-#' @return Server component of interactive manhattan plot
+#' @param action_object A \code{reactiveVal} that will be updated by the module upon selection
+#' @return Server component of interactive manhattan plot. Returns type-payload list with the type \code{"selection"} to the passed \code{action_object} for updating app state.
 #' @export
 #'
 #' @examples
@@ -25,10 +26,8 @@ manhattan_plot_UI <- function(id) {
 manhattan_plot <- function(
   input, output, session,
   results_data,
-  selected_codes ) {
-
-  # Initialize the reactive variable that will return the events from plot
-  code_selection <- reactiveVal()
+  selected_codes,
+  action_object ) {
 
   output$manhattanPlot <- plotly::renderPlotly({
 
@@ -76,14 +75,10 @@ manhattan_plot <- function(
     selected_points <- plotly::event_data("plotly_selected", source = "code_select")
     req(selected_points)
 
-    # Update the reactive variable with our newly selected codes
-    code_selection(
-      list(
-        type = 'code_selection',
-        payload = results_data[selected_points$key,]$code )
-    )
-  })
+    action_object_message <-  list(
+      type = 'selection',
+      payload = results_data[selected_points$key,]$code )
 
-  # Return the reactive variable that contains interaction with the plot
-  return(code_selection)
+    action_object(action_object_message)
+  })
 }

@@ -37,16 +37,20 @@ server <- function(input, output, session) {
 
   selected_codes <- reactiveVal(first_selected)
 
-  manhattan_plot <- callModule(
+  action_object <- reactiveVal()
+
+  callModule(
     manhattan_plot, 'manhattan_plot',
     phewas_results,
-    selected_codes
+    selected_codes,
+    action_object
   )
 
-  observeEvent(manhattan_plot(),{
-    print("we have a message from the plot!")
-    selected_codes(manhattan_plot()$payload)
-    print(manhattan_plot())
+  observeEvent(action_object(),{
+    print("we have received a message from within the plot!")
+    print(action_object())
+    # Update codes
+    selected_codes(action_object()$payload)
   })
 
 }
