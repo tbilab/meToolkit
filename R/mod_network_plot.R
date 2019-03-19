@@ -10,8 +10,8 @@
 #'
 #' @examples
 #'
-#' network2d_UI('mycomorbidityNetwork2d', '100%')
-network2d_UI <- function(
+#' network_plot_UI('mycomorbiditynetwork_plot', '100%')
+network_plot_UI <- function(
   id,
   height = '500px',
   snp_colors = c('#bdbdbd','#fcae91', '#a50f15'),
@@ -72,7 +72,13 @@ network2d_UI <- function(
 #' @examples
 #' callModule(info_panel, 'info_panel', snp_name, individual_data, subset_maf)
 
-network2d <- function(input, output, session, network_data, snp_filter, viz_type = 'free', update_freq = 15) {
+network_plot <- function(
+  input, output, session,
+  network_data,
+  snp_filter,
+  viz_type = 'free',
+  update_freq = 15,
+  action_object ) {
 
   # send data and options to the 2d plot
   output$plot <- r2d3::renderD3({
@@ -80,8 +86,7 @@ network2d <- function(input, output, session, network_data, snp_filter, viz_type
 
     r2d3::r2d3(
       data = jsonlite::toJSON(network_data()),
-      # script = here('inst/d3/comorbidityNetwork2d/index.js'),
-      script = system.file("d3/comorbidityNetwork2d/new_network.js", package = "meToolkit"),
+      script = system.file("d3/network_plot/index.js", package = "meToolkit"),
       container = 'div',
       dependencies = "d3-jetpack",
       options = list(

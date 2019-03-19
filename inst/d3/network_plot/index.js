@@ -87,10 +87,11 @@ function setup_canvas_and_svg(div, C){
   const viz_sizing = {
     height: C.h + margin.top + margin.bottom,
     width: C.w + margin.left + margin.right,
-  }
+  };
 
   // Append the svg and padded g element
   const svg = div.selectAppend('svg')
+    .html('') // wipe svg content if need be
     .at(viz_sizing)
     .st(viz_sizing)
     .style('position', 'absolute');
