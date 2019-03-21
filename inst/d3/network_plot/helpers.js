@@ -310,26 +310,6 @@ function setup_progress_meter(svg, C){
 }
 
 
-// Function to setup zoom and pan behavior
-function setup_zoom(svg, update_network){
-
-  const zoom = d3.zoom()
-    .scaleExtent([0.5, 5])
-    .on("zoom", function(){
-      const current_transform = d3.event.transform;
-
-      // Update scales
-      const new_scales = {
-        X: current_transform.rescaleX(scales.X),
-        Y: current_transform.rescaleY(scales.Y),
-      };
-
-      // Redraw network with this new scale
-      update_network(layout_nodes, layout_links, new_scales);
-    });
-
-  svg.call(zoom);
-}
 
 // Function to draw canvas parts of network
 function draw_canvas_links(links, scales, {canvas, context}, C){

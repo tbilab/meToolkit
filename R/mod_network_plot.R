@@ -88,7 +88,7 @@ network_plot <- function(
       data = jsonlite::toJSON(network_data()),
       script = system.file("d3/network_plot/index.js", package = "meToolkit"),
       container = 'div',
-      dependencies = "d3-jetpack",
+      dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js')),
       options = list(
         just_snp = snp_filter(),
         msg_loc = session$ns('message'),

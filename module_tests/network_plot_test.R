@@ -42,7 +42,6 @@ generate_random_data <- function(){
   network_data
 }
 
-
 ui <- shinyUI(
   tagList(
     h1('Network module test'),

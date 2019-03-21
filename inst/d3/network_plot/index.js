@@ -22,35 +22,44 @@ const C = Object.assign(
   options);
 
 
-// Function to setup and run webworker
-function launch_webworker(network_data, callbacks){
-  const {on_progress_report, on_finish, on_layout_data} = callbacks;
-
-  const nodes = network_data.nodes;
-  const links = network_data.links;
+function setup_webworker(C){
+  let worker;
 
   // Wrap up function into a fake script to call
-  const worker_url = URL.createObjectURL(new Blob(['('+sim_webworker+`)(${C.update_freq})`]));
+  const worker_url = URL.createObjectURL(
+    new Blob(['('+sim_webworker+`)(${C.update_freq})`])
+  );
 
-  // Initialize the worker
-  const worker = new Worker(worker_url);
+  const send_new_job = function(network_data, callbacks){
 
-  // Send worker the data we are working with
-  worker.postMessage({
-    nodes: nodes,
-    links: links
-  });
-
-  // Control what is done when a message is received from the webworker
-  worker.onmessage = function(event) {
-    switch (event.data.type) {
-      case "progress_report": return on_progress_report(event.data.progress);
-      case "layout_data": return on_layout_data(event.data);
-      case "end": return on_finish(event.data);
+    if(worker){
+      // If we already have a webworker running make sure to
+      // terminate it so we don't have multiple going at the
+      // same time.
+      worker.terminate();
     }
+
+    const {on_progress_report, on_finish, on_layout_data} = callbacks;
+
+    // Initialize the worker
+    worker = new Worker(worker_url);
+
+    // Send worker the data we are working with
+    worker.postMessage(network_data);
+
+     // Control what is done when a message is received from the webworker
+    worker.onmessage = function(event) {
+      switch (event.data.type) {
+        case "progress_report": return on_progress_report(event.data.progress);
+        case "layout_data": return on_layout_data(event.data);
+        case "end": return on_finish(event.data);
+      }
+    };
   };
 
+  return send_new_job;
 }
+
 
 // Function to entirely setup network viz.
 // Exposes methods for adding new data and updating the size
@@ -64,6 +73,9 @@ function setup_network_viz(dom_elements, on_node_click){
   const Y = d3.scaleLinear();
 
   const new_data = function({nodes, links}){
+    // Remove old network nodes
+    dom_elements.svg.selectAll('circle').remove();
+
     // Update scale domains
     X.domain(d3.extent(nodes, d => d.x));
     Y.domain(d3.extent(nodes, d => d.y));
@@ -102,8 +114,6 @@ function setup_network_viz(dom_elements, on_node_click){
     draw_canvas_links(layout_data.links, scales, dom_elements, C);
   };
 
-
-
   dom_elements.svg.call(
     d3.zoom()
     .scaleExtent([0.5, 5])
@@ -139,6 +149,8 @@ const network_viz = setup_network_viz(dom_elements, on_node_click);
 
 // Holds the currently selected codes.
 let selected_codes = [];
+
+const webworker = setup_webworker(C);
 
 // Function that is called when a message button is pressed. Passed the type of message.
 function on_message(type){
@@ -189,7 +201,7 @@ r2d3.onRender(function(data, div, width, height, options){
     sanitize_data(data);
 
   // Launch webworker to calculate layout and kickoff network viz after finishing
-  launch_webworker(
+  webworker(
     data_for_viz,
     {
       on_progress_report: progress_meter.update,
@@ -199,9 +211,8 @@ r2d3.onRender(function(data, div, width, height, options){
       on_finish: () => {
         progress_meter.hide();
       },
-    });
-
-//  setup_zoom(svg, draw_network);
+    }
+  );
 });
 
 
