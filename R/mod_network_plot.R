@@ -97,6 +97,7 @@ network_plot <- function(
       )
     )
   })
+
   # Make sure checkbox is displaying right value
   observeEvent(snp_filter(), {
     updateCheckboxInput(session, "snp_filter", value = snp_filter())
@@ -113,7 +114,10 @@ network_plot <- function(
   # If the snp filter toggle has been changed, send the message
   # to the reactive value
   observeEvent(input$snp_filter, {
-    validate(need(input$snp_filter, message = FALSE))
+
+    # Check to see if the snp filter is different than current state
+    validate(need(input$snp_filter != snp_filter(), message = FALSE))
+
     to_return <- list(
       type = 'snp_filter_change',
       payload = input$snp_filter

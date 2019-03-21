@@ -52,13 +52,14 @@ ui <- shinyUI(
 
 server <- function(input, output, session) {
   app_network_data <- reactiveVal(generate_random_data())
+  app_snp_filter <- reactiveVal(FALSE)
 
   action_object <- reactiveVal()
 
   callModule(
     network_plot, 'network_plot',
     app_network_data,
-    snp_filter = reactive(FALSE),
+    snp_filter = app_snp_filter,
     viz_type = 'free',
     update_freq = 15,
     action_object = action_object
@@ -67,6 +68,7 @@ server <- function(input, output, session) {
   observeEvent(action_object(),{
     print("we have a message from the network!")
     app_network_data(generate_random_data())
+    app_snp_filter(!app_snp_filter())
     print(action_object())
   })
 }
