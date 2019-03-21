@@ -1,5 +1,17 @@
 // Helper functions for network plot
 
+// Sets up size object given a width and height and the constants object for sizing viz
+function setup_sizes(width, height, C){
+  return {
+    width: width,
+    height: height,
+    margin: C.margin,
+    w: width - (C.margin.left + C.margin.right),
+    h: height - (C.margin.top + C.margin.bottom),
+  };
+}
+
+
 // Function to make sure data conforms to the format we want
 function sanitize_data(data){
   const data_props = Object.keys(data);
@@ -52,7 +64,7 @@ function send_to_shiny(type, codes, C){
 
 
 // Function to setup overlaid canvas and svg
-function setup_canvas_and_svg(div){
+function setup_dom_elements(div, C, on_message){
   // Make div relatively positioned so we can overlay svg and canvas
   div.style('position', 'relative');
 
@@ -63,8 +75,11 @@ function setup_canvas_and_svg(div){
 
   // Append the canvas
   const canvas = div.selectAppend('canvas');
-
   const context = canvas.node().getContext('2d');
+
+  const tooltip = setup_tooltip(div, C);
+
+  const message_buttons = setup_message_buttons(div, on_message);
 
   const resize = function({width, height}){
     const viz_sizing = {
@@ -78,7 +93,7 @@ function setup_canvas_and_svg(div){
     canvas.at(viz_sizing);
   };
 
-  return {svg, canvas, context, resize};
+  return {svg, canvas, context, tooltip, message_buttons, resize};
 }
 
 
@@ -318,10 +333,12 @@ function setup_zoom(svg, update_network){
 
 // Function to draw canvas parts of network
 function draw_canvas_links(links, scales, {canvas, context}, C){
+
   // Clear canvas
   context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
   context.save();
-  context.globalAlpha = C.edge_opacity;
+  // Scale edge opacity based upon how many edges we have
+  context.globalAlpha = d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);
 
   context.beginPath();
   links.forEach(d => {

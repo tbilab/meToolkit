@@ -1,9 +1,4 @@
 // !preview r2d3 data=network_data, options = list(viz_type = 'free', update_freq = 5), container = 'div', dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js'))
-//
-// r2d3: https://rstudio.github.io/r2d3
-//
-
-const margin = {right: 20, left: 20, top: 20, bottom: 5};
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -13,12 +8,11 @@ const C = Object.assign(
     padding: 20,
     tooltip_offset: 13,
     tooltip_height: 60,
-    margin: margin,
+    margin: {right: 20, left: 20, top: 20, bottom: 5},
     case_radius: 3,
     code_radius_mult: 4,
     case_opacity: 1,
     edge_color: '#aaa',
-    edge_opacity: d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(data.edges.length),
     progress_bar_height: 20,
     progress_bar_color: 'orangered',
     msg_loc: 'shiny_server',
@@ -27,16 +21,6 @@ const C = Object.assign(
   },
   options);
 
-// Sets up size object given a width and height and the constants object for sizing viz
-function setup_sizes(width, height, C){
-  return {
-    width: width,
-    height: height,
-    margin: C.margin,
-    w: width - (C.margin.left + C.margin.right),
-    h: height - (C.margin.top + C.margin.bottom),
-  };
-}
 
 // Function to setup and run webworker
 function launch_webworker(network_data, callbacks){
@@ -68,24 +52,21 @@ function launch_webworker(network_data, callbacks){
 
 }
 
-
 // Function to entirely setup network viz.
 // Exposes methods for adding new data and updating the size
 function setup_network_viz(dom_elements, on_node_click){
 
   let layout_data = null,
-      been_sized = false;
+      been_sized = false,
+      current_zoom = null;
 
-  const scales = {
-    X: d3.scaleLinear(),
-    Y: d3.scaleLinear(),
-  };
+  const X = d3.scaleLinear();
+  const Y = d3.scaleLinear();
 
   const new_data = function({nodes, links}){
-
     // Update scale domains
-    scales.X.domain(d3.extent(nodes, d => d.x));
-    scales.Y.domain(d3.extent(nodes, d => d.y));
+    X.domain(d3.extent(nodes, d => d.x));
+    Y.domain(d3.extent(nodes, d => d.y));
 
     // Update function scope's copy of data
     layout_data = {nodes, links};
@@ -98,8 +79,8 @@ function setup_network_viz(dom_elements, on_node_click){
   const resize = function({width, height, margin}){
 
     // Update scale ranges
-    scales.X.range([margin.left, width - margin.right]);
-    scales.Y.range([height - margin.bottom, margin.top]);
+    X.range([margin.left, width - margin.right]);
+    Y.range([height - margin.bottom, margin.top]);
 
     // Let scope know we have set a size for the viz.
     been_sized = true;
@@ -110,10 +91,30 @@ function setup_network_viz(dom_elements, on_node_click){
   };
 
   const draw = function(){
+    // Update scales with the zoom if we have any
+    const scales = {
+      X: current_zoom ? current_zoom.rescaleX(X) : X,
+      Y: current_zoom ? current_zoom.rescaleY(Y) : Y,
+    };
+
     // Draw svg nodes of network
     draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click);
     draw_canvas_links(layout_data.links, scales, dom_elements, C);
   };
+
+
+
+  dom_elements.svg.call(
+    d3.zoom()
+    .scaleExtent([0.5, 5])
+    .on("zoom", () => {
+      // Record the zoom event to function scope.
+      current_zoom = d3.event.transform;
+
+      // Redraw network with this zoom scale
+      draw();
+    })
+  );
 
   return {new_data, resize};
 };
@@ -125,14 +126,27 @@ function setup_network_viz(dom_elements, on_node_click){
 // This code gets run once and sets up the basic
 // neccesities for the visualization.
 
+
+// Setup all the dom elements for the viz. This includes
+// the svg, canvas, context, tooltip, and message buttons.
+const dom_elements = setup_dom_elements(div, C, on_message);
+
+// Setup the progress bar for network simulation progress
+const progress_meter = setup_progress_meter(dom_elements.svg, C);
+
+// Setup the actual network viz itself.
+const network_viz = setup_network_viz(dom_elements, on_node_click);
+
+// Holds the currently selected codes.
 let selected_codes = [];
 
+// Function that is called when a message button is pressed. Passed the type of message.
+function on_message(type){
+  send_to_shiny(type, selected_codes, C);
+}
 
-// These hold the layout calculated network info once the webworker returns them
-let message_buttons = setup_message_buttons(div, (type) => send_to_shiny(type, selected_codes, C));
-
-
-const on_node_click = function(d){
+// Logic for what is done when a node is clicked.
+function on_node_click(d){
   const node = d3.select(this);
 
   // Is code already selected?
@@ -153,17 +167,11 @@ const on_node_click = function(d){
 
   // do we have selected codes currently? If so display the action popup.
   if(selected_codes.length > 0){
-    message_buttons.show();
+    dom_elements.message_buttons.show();
   } else {
-    message_buttons.hide();
+    dom_elements.message_buttons.hide();
   }
 };
-
-const dom_elements = setup_canvas_and_svg(div);
-dom_elements.tooltip = setup_tooltip(div, C);
-const progress_meter = setup_progress_meter(dom_elements.svg, C);
-
-const network_viz = setup_network_viz(dom_elements, on_node_click);
 
 
 //------------------------------------------------------------
@@ -172,7 +180,7 @@ const network_viz = setup_network_viz(dom_elements, on_node_click);
 // This is code that runs whenever new data is received by the
 // visualization.
 r2d3.onRender(function(data, div, width, height, options){
-  console.log('rendering now!');
+  // Make sure viz is correct size.
   size_viz(width, height);
 
   // Prepare data based upon the desired format from options
@@ -196,6 +204,11 @@ r2d3.onRender(function(data, div, width, height, options){
 //  setup_zoom(svg, draw_network);
 });
 
+
+// Tell r2d3 what to do when we resize the viz
+r2d3.onResize(size_viz);
+
+
 function size_viz(width, height){
   // Adjust size of svg and canvas elements
   const sizes = setup_sizes(width, height, C);
@@ -203,8 +216,6 @@ function size_viz(width, height){
   progress_meter.resize(sizes);
   network_viz.resize(sizes);
 }
-
-r2d3.onResize(size_viz);
 
 // Function to draw svg parts of network
 function draw_svg_nodes({nodes, links}, scales, {svg, tooltip}, C, on_click){
