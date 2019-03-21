@@ -47,7 +47,8 @@ function setup_webworker(C){
     // Send worker the data we are working with
     worker.postMessage(network_data);
 
-     // Control what is done when a message is received from the webworker
+
+    // Control what is done when a message is received from the webworker
     worker.onmessage = function(event) {
       switch (event.data.type) {
         case "progress_report": return on_progress_report(event.data.progress);

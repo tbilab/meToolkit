@@ -84,11 +84,16 @@ network_plot <- function(
   output$plot <- r2d3::renderD3({
     validate(need(network_data(), message = FALSE))
 
+    json_for_network <- jsonlite::toJSON(network_data());
+
     r2d3::r2d3(
-      data = jsonlite::toJSON(network_data()),
+      data = json_for_network,
       script = system.file("d3/network_plot/index.js", package = "meToolkit"),
       container = 'div',
-      dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js')),
+      dependencies = c(
+        "d3-jetpack",
+        system.file("d3/network_plot/helpers.js", package = "meToolkit")
+      ),
       options = list(
         just_snp = snp_filter(),
         msg_loc = session$ns('message'),
