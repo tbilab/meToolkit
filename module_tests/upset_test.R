@@ -2,6 +2,7 @@ library(shiny)
 library(shinydashboard)
 library(magrittr)
 library(tidyverse)
+library(meToolkit)
 
 upsetData <- here::here('module_tests/data/upset_data.rds') %>%
   readr::read_rds()
@@ -38,7 +39,7 @@ server <- function(input, output, session) {
     }
   })
 
-  upsetPlot <- callModule(upset, 'upsetPlot', upset_data, all_snp_data)
+  upsetPlot <- callModule(upset, 'upsetPlot', upset_data, all_snp_data, snp_filter)
 
 }
 

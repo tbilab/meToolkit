@@ -704,16 +704,16 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
     .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
 }
 
-function draw_upset(width,height){
+function draw_upset(data, svg, width, height, options){
+  viz_data = data;
+  viz_svg = svg;
+  viz_options = options
   // ----------------------------------------------------------------------
   // Start main visualization drawing
   // ----------------------------------------------------------------------
 
-  // Check if we have filtered the snps
-  const only_snp_data = data.filter(d => (d.num_snp - d.count) !== 0).length === 0
-
   // Setup the sizes of chart components
-  const sizes = setup_chart_sizes(width, height, margin, only_snp_data);
+  const sizes = setup_chart_sizes(width, height, margin, options.snp_filter);
 
   // Get a set_size scale for use with slider
   const set_size_x = setup_set_size_x_scale(data, sizes);
@@ -744,11 +744,12 @@ function draw_upset(width,height){
       .call(make_set_size_slider, set_size_x, sizes, starting_min_size, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
 
     // Initialize viz
-    draw_with_set_size(g, starting_min_size, sizes, set_size_x, only_snp_data);
+    draw_with_set_size(g, starting_min_size, sizes, set_size_x, options.snp_filter);
   }
 };
 
-draw_upset(width, height);
-r2d3.onResize(draw_upset)
+let viz_data, viz_svg, viz_options;
 
 
+r2d3.onRender(draw_upset);
+r2d3.onResize((width,height) => draw_upset(viz_data, viz_svg, width, height, viz_options));

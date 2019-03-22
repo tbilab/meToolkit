@@ -4,7 +4,8 @@
 \alias{upset}
 \title{Server function of upset module}
 \usage{
-upset(input, output, session, individual_data, all_patient_snps)
+upset(input, output, session, individual_data, all_patient_snps,
+  snp_filter)
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
@@ -12,6 +13,8 @@ upset(input, output, session, individual_data, all_patient_snps)
 \item{individual_data}{Reactive object with dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.}
 
 \item{all_patient_snps}{dataframe containing two columns \code{IID}, \code{snp} for every case in the population. Used in calculating a overall snp abundence.}
+
+\item{snp_filter}{reactive boolean containing if we've filtered by snp status or not.}
 }
 \value{
 Shiny module
