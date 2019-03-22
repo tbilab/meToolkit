@@ -25,13 +25,6 @@ const interaction_box_styles = {
 };
 
 
-// new layout grid
-const set_size_bars_units = 3;
-const rr_plot_units = 3;
-const matrix_plot_units = 3;
-const total_width_units = set_size_bars_units + rr_plot_units + matrix_plot_units;
-const marginal_count_prop = 0.3;
-
 // Function to filter data down to the minimum desired set size
 function filter_set_size(data, marginal_data, min_set_size = 100){
   // Filter the main dataset down
@@ -118,7 +111,13 @@ function setup_scales(patterns, marginal, sizes, set_size_x){
   };
 }
 
-function setup_chart_sizes(width, height, margin){
+function setup_chart_sizes(width, height, margin, only_snps){
+  const set_size_bars_units = 1;
+  const rr_plot_units = only_snps ? 0 : 1;
+  const matrix_plot_units = 1;
+  const marginal_count_prop = 0.3;
+  const total_width_units = set_size_bars_units + rr_plot_units + matrix_plot_units;
+
   const h = height - margin.top - margin.bottom;
   const w = width - margin.left - margin.right;
 
@@ -611,7 +610,7 @@ function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_releas
   move_handle(set_size_x(starting_min_size));
 }
 
-function draw_with_set_size(g, min_set_size, sizes, set_size_x){
+function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
 
   const {patterns, marginals} = filter_set_size(data, options.marginalData, min_set_size);
 
@@ -629,9 +628,14 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x){
     .translate([0, sizes.margin_count_h])
     .call(draw_pattern_count_bars, patterns, scales, sizes);
 
-  const rr_intervals = g.selectAppend('g.rr_intervals')
-    .translate([sizes.set_size_bars_w + sizes.matrix_plot_w, sizes.margin_count_h])
-    .call(draw_rr_intervals, patterns, scales, sizes);
+  if(only_snp_data){
+    // Make sure to remove any lingering snp info
+    g.select('g.rr_intervals').remove();
+  } else {
+     const rr_intervals = g.selectAppend('g.rr_intervals')
+      .translate([sizes.set_size_bars_w + sizes.matrix_plot_w, sizes.margin_count_h])
+      .call(draw_rr_intervals, patterns, scales, sizes);
+  }
 
   const code_marginal_bars = g.selectAppend('g.code_marginal_bars')
     .translate([sizes.set_size_bars_w,0])
@@ -700,14 +704,16 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x){
     .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
 }
 
-
 function draw_upset(width,height){
   // ----------------------------------------------------------------------
   // Start main visualization drawing
   // ----------------------------------------------------------------------
 
+  // Check if we have filtered the snps
+  const only_snp_data = data.filter(d => (d.num_snp - d.count) !== 0).length === 0
+
   // Setup the sizes of chart components
-  const sizes = setup_chart_sizes(width, height, margin);
+  const sizes = setup_chart_sizes(width, height, margin, only_snp_data);
 
   // Get a set_size scale for use with slider
   const set_size_x = setup_set_size_x_scale(data, sizes);
@@ -715,6 +721,7 @@ function draw_upset(width,height){
   // Add a g to pad chart
   const g = svg.selectAppend('g.padding')
     .translate([sizes.margin.left, sizes.margin.top]);
+
 
   // Check if we have enough data to make a meaningful upset chart
   if(data.length < 2){
@@ -737,7 +744,7 @@ function draw_upset(width,height){
       .call(make_set_size_slider, set_size_x, sizes, starting_min_size, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
 
     // Initialize viz
-    draw_with_set_size(g, starting_min_size, sizes, set_size_x);
+    draw_with_set_size(g, starting_min_size, sizes, set_size_x, only_snp_data);
   }
 };
 
