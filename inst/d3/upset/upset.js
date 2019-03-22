@@ -235,17 +235,13 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
   pattern_count_bars.exit().remove();
 
   // Append-Update
-  // Bars that are entering the viz
   pattern_count_bars.enter()
     .append('rect.pattern_count_bars')
     .at(starting_attrs)
+    .merge(pattern_count_bars)
     .transition()
     .at(ending_attrs);
 
-  // Bars that are sticking around but need to be updated
-  pattern_count_bars
-    .transition()
-    .at(ending_attrs);
 
   //// Pattern count bars axis
   const axis = g.selectAppend("g.axis")
@@ -303,32 +299,52 @@ function draw_rr_intervals(g, patterns, scales, sizes){
       y1: d => d === 1 ? -sizes.matrix_plot_h: 0,
     });
 
+
   const rr_binding = g.selectAll('.rr_intervals')
     .data(patterns, d => d.pattern);
 
   rr_binding.exit().remove();
 
   // Now draw the intervals
-  const rr_intervals = rr_binding
-    .enter().append('g.rr_intervals')
-    .merge(rr_binding)
-    .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2]);
+  const new_intervals = rr_binding.enter()
+    .append('g.rr_intervals');
 
-  rr_intervals
-    .selectAppend('line')
+  const new_interval_lines = new_intervals.append('line')
     .at({
-      x1: d => scales.rr_x(d.lower),
-      x2: d => scales.rr_x(d.upper),
+      x1: d => scales.rr_x(d.pointEst),
+      x2: d => scales.rr_x(d.pointEst),
       stroke: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
       strokeWidth: size_of_interval_line,
     });
 
-  rr_intervals
-    .selectAppend('circle')
+  const new_interval_points = new_intervals.append('circle')
+    .at({
+      cx: d => scales.rr_x(d.pointEst),
+      r: 0,
+      fill: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
+    });
+
+  // existing intervals
+  rr_binding
+    .merge(new_intervals)
+    .transition()
+    .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2]);
+
+  rr_binding.select('line')
+    .merge(new_interval_lines)
+    .transition()
+    .at({
+      x1: d => scales.rr_x(d.lower),
+      x2: d => scales.rr_x(d.upper),
+    });
+
+
+  rr_binding.select('circle')
+    .merge(new_interval_points)
+    .transition()
     .at({
       cx: d => scales.rr_x(d.pointEst),
       r: size_of_pe,
-      fill: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
     });
 
   // Title subplot
