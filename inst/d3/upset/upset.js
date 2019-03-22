@@ -704,16 +704,14 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
     .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
 }
 
-function draw_upset(data, svg, width, height, options){
-  viz_data = data;
-  viz_svg = svg;
-  viz_options = options
+
+function draw_upset(){
   // ----------------------------------------------------------------------
   // Start main visualization drawing
   // ----------------------------------------------------------------------
 
   // Setup the sizes of chart components
-  const sizes = setup_chart_sizes(width, height, margin, options.snp_filter);
+  const sizes = setup_chart_sizes(viz_width, viz_height, margin, viz_options.snp_filter);
 
   // Get a set_size scale for use with slider
   const set_size_x = setup_set_size_x_scale(data, sizes);
@@ -729,27 +727,42 @@ function draw_upset(data, svg, width, height, options){
     svg.append('text')
       .attr('text-anchor', 'middle')
       .tspans([`${lead_message} filter size threshold`, 'Adjust threshold down to see groups.'])
-      .attr('x', width/2)
-      .attr('y', height/2);
+      .attr('x', viz_width/2)
+      .attr('y', viz_height/2);
 
   } else {
     const [min_count, max_count] = d3.extent(data, d => d.count);
     // Make sure desired min set size is within reason
-    const starting_min_size = options.min_set_size < min_count ? min_count + 1 :
-                              options.min_set_size > max_count ? max_count -1  :
-                                                                 options.min_set_size;
+    const starting_min_size = viz_options.min_set_size < min_count ? min_count + 1 :
+                              viz_options.min_set_size > max_count ? max_count -1  :
+                                                                 viz_options.min_set_size;
     // Setup the size slider
     const set_size_slider =  g.selectAppend('g.set_size_slider')
       .translate([0, sizes.h])
       .call(make_set_size_slider, set_size_x, sizes, starting_min_size, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
 
     // Initialize viz
-    draw_with_set_size(g, starting_min_size, sizes, set_size_x, options.snp_filter);
+    draw_with_set_size(g, starting_min_size, sizes, set_size_x, viz_options.snp_filter);
   }
 };
 
-let viz_data, viz_svg, viz_options;
+let viz_data = data,
+    viz_svg = svg,
+    viz_options = options,
+    viz_width = width,
+    viz_height = height;
 
 
-r2d3.onRender(draw_upset);
-r2d3.onResize((width,height) => draw_upset(viz_data, viz_svg, width, height, viz_options));
+r2d3.onRender((data, svg, width, height, options) => {
+  viz_data = data;
+  viz_svg = svg;
+  viz_options = options;
+  draw_upset();
+});
+
+r2d3.onResize((width,height) => {
+  viz_width = width;
+  viz_height = height;
+
+  draw_upset(viz_data, viz_svg, viz_width, viz_height, viz_options)
+});
