@@ -313,8 +313,6 @@ function setup_progress_meter(svg, C){
 
 
 
-
-
 // Simulation webworker function
 function sim_webworker(update_freq){
   importScripts("https://d3js.org/d3-collection.v1.min.js");

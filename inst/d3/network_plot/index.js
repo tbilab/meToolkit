@@ -230,7 +230,7 @@ function size_viz(width, height){
 }
 
 // Function to draw svg parts of network
-function draw_svg_nodes({nodes, links}, scales, {svg, tooltip}, C, on_click){
+function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click){
 
   const x_max = scales.X.range()[1];
   const y_max = scales.Y.range()[1];
@@ -271,11 +271,9 @@ function draw_svg_nodes({nodes, links}, scales, {svg, tooltip}, C, on_click){
     .on('mouseover', function(d){
 
       const connected_nodes = find_connections(d.name, links);
-      // Highlight connected nodes by making them 1.5 times larger than default
-      all_nodes
-        .filter(n => connected_nodes.includes(n.name))
-        .attr('r', function(){return d3.select(this).attr('r')*1.5})
-        .at('stroke-width', 1);
+
+      // Redraw the canvas part of the viz with these highlights
+      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, connected_nodes);
 
       tooltip
         .move([scales.X(d.x), scales.Y(d.y)])
@@ -286,13 +284,13 @@ function draw_svg_nodes({nodes, links}, scales, {svg, tooltip}, C, on_click){
       tooltip.hide();
 
       // Reset nodes that may have been highlighted
-      all_nodes.at(node_attrs);
+      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
     })
     .on('click', on_click);
 }
 
 // Function to draw canvas parts of network
-function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C){
+function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highlighted_nodes = []){
 
   // Clear canvas
   context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
@@ -315,10 +313,19 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C){
   // Draw patient nodes
   context.globalAlpha = C.case_opacity;
 
+  // Function to assign node highlights
+  // Only check for highlight modification if we need to to avoid expensive calculations
+  const node_border = d => highlighted_nodes.length != 0 ?
+    `rgba(0, 0, 0, ${highlighted_nodes.includes(d.name) ? 1 : 0})` :
+    `rgba(0, 0, 0, 0)`;
+
+
   nodes.forEach( d => {
     if(!d.selectable){
-      // No border around the nodes. This will change when selection is built back in
-      context.strokeStyle = `rgba(0, 0, 0, 0)`;
+
+      // Border around the nodes.
+      context.strokeStyle = node_border(d);
+
       context.fillStyle = d.color;
 
       context.beginPath();
