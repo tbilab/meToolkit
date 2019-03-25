@@ -112,7 +112,11 @@ upset <- function(input, output, session, individual_data, all_patient_snps) {
     # Send everything to the upset javascript code
     r2d3::r2d3(
       data = pattern_to_enrichment,
-      options = list(marginalData = code_marginal_data, overallMaRate = overall_ma_freq, min_set_size = 20),
+      options = list(
+        marginalData = code_marginal_data,
+        overallMaRate = overall_ma_freq,
+        min_set_size = 20
+      ),
       script = system.file("d3/upset/upset.js", package = "meToolkit"),
       css = system.file("d3/upset/upset.css", package = "meToolkit"),
       dependencies = c("d3-jetpack",system.file("d3/upset/helpers.js", package = "meToolkit"))
