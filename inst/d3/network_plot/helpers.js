@@ -27,9 +27,9 @@ function sanitize_data(data){
 function fix_nodes_to_line(data, C){
   data.nodes.forEach(d => {
     if(d.selectable){
-      d.fx = -1
+      d.fx = -1;
     } else {
-      d.fx = 1
+      d.fx = 1;
     }
 
   });
@@ -311,27 +311,6 @@ function setup_progress_meter(svg, C){
 
 
 
-// Function to draw canvas parts of network
-function draw_canvas_links(links, scales, {canvas, context}, C){
-
-  // Clear canvas
-  context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
-  context.save();
-  // Scale edge opacity based upon how many edges we have
-  context.globalAlpha = d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);
-
-  context.beginPath();
-  links.forEach(d => {
-    context.moveTo(scales.X(d.source.x), scales.Y(d.source.y));
-    context.lineTo(scales.X(d.target.x), scales.Y(d.target.y));
-  });
-
-  // Set color of edges
-  context.strokeStyle = C.edge_color;
-
-  // Draw to canvas
-  context.stroke();
-}
 
 
 

@@ -112,7 +112,7 @@ function setup_network_viz(dom_elements, on_node_click){
 
     // Draw svg nodes of network
     draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click);
-    draw_canvas_links(layout_data.links, scales, dom_elements, C);
+    draw_canvas_portion(layout_data, scales, dom_elements, C);
   };
 
   dom_elements.svg.call(
@@ -253,7 +253,8 @@ function draw_svg_nodes({nodes, links}, scales, {svg, tooltip}, C, on_click){
 
   // Bind data but only the phenotype nodes
   const node_circles = svg.selectAll('circle')
-    .data(nodes, d => d.id);
+    .data(nodes.filter(d => d.selectable), d => d.id);
+
 
   const all_nodes = node_circles.enter()
     .append('circle')
@@ -288,4 +289,43 @@ function draw_svg_nodes({nodes, links}, scales, {svg, tooltip}, C, on_click){
       all_nodes.at(node_attrs);
     })
     .on('click', on_click);
+}
+
+// Function to draw canvas parts of network
+function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C){
+
+  // Clear canvas
+  context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
+  context.save();
+  // Scale edge opacity based upon how many edges we have
+  context.globalAlpha = d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);
+
+  context.beginPath();
+  links.forEach(d => {
+    context.moveTo(scales.X(d.source.x), scales.Y(d.source.y));
+    context.lineTo(scales.X(d.target.x), scales.Y(d.target.y));
+  });
+
+  // Set color of edges
+  context.strokeStyle = C.edge_color;
+
+  // Draw to canvas
+  context.stroke();
+
+  // Draw patient nodes
+  context.globalAlpha = C.case_opacity;
+
+  nodes.forEach( d => {
+    if(!d.selectable){
+      // No border around the nodes. This will change when selection is built back in
+      context.strokeStyle = `rgba(0, 0, 0, 0)`;
+      context.fillStyle = d.color;
+
+      context.beginPath();
+      context.arc(scales.X(d.x), scales.Y(d.y), C.case_radius, 0, 2 * Math.PI);
+      context.fill();
+      context.stroke();
+    }
+  });
+
 }
