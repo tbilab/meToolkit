@@ -39,7 +39,7 @@ server <- function(input, output, session) {
     }
   })
 
-  upsetPlot <- callModule(upset, 'upsetPlot', upset_data, all_snp_data, snp_filter)
+  upsetPlot <- callModule(upset, 'upsetPlot', upset_data, all_snp_data)
 
 }
 

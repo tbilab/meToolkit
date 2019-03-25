@@ -1,6 +1,5 @@
 // !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
 
-
 // Constants
 const margin = {right: 25, left: 25, top: 20, bottom: 70}; // margins on side of chart
 
@@ -23,7 +22,6 @@ const interaction_box_styles = {
   stroke: 'grey',
   strokeWidth: 1
 };
-
 
 // Function to filter data down to the minimum desired set size
 function filter_set_size(data, marginal_data, min_set_size = 100){
@@ -708,10 +706,12 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
 function draw_upset(){
   // ----------------------------------------------------------------------
   // Start main visualization drawing
-  // ----------------------------------------------------------------------
+  // ---------------------------------------------------------------------
+
+  const filtered_on_snp = viz_data.filter(d => d.num_snp < d.count).length === 0;
 
   // Setup the sizes of chart components
-  const sizes = setup_chart_sizes(viz_width, viz_height, margin, viz_options.snp_filter);
+  const sizes = setup_chart_sizes(viz_width, viz_height, margin, filtered_on_snp);
 
   // Get a set_size scale for use with slider
   const set_size_x = setup_set_size_x_scale(data, sizes);
@@ -742,7 +742,7 @@ function draw_upset(){
       .call(make_set_size_slider, set_size_x, sizes, starting_min_size, (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x));
 
     // Initialize viz
-    draw_with_set_size(g, starting_min_size, sizes, set_size_x, viz_options.snp_filter);
+    draw_with_set_size(g, starting_min_size, sizes, set_size_x, filtered_on_snp);
   }
 };
 
