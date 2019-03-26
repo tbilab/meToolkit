@@ -98,7 +98,7 @@ function setup_dom_elements(div, C, on_message){
 
 
 // Function to initialize a tooltip for showing mousover info
-// Appends a tooltip to a div and opens up methods to move it around, show, hide, and update contents.
+// Appends a tooltip to a div and opens up methods to move it around, show, hide, and update contents
 function setup_tooltip(div, C){
 
   const tip = div.selectAppend('div.tooltip')

@@ -24,10 +24,7 @@ ui <- shinyUI(
 server <- function(input, output, session) {
 
   snp_filter <- reactiveVal(FALSE)
-
-  observeEvent(input$toggle_snp,{
-    snp_filter(!snp_filter())
-  })
+  action_object <- reactiveVal()
 
   upset_data <- reactive({
     data <- individual_data
@@ -39,7 +36,20 @@ server <- function(input, output, session) {
     }
   })
 
-  upsetPlot <- callModule(upset, 'upsetPlot', upset_data, all_snp_data)
+  observeEvent(input$toggle_snp,{
+    snp_filter(!snp_filter())
+  })
+
+  observeEvent(action_object(),{
+    print("we have a message from the plot!")
+    print(action_object()$payload)
+  })
+
+  upsetPlot <- callModule(
+    upset, 'upsetPlot',
+    upset_data,
+    all_snp_data,
+    action_object )
 
 }
 
