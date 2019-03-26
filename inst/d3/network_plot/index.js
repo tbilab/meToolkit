@@ -69,6 +69,7 @@ function setup_network_viz(dom_elements, on_node_click){
   let layout_data = null,
       been_sized = false,
       current_zoom = null,
+      patient_patterns = null,
       nodes_to_highlight = [];
 
   const X = d3.scaleLinear();
@@ -78,6 +79,7 @@ function setup_network_viz(dom_elements, on_node_click){
 
     const nodes = data.nodes || data.vertices;
     const links = data.links || data.edges;
+
 
     // Remove old network nodes
     dom_elements.svg.selectAll('circle').remove();
@@ -108,7 +110,7 @@ function setup_network_viz(dom_elements, on_node_click){
     }
   };
 
-  const draw = function(highlighted_nodes = []){
+  const draw = function(){
     // Update scales with the zoom if we have any
     const scales = {
       X: current_zoom ? current_zoom.rescaleX(X) : X,
@@ -120,10 +122,21 @@ function setup_network_viz(dom_elements, on_node_click){
     draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
   };
 
+  const new_patterns = function(patterns){
+    patient_patterns = patterns;
+  };
+
   const highlight = function(codes_to_highlight){
     if(layout_data){
-       // Find the indexes of the highlighted nodes and update scope variable
-      const to_highlight = find_patients_by_pattern(layout_data, codes_to_highlight);
+
+      const single_code = typeof codes_to_highlight === 'string';
+
+      // Find the patient nodes who have the pattern we want to highlight
+      const to_highlight = patient_patterns
+        .filter(d => arrays_equal(d.pattern, single_code ? [codes_to_highlight] : codes_to_highlight))
+        .map(d => d.name);
+
+      // Update the canvas to highlight these nodes
       draw_canvas_portion(layout_data, {X, Y}, dom_elements, C, to_highlight);
     }
   };
@@ -140,7 +153,7 @@ function setup_network_viz(dom_elements, on_node_click){
     })
   );
 
-  return {new_data, resize, highlight};
+  return {new_data, resize, new_patterns, highlight};
 };
 
 
@@ -175,6 +188,7 @@ let selected_codes = [],
       width,
       height,
       options,
+      patient_patterns: null,
     };
 
 
@@ -199,6 +213,10 @@ r2d3.onRender(function(data, div, width, height, options){
   viz.options = options;
 
   if(new_data){
+    // Build a patient pattern array and send to network viz
+    viz.patient_patterns = build_patient_patterns(viz.data);
+    network_viz.new_patterns(viz.patient_patterns);
+
     // Prepare data based upon the desired format from options
     const data_for_viz = C.viz_type === 'bipartite' ?
       fix_nodes_to_line(sanitize_data(viz.data), C):

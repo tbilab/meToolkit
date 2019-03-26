@@ -83,9 +83,15 @@ server <- function(input, output, session) {
   )
 
   observeEvent(input$update_w_pattern, {
-    # if()
     print('highlighting a pattern')
-    app_network_pattern(random_data$pattern)
+
+    random_code <- (app_network_data()$vertices) %>%
+      filter(selectable) %>%
+      sample_n(1) %>%
+      pull(name)
+
+    print(random_code)
+    app_network_pattern(c(random_code))
   })
 
   observeEvent(action_object(),{

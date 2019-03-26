@@ -175,13 +175,14 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
 
 
       // Send message to shiny about the highlighted pattern
-      const message_loc = viz_options.msg_loc || 'no_shiny';
-      send_to_shiny('pattern_highlight', codes_in_pattern, message_loc);
+      send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
     },
     mouseout: function(d){
       right_info_panel.hide();
       left_info_panel.hide();
       d3.select(this).attr('opacity', 0);
+
+      send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
     }
   };
 

@@ -1,6 +1,5 @@
 // Helper functions for network plot
 
-
 function unique(data, key){
   return d3.set(data).values();
 };
@@ -544,6 +543,31 @@ function find_patients_by_pattern({nodes, links}, pattern){
 
 }
 
+// Builds array of patient to phecode pattern for use in filtering
+function build_patient_patterns(data){
+  const nodes = data.nodes || data.vertices;
+  const links = data.links || data.edges;
+
+  const id_to_code = nodes.reduce(
+    (acc, d) => {
+      if(d.selectable){
+        acc[d.id] = d.name;
+      }
+      return acc;
+    },
+    {}
+  );
+
+
+  const patient_to_codes = {};
+
+  for(let i = 0; i < links.length; i++){
+    patient_to_codes[links[i].source] = [...(patient_to_codes[links[i].source] || []), id_to_code[links[i].target]];
+  }
+
+  return nodes.filter(d => !d.selectable).map(d => ({name: d.name, pattern: patient_to_codes[d.id]}));
+}
+
 
 // Test if two datasets are equal for determining if we have new data from render call
 function is_new_data(old_data, new_data) {
@@ -562,4 +586,14 @@ function is_new_data(old_data, new_data) {
 
   // If we have a different length then we have new data somewhere
   return combined_names.length !== old_nodes.length;
+}
+
+function arrays_equal(arr_1, arr_2){
+  // If vecs are different lengths data must different
+  if(arr_1.length !== arr_1.length)
+    return false;
+
+  // If the union of the two arrays is the same size as both they're the same.
+  const size_of_union = unique([...arr_1, ...arr_2]).length
+  return (size_of_union === arr_1.length) && (size_of_union === arr_2.length);
 }
