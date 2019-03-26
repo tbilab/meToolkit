@@ -137,10 +137,14 @@ function setup_network_viz(dom_elements, on_node_click){
 // This code gets run once and sets up the basic
 // neccesities for the visualization.
 
-
 // Setup all the dom elements for the viz. This includes
 // the svg, canvas, context, tooltip, and message buttons.
-const dom_elements = setup_dom_elements(div, C, on_message);
+const dom_elements = setup_dom_elements(
+  div, C,
+  // Function that is called when a message button is pressed. Passed the type of message
+  function(type){
+    send_to_shiny(type, selected_codes, C);
+  });
 
 // Setup the progress bar for network simulation progress
 const progress_meter = setup_progress_meter(dom_elements.svg, C);
@@ -148,43 +152,20 @@ const progress_meter = setup_progress_meter(dom_elements.svg, C);
 // Setup the actual network viz itself.
 const network_viz = setup_network_viz(dom_elements, on_node_click);
 
-// Holds the currently selected codes.
-let selected_codes = [];
 
 const webworker = setup_webworker(C);
 
-// Function that is called when a message button is pressed. Passed the type of message.
-function on_message(type){
-  send_to_shiny(type, selected_codes, C);
-}
+// Holds the currently selected codes.
+let selected_codes = [],
+    viz = {
+      data,
+      width,
+      height,
+      options,
+    };
 
-// Logic for what is done when a node is clicked.
-function on_node_click(d){
-  const node = d3.select(this);
 
-  // Is code already selected?
-  if(selected_codes.includes(d.name)){
-    // pull code out of selected list
-    selected_codes = selected_codes.filter(code => code !== d.name);
 
-    // reset the style of node
-    node.attr("stroke-width", 0);
-
-  } else {
-    // add code to selected codes list
-    selected_codes = [d.name, ...selected_codes];
-
-    // Outline node to emphasize highlight
-     node.attr("stroke-width", 2);
-  }
-
-  // do we have selected codes currently? If so display the action popup.
-  if(selected_codes.length > 0){
-    dom_elements.message_buttons.show();
-  } else {
-    dom_elements.message_buttons.hide();
-  }
-};
 
 
 //------------------------------------------------------------
@@ -193,21 +174,26 @@ function on_node_click(d){
 // This is code that runs whenever new data is received by the
 // visualization.
 r2d3.onRender(function(data, div, width, height, options){
+
+  // Update the global viz info object
+  viz.data = data;
+  viz.options = options;
+
   // Make sure viz is correct size.
-  size_viz(width, height);
+  size_viz(viz.width, viz.height);
 
   // Prepare data based upon the desired format from options
   const data_for_viz = C.viz_type === 'bipartite' ?
-    fix_nodes_to_line(sanitize_data(data), C):
-    sanitize_data(data);
+    fix_nodes_to_line(sanitize_data(viz.data), C):
+    sanitize_data(viz.data);
 
   // Launch webworker to calculate layout and kickoff network viz after finishing
   webworker(
     data_for_viz,
     {
       on_progress_report: progress_meter.update,
-      on_layout_data: (data) => {
-        network_viz.new_data(data);
+      on_layout_data: (d) => {
+        network_viz.new_data(d);
       },
       on_finish: () => {
         progress_meter.hide();
@@ -218,7 +204,13 @@ r2d3.onRender(function(data, div, width, height, options){
 
 
 // Tell r2d3 what to do when we resize the viz
-r2d3.onResize(size_viz);
+r2d3.onResize((width, height) => {
+  // Update the global viz info object
+  viz.width = width;
+  viz.height = height;
+
+  size_viz(viz.width, viz.height);
+});
 
 
 function size_viz(width, height){
@@ -229,110 +221,5 @@ function size_viz(width, height){
   network_viz.resize(sizes);
 }
 
-// Function to draw svg parts of network
-function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click){
-
-  const x_max = scales.X.range()[1];
-  const y_max = scales.Y.range()[1];
-
-  const choose_stroke_width = (d) => {
-    const selected = selected_codes.includes(d.name);
-
-    return d.inverted ? 3:
-           selected ? 2 : 0;
-  };
-
-  const node_attrs = {
-    r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
-    cx: d => scales.X(d.x),
-    cy: d => scales.Y(d.y),
-    stroke: d => d.inverted ?  d.color: 'black',
-    strokeWidth: choose_stroke_width,
-    fill: d => d.inverted ? 'white': d.color,
-  };
-
-  // Bind data but only the phenotype nodes
-  const node_circles = svg.selectAll('circle')
-    .data(nodes.filter(d => d.selectable), d => d.id);
 
 
-  const all_nodes = node_circles.enter()
-    .append('circle')
-    .at({
-      r: 0,
-      cx: d => Math.random()*x_max,
-      cy: d => Math.random()*y_max,
-    })
-    .merge(node_circles)
-    .at(node_attrs);
-
-  // Add mouseover behavior for nodes that are selectable
-  all_nodes
-    .on('mouseover', function(d){
-
-      const connected_nodes = find_connections(d.name, links);
-
-      // Redraw the canvas part of the viz with these highlights
-      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, connected_nodes);
-
-      tooltip
-        .move([scales.X(d.x), scales.Y(d.y)])
-        .update(d.tooltip)
-        .show();
-    })
-    .on('mouseout', function(d){
-      tooltip.hide();
-
-      // Reset nodes that may have been highlighted
-      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
-    })
-    .on('click', on_click);
-}
-
-// Function to draw canvas parts of network
-function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highlighted_nodes = []){
-
-  // Clear canvas
-  context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
-  context.save();
-  // Scale edge opacity based upon how many edges we have
-  context.globalAlpha = d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);
-
-  context.beginPath();
-  links.forEach(d => {
-    context.moveTo(scales.X(d.source.x), scales.Y(d.source.y));
-    context.lineTo(scales.X(d.target.x), scales.Y(d.target.y));
-  });
-
-  // Set color of edges
-  context.strokeStyle = C.edge_color;
-
-  // Draw to canvas
-  context.stroke();
-
-  // Draw patient nodes
-  context.globalAlpha = C.case_opacity;
-
-  // Function to assign node highlights
-  // Only check for highlight modification if we need to to avoid expensive calculations
-  const node_border = d => highlighted_nodes.length != 0 ?
-    `rgba(0, 0, 0, ${highlighted_nodes.includes(d.name) ? 1 : 0})` :
-    `rgba(0, 0, 0, 0)`;
-
-
-  nodes.forEach( d => {
-    if(!d.selectable){
-
-      // Border around the nodes.
-      context.strokeStyle = node_border(d);
-
-      context.fillStyle = d.color;
-
-      context.beginPath();
-      context.arc(scales.X(d.x), scales.Y(d.y), C.case_radius, 0, 2 * Math.PI);
-      context.fill();
-      context.stroke();
-    }
-  });
-
-}
