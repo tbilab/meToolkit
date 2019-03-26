@@ -511,3 +511,32 @@ function on_node_click(d){
     dom_elements.message_buttons.hide();
   }
 };
+
+
+// Finds which patient nodes contain a given pattern of codes.
+function find_patients_by_pattern({nodes, links}, pattern){
+    // Find the indexes of the highlighted nodes
+    const highlighted_indices = nodes.filter(d => pattern.includes(d.name)).map(d => d.index);
+
+    const highlighted_patient_ids = Object.values(
+      links.reduce(
+        (acc, d) => {
+          const patient = d.source;
+          const code = d.target;
+          // Only add the code if we need to.
+          if(highlighted_indices.includes(code)){
+            patient_info = acc[patient] || {};
+            patient_codes = patient_info.codes || [];
+            patient_info.codes = [...patient_codes, code];
+            patient_info.id = patient;
+            acc[patient] = patient_info;
+          }
+          return acc;
+        },{} )
+    ).filter(d => d.codes.length == pattern.length)
+     .map(d => d.id);
+
+    return nodes
+      .filter(d => highlighted_patient_ids.includes(d.id))
+      .map(d => d.name);
+  }

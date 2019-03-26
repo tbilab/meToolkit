@@ -1,4 +1,4 @@
-// !preview r2d3 data=network_data, options = list(viz_type = 'free', update_freq = 5), container = 'div', dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js'))
+// !preview r2d3 data=network_data, options = list(viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -68,7 +68,8 @@ function setup_network_viz(dom_elements, on_node_click){
 
   let layout_data = null,
       been_sized = false,
-      current_zoom = null;
+      current_zoom = null,
+      nodes_to_highlight = [];
 
   const X = d3.scaleLinear();
   const Y = d3.scaleLinear();
@@ -103,7 +104,7 @@ function setup_network_viz(dom_elements, on_node_click){
     }
   };
 
-  const draw = function(){
+  const draw = function(highlighted_nodes = []){
     // Update scales with the zoom if we have any
     const scales = {
       X: current_zoom ? current_zoom.rescaleX(X) : X,
@@ -112,7 +113,16 @@ function setup_network_viz(dom_elements, on_node_click){
 
     // Draw svg nodes of network
     draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click);
-    draw_canvas_portion(layout_data, scales, dom_elements, C);
+    draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
+  };
+
+  const highlight = function(codes_to_highlight){
+
+    // Find the indexes of the highlighted nodes and update scope variable
+    nodes_to_highlight = find_patients_by_pattern(layout_data, codes_to_highlight);
+
+    // Redraw to reflect this new highlight
+    draw();
   };
 
   dom_elements.svg.call(
@@ -127,7 +137,7 @@ function setup_network_viz(dom_elements, on_node_click){
     })
   );
 
-  return {new_data, resize};
+  return {new_data, resize, highlight};
 };
 
 
@@ -166,8 +176,6 @@ let selected_codes = [],
 
 
 
-
-
 //------------------------------------------------------------
 // On Render
 //------------------------------------------------------------
@@ -200,6 +208,13 @@ r2d3.onRender(function(data, div, width, height, options){
       },
     }
   );
+
+   // Check if we have a request to highlight a pattern
+  if(viz.options.highlighted_pattern){
+    network_viz.new_data(data_for_viz); // Remove this once it's all set
+    network_viz.highlight(viz.options.highlighted_pattern);
+  }
+
 });
 
 
