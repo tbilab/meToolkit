@@ -13,13 +13,12 @@ phewas_results <- fake_phewas_results %>%
   meToolkit::buildColorPalette(category)
 
 # Some constants
-n_patients <- 1000
 snp_prev <- 0.15
 inverted_codes <- c()
 snp_filter <- FALSE
 
 
-generate_random_data <- function(){
+generate_random_data <- function(n_patients = 1000){
   individual_data <- phewas_results %>%
     meToolkit::simIndividualData(n_patients, snp_prev) %>% {
       right_join(
@@ -28,6 +27,20 @@ generate_random_data <- function(){
       )
     } %>%
     rename(IID = id)
+
+  patient_w_pattern <- individual_data %>%
+    gather(code, value, -IID, -snp) %>%
+    filter(value != 0) %>%
+    count(IID) %>%
+    arrange(-n) %>%
+    head(1) %>%
+    pull(IID)
+
+  pattern_to_highlight <- individual_data %>%
+    filter(IID == patient_w_pattern) %>%
+    gather(code, value, -IID, -snp) %>%
+    filter(value != 0) %>%
+    pull(code)
 
   network_data <- meToolkit::makeNetworkData(individual_data, phewas_results, inverted_codes)
 
@@ -39,18 +52,22 @@ generate_random_data <- function(){
   network_data$vertices <- network_data$vertices %>%
     filter((index %in% cases_with_edges) | (size == 0.3))
 
-  network_data
+  list(network_data = network_data, pattern = pattern_to_highlight)
 }
 
 ui <- shinyUI(
   tagList(
     h1('Network module test'),
+    actionButton('update_w_pattern', 'highlight a pattern'),
     network_plot_UI('network_plot',  height = '500px')
   )
 )
 
 server <- function(input, output, session) {
-  app_network_data <- reactiveVal(generate_random_data())
+  random_data <- generate_random_data(1000)
+
+  app_network_data <- reactiveVal(random_data$network_data)
+  app_network_pattern <- reactiveVal(c())
   app_snp_filter <- reactiveVal(FALSE)
 
   action_object <- reactiveVal()
@@ -58,15 +75,26 @@ server <- function(input, output, session) {
   callModule(
     network_plot, 'network_plot',
     app_network_data,
+    app_network_pattern,
     snp_filter = app_snp_filter,
     viz_type = 'free',
     update_freq = 15,
     action_object = action_object
   )
 
+  observeEvent(input$update_w_pattern, {
+    # if()
+    print('highlighting a pattern')
+    app_network_pattern(random_data$pattern)
+  })
+
   observeEvent(action_object(),{
     print("we have a message from the network!")
-    app_network_data(generate_random_data())
+    random_data <- generate_random_data(rpois(1, 1000))
+
+    app_network_data(random_data$network_data)
+    app_network_pattern(c())
+
     app_snp_filter(!app_snp_filter())
     print(action_object())
   })

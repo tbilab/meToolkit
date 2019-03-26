@@ -1,4 +1,4 @@
-// !preview r2d3 data=network_data, options = list(viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js'))
+// !preview r2d3 data= jsonlite::toJSON(read_rds(here::here('data/fake_network_data.rds'))), options = list(viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -74,7 +74,11 @@ function setup_network_viz(dom_elements, on_node_click){
   const X = d3.scaleLinear();
   const Y = d3.scaleLinear();
 
-  const new_data = function({nodes, links}){
+  const new_data = function(data){
+
+    const nodes = data.nodes || data.vertices;
+    const links = data.links || data.edges;
+
     // Remove old network nodes
     dom_elements.svg.selectAll('circle').remove();
 
@@ -112,17 +116,16 @@ function setup_network_viz(dom_elements, on_node_click){
     };
 
     // Draw svg nodes of network
-    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click);
+    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, d => highlight([d.name]));
     draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
   };
 
   const highlight = function(codes_to_highlight){
-
-    // Find the indexes of the highlighted nodes and update scope variable
-    nodes_to_highlight = find_patients_by_pattern(layout_data, codes_to_highlight);
-
-    // Redraw to reflect this new highlight
-    draw();
+    if(layout_data){
+       // Find the indexes of the highlighted nodes and update scope variable
+      const to_highlight = find_patients_by_pattern(layout_data, codes_to_highlight);
+      draw_canvas_portion(layout_data, {X, Y}, dom_elements, C, to_highlight);
+    }
   };
 
   dom_elements.svg.call(
@@ -161,18 +164,19 @@ const progress_meter = setup_progress_meter(dom_elements.svg, C);
 
 // Setup the actual network viz itself.
 const network_viz = setup_network_viz(dom_elements, on_node_click);
-
+network_viz.new_data(data);
 
 const webworker = setup_webworker(C);
 
 // Holds the currently selected codes.
 let selected_codes = [],
     viz = {
-      data,
+      data: {},
       width,
       height,
       options,
     };
+
 
 
 
@@ -183,36 +187,39 @@ let selected_codes = [],
 // visualization.
 r2d3.onRender(function(data, div, width, height, options){
 
-  // Update the global viz info object
-  viz.data = data;
+  const new_data = is_new_data(viz.data, data);
+
+  if(new_data){
+     // Update the global viz info object
+    viz.data = data;
+  } else {
+    network_viz.highlight(options.highlighted_pattern);
+  }
+
   viz.options = options;
 
-  // Make sure viz is correct size.
-  size_viz(viz.width, viz.height);
+  if(new_data){
+    // Prepare data based upon the desired format from options
+    const data_for_viz = C.viz_type === 'bipartite' ?
+      fix_nodes_to_line(sanitize_data(viz.data), C):
+      sanitize_data(viz.data);
 
-  // Prepare data based upon the desired format from options
-  const data_for_viz = C.viz_type === 'bipartite' ?
-    fix_nodes_to_line(sanitize_data(viz.data), C):
-    sanitize_data(viz.data);
+    // Make sure viz is correct size.
+    size_viz(viz.width, viz.height);
 
-  // Launch webworker to calculate layout and kickoff network viz after finishing
-  webworker(
-    data_for_viz,
-    {
-      on_progress_report: progress_meter.update,
-      on_layout_data: (d) => {
-        network_viz.new_data(d);
-      },
-      on_finish: () => {
-        progress_meter.hide();
-      },
-    }
-  );
-
-   // Check if we have a request to highlight a pattern
-  if(viz.options.highlighted_pattern){
-    network_viz.new_data(data_for_viz); // Remove this once it's all set
-    network_viz.highlight(viz.options.highlighted_pattern);
+    // Launch webworker to calculate layout and kickoff network viz after finishing
+    webworker(
+      data_for_viz,
+      {
+        on_progress_report: progress_meter.update,
+        on_layout_data: (d) => {
+          network_viz.new_data(d);
+        },
+        on_finish: () => {
+          progress_meter.hide();
+        },
+      }
+    );
   }
 
 });

@@ -1,5 +1,10 @@
 // Helper functions for network plot
 
+
+function unique(data, key){
+  return d3.set(data).values();
+};
+
 // Sets up size object given a width and height and the constants object for sizing viz
 function setup_sizes(width, height, C){
   return {
@@ -424,7 +429,7 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
 
 
 // Function to draw svg parts of network
-function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click){
+function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click, on_mouseover){
 
   const x_max = scales.X.range()[1];
   const y_max = scales.Y.range()[1];
@@ -463,11 +468,10 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
   // Add mouseover behavior for nodes that are selectable
   all_nodes
     .on('mouseover', function(d){
-
-      const connected_nodes = find_connections(d.name, links);
+      on_mouseover(d);
 
       // Redraw the canvas part of the viz with these highlights
-      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, connected_nodes);
+      //draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, connected_nodes);
 
       tooltip
         .move([scales.X(d.x), scales.Y(d.y)])
@@ -515,28 +519,47 @@ function on_node_click(d){
 
 // Finds which patient nodes contain a given pattern of codes.
 function find_patients_by_pattern({nodes, links}, pattern){
-    // Find the indexes of the highlighted nodes
-    const highlighted_indices = nodes.filter(d => pattern.includes(d.name)).map(d => d.index);
 
-    const highlighted_patient_ids = Object.values(
-      links.reduce(
-        (acc, d) => {
-          const patient = d.source;
-          const code = d.target;
-          // Only add the code if we need to.
-          if(highlighted_indices.includes(code)){
-            patient_info = acc[patient] || {};
-            patient_codes = patient_info.codes || [];
-            patient_info.codes = [...patient_codes, code];
-            patient_info.id = patient;
-            acc[patient] = patient_info;
-          }
-          return acc;
-        },{} )
-    ).filter(d => d.codes.length == pattern.length)
-     .map(d => d.id);
-
-    return nodes
-      .filter(d => highlighted_patient_ids.includes(d.id))
-      .map(d => d.name);
+  if(pattern.length === 1){
+    return find_connections(pattern[0], links);
   }
+
+  return Object.values(
+    links.reduce(
+      (acc, d) => {
+        const patient = d.source.name;
+        const code = d.target.name;
+        // Only add the code if we need to.
+        if(pattern.includes(code)){
+          patient_info = acc[patient] || {};
+          patient_codes = patient_info.codes || [];
+          patient_info.codes = [...patient_codes, code];
+          patient_info.name = patient;
+          acc[patient] = patient_info;
+        }
+        return acc;
+      },{} )
+  ).filter(d => d.codes.length == pattern.length)
+   .map(d => d.name);
+
+}
+
+
+// Test if two datasets are equal for determining if we have new data from render call
+function is_new_data(old_data, new_data) {
+  const old_nodes = old_data.nodes || old_data.vertices,
+        new_nodes = new_data.nodes || new_data.vertices;
+
+  if(typeof old_nodes === 'undefined')
+    return true;
+
+  // If node vecs are different lengths data must be new
+  if(old_nodes.length !== new_nodes.length)
+    return true;
+
+  // Next, test if both node sets combined unique nodes is same length as old data
+  const combined_names = unique([...old_nodes, ...new_nodes].map(d => d.name));
+
+  // If we have a different length then we have new data somewhere
+  return combined_names.length !== old_nodes.length;
+}
