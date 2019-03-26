@@ -289,9 +289,8 @@ function send_to_shiny(type, payload, destination){
   // Build message
   const message_body = {
     type: type,
-    timestamp: Date.now().toString(),
     // append the date to the begining so sent value always changes.
-    payload: payload
+    payload: [Date.now().toString(), ...payload]
   };
 
   // Make sure shiny is available before sending message
