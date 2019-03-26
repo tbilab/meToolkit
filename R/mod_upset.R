@@ -22,12 +22,13 @@ upset_UI <- function(id, div_class = 'upset_plot') {
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param individual_data Reactive object with dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.
 #' @param all_patient_snps dataframe containing two columns \code{IID}, \code{snp} for every case in the population. Used in calculating a overall snp abundence.
+#' @param action_object A \code{reactiveVal} that will be updated by the module upon isolation, deletion, or snp_filtering.
 #' @return Shiny module
 #' @export
 #'
 #' @examples
 #' callModule(upset, 'my_mod')
-upset <- function(input, output, session, individual_data, all_patient_snps) {
+upset <- function(input, output, session, individual_data, all_patient_snps, action_object = NULL) {
 
   # What's the MA freq for all the data?
   overall_ma_freq <- mean(all_patient_snps$snp != 0)
@@ -115,11 +116,20 @@ upset <- function(input, output, session, individual_data, all_patient_snps) {
       options = list(
         marginalData = code_marginal_data,
         overallMaRate = overall_ma_freq,
-        min_set_size = 20
+        min_set_size = 20,
+        msg_loc = session$ns('message')
       ),
       script = system.file("d3/upset/upset.js", package = "meToolkit"),
       css = system.file("d3/upset/upset.css", package = "meToolkit"),
       dependencies = c("d3-jetpack",system.file("d3/upset/helpers.js", package = "meToolkit"))
     )
   }) # End renderD3
+
+
+  if(!is.null(action_object)){
+    observeEvent(input$message, {
+      validate(need(input$message, message = FALSE))
+      action_object(input$message)
+    })
+  }
 }
