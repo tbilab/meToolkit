@@ -34,7 +34,13 @@ manhattan_plot <- function(
     plot_data <- results_data %>%
       mutate(
         selected = ifelse(code %in% selected_codes(), 10, 3),
-        id = 1:n()
+        id = 1:n(),
+        # Add a break to start of tooltip if needed.
+        tooltip = ifelse(
+          grepl('^</br>', tooltip),
+          tooltip,
+          paste0('</br>', tooltip)
+        )
       )
 
     plot_data %>%
