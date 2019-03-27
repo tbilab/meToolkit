@@ -1,5 +1,9 @@
 // Helper functions for network plot
 
+function unique(data, key){
+  return d3.set(data).values();
+};
+
 // Sets up size object given a width and height and the constants object for sizing viz
 function setup_sizes(width, height, C){
   return {
@@ -59,7 +63,11 @@ function send_to_shiny(type, codes, C){
   };
 
   // Send message off to server
-  Shiny.onInputChange(C.msg_loc, message_body);
+  if(typeof Shiny !== 'undefined'){
+    Shiny.onInputChange(C.msg_loc, message_body);
+  } else {
+    console.log('sending message to shiny');
+  }
 };
 
 
@@ -310,9 +318,6 @@ function setup_progress_meter(svg, C){
 }
 
 
-
-
-
 // Simulation webworker function
 function sim_webworker(update_freq){
   importScripts("https://d3js.org/d3-collection.v1.min.js");
@@ -373,3 +378,222 @@ function sim_webworker(update_freq){
   };
 }
 
+// Function to draw canvas parts of network
+function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highlighted_nodes = []){
+
+  // Clear canvas
+  context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
+  context.save();
+  // Scale edge opacity based upon how many edges we have
+  context.globalAlpha = d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);
+
+  context.beginPath();
+  links.forEach(d => {
+    context.moveTo(scales.X(d.source.x), scales.Y(d.source.y));
+    context.lineTo(scales.X(d.target.x), scales.Y(d.target.y));
+  });
+
+  // Set color of edges
+  context.strokeStyle = C.edge_color;
+
+  // Draw to canvas
+  context.stroke();
+
+  // Draw patient nodes
+  context.globalAlpha = C.case_opacity;
+
+  // Function to assign node highlights
+  // Only check for highlight modification if we need to to avoid expensive calculations
+  const node_border = d => highlighted_nodes.length != 0 ?
+    `rgba(0, 0, 0, ${highlighted_nodes.includes(d.name) ? 1 : 0})` :
+    `rgba(0, 0, 0, 0)`;
+
+
+  nodes.forEach( d => {
+    if(!d.selectable){
+
+      // Border around the nodes.
+      context.strokeStyle = node_border(d);
+
+      context.fillStyle = d.color;
+
+      context.beginPath();
+      context.arc(scales.X(d.x), scales.Y(d.y), C.case_radius, 0, 2 * Math.PI);
+      context.fill();
+      context.stroke();
+    }
+  });
+
+}
+
+
+// Function to draw svg parts of network
+function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click, on_mouseover){
+
+  const x_max = scales.X.range()[1];
+  const y_max = scales.Y.range()[1];
+
+  const choose_stroke_width = (d) => {
+    const selected = selected_codes.includes(d.name);
+
+    return d.inverted ? 3:
+           selected ? 2 : 0;
+  };
+
+  const node_attrs = {
+    r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
+    cx: d => scales.X(d.x),
+    cy: d => scales.Y(d.y),
+    stroke: d => d.inverted ?  d.color: 'black',
+    strokeWidth: choose_stroke_width,
+    fill: d => d.inverted ? 'white': d.color,
+  };
+
+  // Bind data but only the phenotype nodes
+  const node_circles = svg.selectAll('circle')
+    .data(nodes.filter(d => d.selectable), d => d.id);
+
+
+  const all_nodes = node_circles.enter()
+    .append('circle')
+    .at({
+      r: 0,
+      cx: d => Math.random()*x_max,
+      cy: d => Math.random()*y_max,
+    })
+    .merge(node_circles)
+    .at(node_attrs);
+
+  // Add mouseover behavior for nodes that are selectable
+  all_nodes
+    .on('mouseover', function(d){
+      on_mouseover(d);
+
+      // Redraw the canvas part of the viz with these highlights
+      //draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, connected_nodes);
+
+      tooltip
+        .move([scales.X(d.x), scales.Y(d.y)])
+        .update(d.tooltip)
+        .show();
+    })
+    .on('mouseout', function(d){
+      tooltip.hide();
+
+      // Reset nodes that may have been highlighted
+      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
+    })
+    .on('click', on_click);
+}
+
+
+// Logic for what is done when a node is clicked.
+function on_node_click(d){
+  const node = d3.select(this);
+
+  // Is code already selected?
+  if(selected_codes.includes(d.name)){
+    // pull code out of selected list
+    selected_codes = selected_codes.filter(code => code !== d.name);
+
+    // reset the style of node
+    node.attr("stroke-width", 0);
+
+  } else {
+    // add code to selected codes list
+    selected_codes = [d.name, ...selected_codes];
+
+    // Outline node to emphasize highlight
+     node.attr("stroke-width", 2);
+  }
+
+  // do we have selected codes currently? If so display the action popup.
+  if(selected_codes.length > 0){
+    dom_elements.message_buttons.show();
+  } else {
+    dom_elements.message_buttons.hide();
+  }
+};
+
+
+// Finds which patient nodes contain a given pattern of codes.
+function find_patients_by_pattern({nodes, links}, pattern){
+
+  if(pattern.length === 1){
+    return find_connections(pattern[0], links);
+  }
+
+  return Object.values(
+    links.reduce(
+      (acc, d) => {
+        const patient = d.source.name;
+        const code = d.target.name;
+        // Only add the code if we need to.
+        if(pattern.includes(code)){
+          patient_info = acc[patient] || {};
+          patient_codes = patient_info.codes || [];
+          patient_info.codes = [...patient_codes, code];
+          patient_info.name = patient;
+          acc[patient] = patient_info;
+        }
+        return acc;
+      },{} )
+  ).filter(d => d.codes.length == pattern.length)
+   .map(d => d.name);
+
+}
+
+// Builds array of patient to phecode pattern for use in filtering
+function build_patient_patterns(data){
+  const nodes = data.nodes || data.vertices;
+  const links = data.links || data.edges;
+
+  const id_to_code = nodes.reduce(
+    (acc, d) => {
+      if(d.selectable){
+        acc[d.id] = d.name;
+      }
+      return acc;
+    },
+    {}
+  );
+
+
+  const patient_to_codes = {};
+
+  for(let i = 0; i < links.length; i++){
+    patient_to_codes[links[i].source] = [...(patient_to_codes[links[i].source] || []), id_to_code[links[i].target]];
+  }
+
+  return nodes.filter(d => !d.selectable).map(d => ({name: d.name, pattern: patient_to_codes[d.id]}));
+}
+
+
+// Test if two datasets are equal for determining if we have new data from render call
+function is_new_data(old_data, new_data) {
+  const old_nodes = old_data.nodes || old_data.vertices,
+        new_nodes = new_data.nodes || new_data.vertices;
+
+  if(typeof old_nodes === 'undefined')
+    return true;
+
+  // If node vecs are different lengths data must be new
+  if(old_nodes.length !== new_nodes.length)
+    return true;
+
+  // Next, test if both node sets combined unique nodes is same length as old data
+  const combined_names = unique([...old_nodes, ...new_nodes].map(d => d.name));
+
+  // If we have a different length then we have new data somewhere
+  return combined_names.length !== old_nodes.length;
+}
+
+function arrays_equal(arr_1, arr_2){
+  // If vecs are different lengths data must different
+  if(arr_1.length !== arr_1.length)
+    return false;
+
+  // If the union of the two arrays is the same size as both they're the same.
+  const size_of_union = unique([...arr_1, ...arr_2]).length
+  return (size_of_union === arr_1.length) && (size_of_union === arr_2.length);
+}

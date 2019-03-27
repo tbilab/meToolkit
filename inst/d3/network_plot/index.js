@@ -1,4 +1,4 @@
-// !preview r2d3 data=network_data, options = list(viz_type = 'free', update_freq = 5), container = 'div', dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js'))
+// !preview r2d3 data= jsonlite::toJSON(read_rds(here::here('data/fake_network_data.rds'))), options = list(viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -68,12 +68,19 @@ function setup_network_viz(dom_elements, on_node_click){
 
   let layout_data = null,
       been_sized = false,
-      current_zoom = null;
+      current_zoom = null,
+      patient_patterns = null,
+      nodes_to_highlight = [];
 
   const X = d3.scaleLinear();
   const Y = d3.scaleLinear();
 
-  const new_data = function({nodes, links}){
+  const new_data = function(data){
+
+    const nodes = data.nodes || data.vertices;
+    const links = data.links || data.edges;
+
+
     // Remove old network nodes
     dom_elements.svg.selectAll('circle').remove();
 
@@ -111,8 +118,27 @@ function setup_network_viz(dom_elements, on_node_click){
     };
 
     // Draw svg nodes of network
-    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click);
-    draw_canvas_portion(layout_data, scales, dom_elements, C);
+    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, d => highlight([d.name]));
+    draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
+  };
+
+  const new_patterns = function(patterns){
+    patient_patterns = patterns;
+  };
+
+  const highlight = function(codes_to_highlight){
+    if(layout_data){
+
+      const single_code = typeof codes_to_highlight === 'string';
+
+      // Find the patient nodes who have the pattern we want to highlight
+      const to_highlight = patient_patterns
+        .filter(d => arrays_equal(d.pattern, single_code ? [codes_to_highlight] : codes_to_highlight))
+        .map(d => d.name);
+
+      // Update the canvas to highlight these nodes
+      draw_canvas_portion(layout_data, {X, Y}, dom_elements, C, to_highlight);
+    }
   };
 
   dom_elements.svg.call(
@@ -127,7 +153,7 @@ function setup_network_viz(dom_elements, on_node_click){
     })
   );
 
-  return {new_data, resize};
+  return {new_data, resize, new_patterns, highlight};
 };
 
 
@@ -137,54 +163,35 @@ function setup_network_viz(dom_elements, on_node_click){
 // This code gets run once and sets up the basic
 // neccesities for the visualization.
 
-
 // Setup all the dom elements for the viz. This includes
 // the svg, canvas, context, tooltip, and message buttons.
-const dom_elements = setup_dom_elements(div, C, on_message);
+const dom_elements = setup_dom_elements(
+  div, C,
+  // Function that is called when a message button is pressed. Passed the type of message
+  function(type){
+    send_to_shiny(type, selected_codes, C);
+  });
 
 // Setup the progress bar for network simulation progress
 const progress_meter = setup_progress_meter(dom_elements.svg, C);
 
 // Setup the actual network viz itself.
 const network_viz = setup_network_viz(dom_elements, on_node_click);
-
-// Holds the currently selected codes.
-let selected_codes = [];
+network_viz.new_data(data);
 
 const webworker = setup_webworker(C);
 
-// Function that is called when a message button is pressed. Passed the type of message.
-function on_message(type){
-  send_to_shiny(type, selected_codes, C);
-}
+// Holds the currently selected codes.
+let selected_codes = [],
+    viz = {
+      data: {},
+      width,
+      height,
+      options,
+      patient_patterns: null,
+    };
 
-// Logic for what is done when a node is clicked.
-function on_node_click(d){
-  const node = d3.select(this);
 
-  // Is code already selected?
-  if(selected_codes.includes(d.name)){
-    // pull code out of selected list
-    selected_codes = selected_codes.filter(code => code !== d.name);
-
-    // reset the style of node
-    node.attr("stroke-width", 0);
-
-  } else {
-    // add code to selected codes list
-    selected_codes = [d.name, ...selected_codes];
-
-    // Outline node to emphasize highlight
-     node.attr("stroke-width", 2);
-  }
-
-  // do we have selected codes currently? If so display the action popup.
-  if(selected_codes.length > 0){
-    dom_elements.message_buttons.show();
-  } else {
-    dom_elements.message_buttons.hide();
-  }
-};
 
 
 //------------------------------------------------------------
@@ -193,32 +200,57 @@ function on_node_click(d){
 // This is code that runs whenever new data is received by the
 // visualization.
 r2d3.onRender(function(data, div, width, height, options){
-  // Make sure viz is correct size.
-  size_viz(width, height);
 
-  // Prepare data based upon the desired format from options
-  const data_for_viz = C.viz_type === 'bipartite' ?
-    fix_nodes_to_line(sanitize_data(data), C):
-    sanitize_data(data);
+  const new_data = is_new_data(viz.data, data);
 
-  // Launch webworker to calculate layout and kickoff network viz after finishing
-  webworker(
-    data_for_viz,
-    {
-      on_progress_report: progress_meter.update,
-      on_layout_data: (data) => {
-        network_viz.new_data(data);
-      },
-      on_finish: () => {
-        progress_meter.hide();
-      },
-    }
-  );
+  if(new_data){
+     // Update the global viz info object
+    viz.data = data;
+  } else {
+    network_viz.highlight(options.highlighted_pattern);
+  }
+
+  viz.options = options;
+
+  if(new_data){
+    // Build a patient pattern array and send to network viz
+    viz.patient_patterns = build_patient_patterns(viz.data);
+    network_viz.new_patterns(viz.patient_patterns);
+
+    // Prepare data based upon the desired format from options
+    const data_for_viz = C.viz_type === 'bipartite' ?
+      fix_nodes_to_line(sanitize_data(viz.data), C):
+      sanitize_data(viz.data);
+
+    // Make sure viz is correct size.
+    size_viz(viz.width, viz.height);
+
+    // Launch webworker to calculate layout and kickoff network viz after finishing
+    webworker(
+      data_for_viz,
+      {
+        on_progress_report: progress_meter.update,
+        on_layout_data: (d) => {
+          network_viz.new_data(d);
+        },
+        on_finish: () => {
+          progress_meter.hide();
+        },
+      }
+    );
+  }
+
 });
 
 
 // Tell r2d3 what to do when we resize the viz
-r2d3.onResize(size_viz);
+r2d3.onResize((width, height) => {
+  // Update the global viz info object
+  viz.width = width;
+  viz.height = height;
+
+  size_viz(viz.width, viz.height);
+});
 
 
 function size_viz(width, height){
@@ -229,110 +261,5 @@ function size_viz(width, height){
   network_viz.resize(sizes);
 }
 
-// Function to draw svg parts of network
-function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click){
-
-  const x_max = scales.X.range()[1];
-  const y_max = scales.Y.range()[1];
-
-  const choose_stroke_width = (d) => {
-    const selected = selected_codes.includes(d.name);
-
-    return d.inverted ? 3:
-           selected ? 2 : 0;
-  };
-
-  const node_attrs = {
-    r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
-    cx: d => scales.X(d.x),
-    cy: d => scales.Y(d.y),
-    stroke: d => d.inverted ?  d.color: 'black',
-    strokeWidth: choose_stroke_width,
-    fill: d => d.inverted ? 'white': d.color,
-  };
-
-  // Bind data but only the phenotype nodes
-  const node_circles = svg.selectAll('circle')
-    .data(nodes.filter(d => d.selectable), d => d.id);
 
 
-  const all_nodes = node_circles.enter()
-    .append('circle')
-    .at({
-      r: 0,
-      cx: d => Math.random()*x_max,
-      cy: d => Math.random()*y_max,
-    })
-    .merge(node_circles)
-    .at(node_attrs);
-
-  // Add mouseover behavior for nodes that are selectable
-  all_nodes
-    .on('mouseover', function(d){
-
-      const connected_nodes = find_connections(d.name, links);
-
-      // Redraw the canvas part of the viz with these highlights
-      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, connected_nodes);
-
-      tooltip
-        .move([scales.X(d.x), scales.Y(d.y)])
-        .update(d.tooltip)
-        .show();
-    })
-    .on('mouseout', function(d){
-      tooltip.hide();
-
-      // Reset nodes that may have been highlighted
-      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
-    })
-    .on('click', on_click);
-}
-
-// Function to draw canvas parts of network
-function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highlighted_nodes = []){
-
-  // Clear canvas
-  context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
-  context.save();
-  // Scale edge opacity based upon how many edges we have
-  context.globalAlpha = d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);
-
-  context.beginPath();
-  links.forEach(d => {
-    context.moveTo(scales.X(d.source.x), scales.Y(d.source.y));
-    context.lineTo(scales.X(d.target.x), scales.Y(d.target.y));
-  });
-
-  // Set color of edges
-  context.strokeStyle = C.edge_color;
-
-  // Draw to canvas
-  context.stroke();
-
-  // Draw patient nodes
-  context.globalAlpha = C.case_opacity;
-
-  // Function to assign node highlights
-  // Only check for highlight modification if we need to to avoid expensive calculations
-  const node_border = d => highlighted_nodes.length != 0 ?
-    `rgba(0, 0, 0, ${highlighted_nodes.includes(d.name) ? 1 : 0})` :
-    `rgba(0, 0, 0, 0)`;
-
-
-  nodes.forEach( d => {
-    if(!d.selectable){
-
-      // Border around the nodes.
-      context.strokeStyle = node_border(d);
-
-      context.fillStyle = d.color;
-
-      context.beginPath();
-      context.arc(scales.X(d.x), scales.Y(d.y), C.case_radius, 0, 2 * Math.PI);
-      context.fill();
-      context.stroke();
-    }
-  });
-
-}
