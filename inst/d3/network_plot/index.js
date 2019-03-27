@@ -69,6 +69,7 @@ function setup_network_viz(dom_elements, on_node_click){
   let layout_data = null,
       been_sized = false,
       current_zoom = null,
+      scales = null,
       patient_patterns = null,
       nodes_to_highlight = [];
 
@@ -79,7 +80,6 @@ function setup_network_viz(dom_elements, on_node_click){
 
     const nodes = data.nodes || data.vertices;
     const links = data.links || data.edges;
-
 
     // Remove old network nodes
     dom_elements.svg.selectAll('circle').remove();
@@ -110,12 +110,17 @@ function setup_network_viz(dom_elements, on_node_click){
     }
   };
 
-  const draw = function(){
-    // Update scales with the zoom if we have any
-    const scales = {
+  const update_scales = function(){
+     // Update scales with the zoom if we have any
+    scales = {
       X: current_zoom ? current_zoom.rescaleX(X) : X,
       Y: current_zoom ? current_zoom.rescaleY(Y) : Y,
     };
+  };
+
+  const draw = function(){
+    // Update scales with the zoom if we have any
+    update_scales();
 
     // Draw svg nodes of network
     draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, d => highlight([d.name]));
@@ -136,8 +141,11 @@ function setup_network_viz(dom_elements, on_node_click){
         .filter(d => arrays_equal(d.pattern, single_code ? [codes_to_highlight] : codes_to_highlight))
         .map(d => d.name);
 
+      // Make sure scales are update width current zoom
+      update_scales();
+
       // Update the canvas to highlight these nodes
-      draw_canvas_portion(layout_data, {X, Y}, dom_elements, C, to_highlight);
+      draw_canvas_portion(layout_data, scales, dom_elements, C, to_highlight);
     }
   };
 
