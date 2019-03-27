@@ -1,4 +1,4 @@
-// !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/pattern_network/helpers.js')), css=here('inst/d3/upset/upset.css')
+// !preview r2d3 data = read_rds(here('module_tests/data/upset_r2d3_data.rds')), dependencies = c("d3-jetpack",here('inst/d3/pattern_network/helpers.js'))
 
 console.log('im here!');
 
@@ -16,32 +16,130 @@ const C = Object.assign({
   margin: margin,
   edge_color: '#aaa',
   msg_loc: 'shiny_server',
+  layout: 'bipartite',
+  radius_exageration: 10,
+  code_radius: 25,
+  snp_color: '#fc8d59',
+  no_snp_color: '#99d594',
+  code_color: '#beaed4',
 }, options);
 
-// Function to generate a distance calculating function
-// between two patterns based off of marginal prop weighted
-// manhattan distance
-function make_dist_funct(marginals){
-  // Find total count of codes for normalization purposes
-  const total_count = d3.sum(marginals, d => d.count);
+const viz_g = svg.selectAppend('g.viz')
+  .translate([margin.left, margin.top]);
 
-  // Create object that maps code to inverse proportion of occurance in marginals, or weight for distance
-  const code_to_weight = marginals.reduce(
-    (acc,curr) => Object.assign(acc,{[curr.code]: total_count/curr.count}),
-    {}
-  );
+// Extract the 'node' data
+const patterns = HTMLWidgets.dataframeToD3(data.data);
+const codes = data.options.marginalData;
 
-  return (pattern_a, pattern_b) => {
-    // Find union of the two patterns
-    const common_codes = union(pattern_a.split('-'), pattern_b.split('-'));
-
-    // return weighted sum using inverse proportions
-    return common_codes.reduce((dist,code) => dist + code_to_weight[code], 0);
-  };
-}
+const {nodes, links} = build_nodes_links(patterns, codes, C);
 
 
-const calc_dist = make_dist_funct(options.marginalData);
+// Scale to size the nodes in network
+const node_size_scale = d3.scaleSqrt()
+  .domain([0, d3.max(patterns, d => d.count)])
+  .range([0, 50]);
 
-calc_dist(data[5].pattern, data[7].pattern)
+const pattern_color_scale = d3.scaleLinear()
+  .domain(d3.extent(nodes, d => d.snp_ratio))
+  .range([C.no_snp_color, C.snp_color]);
 
+
+// Setup the simulation
+const simulation = d3.forceSimulation(nodes)
+  .force("link",
+    d3.forceLink(links)
+      .id(d => d.name)
+  )
+ .force('collision',
+    d3.forceCollide()
+      .radius(d =>
+        (d.type === 'pattern' ?
+          node_size_scale(d.total_size):
+          C.code_radius) + C.radius_exageration
+      )
+      .strength(0.8)
+  )
+  .force("charge", d3.forceManyBody())
+  //.force("x", d3.forceX(C.w / 2))
+  .force("y", d3.forceY(C.h / 2));
+
+// Setup the chart components
+const link_lines = viz_g.selectAppend("g.links")
+  .at({ stroke: "#999", strokeOpacity: 0.6 })
+    .selectAll("line")
+    .data(links)
+    .enter()
+    .append('line')
+    .at({strokeWidth: 3});
+
+const node_circles = viz_g.selectAppend("g.nodes")
+  .at()
+  .selectAll('circle')
+  .data(nodes)
+  .enter().append('g.node');
+
+node_circles.append('circle')
+  .at({
+    stroke: '#fff',
+    strokeWidth: 1.5,
+    r: d => d.type === 'pattern' ? node_size_scale(d.total_size): C.code_radius,
+    fill: d => d.type === 'pattern' ? pattern_color_scale(d.snp_ratio): C.code_color
+  })
+  .call(drag(simulation));
+
+node_circles.filter(d => d.type === 'code')
+  .append('text')
+  .at({
+    //x: - C.code_radius,
+    textAnchor: 'middle',
+    alignmentBaseline: 'middle',
+    fill: 'white',
+  })
+  .st({
+    fontSize: '0.9em',
+  })
+  .text(d => d.name)
+
+node_circles
+  .on('mouseover', d => {
+    console.log(d.name);
+  });
+
+simulation.on("tick", () => {
+  link_lines
+    .at({
+      x1: d => d.source.x,
+      x2: d => d.target.x,
+      y1: d => d.source.y,
+      y2: d => d.target.y,
+    });
+
+  node_circles
+    .translate(d => [d.x, d.y]);
+});
+
+
+function drag(simulation){
+
+  function dragstarted(d) {
+    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+    //d.fx = d.x;
+    d.fy = d.y;
+  }
+
+  function dragged(d) {
+   // d.fx = d3.event.x;
+    d.fy = d3.event.y;
+  }
+
+  function dragended(d) {
+    if (!d3.event.active) simulation.alphaTarget(0);
+    //d.fx = null;
+    d.fy = null;
+  }
+
+  return d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
+};
