@@ -16,6 +16,9 @@ info_panel(input, output, session, snp_name, all_individual_data,
 
 \item{current_individual_data}{Reactive individual level data for the currently viewed subset of the cohort, again needs a \code{snp} column.}
 }
+\value{
+Server component of info panel module
+}
 \description{
 Server function of snp info panel
 }

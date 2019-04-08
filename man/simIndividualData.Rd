@@ -24,3 +24,6 @@ list with following components
 This function will take the results of a phewas study (most importantly a code, case and control numbers, and an OR) and simulate as many individual
 datapoints as you desire.
 }
+\examples{
+simIndividualData(fake_phewas_results, 10, 0.15)
+}
