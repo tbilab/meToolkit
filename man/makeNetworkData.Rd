@@ -34,3 +34,6 @@ A list containing two dataframes:
 \description{
 Convert phenotype dataframe to a data list that works with network plotting functions
 }
+\examples{
+makeNetworkData(data, phewas_results)
+}

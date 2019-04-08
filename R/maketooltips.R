@@ -6,6 +6,7 @@
 #' @export
 #'
 #' @examples
+#' myPhewasResults %>% makeTooltips()
 makeTooltips <- function(phewas){
 
   columns <- colnames(phewas)

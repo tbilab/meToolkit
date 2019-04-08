@@ -10,6 +10,7 @@
 #' @export
 #'
 #' @examples
+#' simPhewasResults(n_codes = 100, n_categories = 11)
 simPhewasResults <- function(n_codes, n_categories){
 
   # Parameters used in generating p-values from a beta distribution.

@@ -24,7 +24,7 @@ info_panel_UI <- function(id) {
 #' @param all_individual_data Individual level data for all patients inc urrent cohort, needs to contain column \code{snp} containing copies of MA.
 #' @param current_individual_data Reactive individual level data for the currently viewed subset of the cohort, again needs a \code{snp} column.
 #'
-#' @return
+#' @return Server component of info panel module
 #' @export
 #'
 #' @examples

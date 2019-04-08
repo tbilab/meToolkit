@@ -21,6 +21,7 @@
 #' @export
 #'
 #' @examples
+#' makeNetworkData(data, phewas_results)
 makeNetworkData <- function(
   data,
   phecode_info,

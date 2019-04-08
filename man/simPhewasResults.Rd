@@ -21,3 +21,6 @@ A dataframe with columns: \code{code}: a unique phecode id (numbers of the form 
 Simulate PheWAS results
 Produces a dataframe that can be used for testing out functions in package on simulated data. Usually paired with \code{meToolkit::simIndividualData()}.
 }
+\examples{
+simPhewasResults(n_codes = 100, n_categories = 11)
+}

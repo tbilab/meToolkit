@@ -15,3 +15,6 @@ dataframe with an added tooltip column.
 \description{
 Create a tooltip column for a phewas results dataframe.
 }
+\examples{
+myPhewasResults \%>\% makeTooltips()
+}

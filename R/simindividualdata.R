@@ -15,6 +15,7 @@
 #' @export
 #'
 #' @examples
+#' simIndividualData(fake_phewas_results, 10, 0.15)
 simIndividualData <- function(phewas_results, num_patients, snp_prev){
     # Get needed statistics out of the phewas results
     code_stats <- phewas_results %>%
