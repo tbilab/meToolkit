@@ -25,6 +25,7 @@ Imports:
     rsnps,
     purrr,
     glue,
-    plotly
+    plotly,
+    DT
 Suggests: 
     testthat
