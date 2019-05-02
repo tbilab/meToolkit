@@ -5,7 +5,7 @@ function unique(data, key){
 };
 
 function decide_link_opacity(links){
-  return d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);
+  return d3.scaleLinear().domain([0,5000]).range([0.4, 0.01])(links.length);
 }
 // Sets up size object given a width and height and the constants object for sizing viz
 function setup_sizes(width, height, C){
@@ -339,14 +339,14 @@ function sim_webworker(update_freq){
         "link",
         d3.forceLink(links)
           .id(d => d.id)
-          .distance(0.2)
+          .distance(0.3)
           .strength(0.8)
       )
       .force(
         'collision',
         d3.forceCollide()
           .radius(d => d.selectable ? 10: 3)
-          .strength(0.4)
+          .strength(0.5)
       )
       .force(
         "charge",
@@ -632,3 +632,41 @@ function downloadPlot(svg){
   downloadLink.click();
   document.body.removeChild(downloadLink);
 }
+
+function append_download_button(div){
+  div.selectAppend('div.download_button')
+    .html(button_icon)
+    .st({
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+      height: 32,
+      width: 32,
+      cursor: 'pointer'
+    })
+    .on('mouseover', function(){
+      d3.select(this)
+        .select('svg')
+        .st({
+          stroke: 'blue',
+          strokeWidth: 3,
+        });
+    })
+    .on('mouseout', function(){
+       d3.select(this)
+        .select('svg')
+        .st({
+          stroke: 'black',
+          strokeWidth: 2,
+        });
+    })
+    .on('click', () => {
+      downloadPlot(dom_elements.svg)
+    });
+}
+
+const button_icon = `
+<svg id="i-download" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M9 22 C0 23 1 12 9 13 6 2 23 2 22 10 32 7 32 23 23 22 M11 26 L16 30 21 26 M16 16 L16 30" />
+</svg>
+`;

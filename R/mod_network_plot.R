@@ -101,7 +101,8 @@ network_plot <- function(
         msg_loc = session$ns('message'),
         highlighted_pattern = highlighted_codes(),
         viz_type = viz_type,
-        update_freq = update_freq
+        update_freq = update_freq,
+        export_mode = TRUE
       )
     )
   })
