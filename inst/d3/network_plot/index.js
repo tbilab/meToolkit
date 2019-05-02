@@ -1,4 +1,4 @@
-// !preview r2d3 data= jsonlite::toJSON(read_rds(here::here('data/fake_network_data.rds'))), options = list(viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here('inst/d3/network_plot/helpers.js'))
+// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = TRUE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here::here('inst/d3/network_plot/helpers.js'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -124,7 +124,10 @@ function setup_network_viz(dom_elements, on_node_click){
 
     // Draw svg nodes of network
     draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, d => highlight([d.name]));
-    draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
+
+    if(!C.export_mode){
+      draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
+    }
   };
 
   const new_patterns = function(patterns){
@@ -248,6 +251,20 @@ r2d3.onRender(function(data, div, width, height, options){
     );
   }
 
+
+  // If we're in the export mode put a small download button in.
+  if(C.export_mode){
+    div.append('button')
+      .text('Download Plot')
+      .st({
+        position: 'absolute',
+        right: 0,
+        bottom: 0
+      })
+      .on('click', () => {
+        downloadPlot(dom_elements.svg)
+      })
+  }
 });
 
 

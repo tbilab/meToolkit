@@ -4,6 +4,9 @@ function unique(data, key){
   return d3.set(data).values();
 };
 
+function decide_link_opacity(links){
+  return d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);
+}
 // Sets up size object given a width and height and the constants object for sizing viz
 function setup_sizes(width, height, C){
   return {
@@ -449,9 +452,12 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
     fill: d => d.inverted ? 'white': d.color,
   };
 
-  // Bind data but only the phenotype nodes
+  // Bind data but only the phenotype nodes unless we're in export mode and need everything to be SVG
   const node_circles = svg.selectAll('circle')
-    .data(nodes.filter(d => d.selectable), d => d.id);
+    .data(
+      nodes.filter(d => d.selectable || C.export_mode),
+      d => d.id
+    );
 
 
   const all_nodes = node_circles.enter()
@@ -469,9 +475,6 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
     .on('mouseover', function(d){
       on_mouseover(d);
 
-      // Redraw the canvas part of the viz with these highlights
-      //draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, connected_nodes);
-
       tooltip
         .move([scales.X(d.x), scales.Y(d.y)])
         .update(d.tooltip)
@@ -484,6 +487,26 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
     })
     .on('click', on_click);
+
+
+    if(C.export_mode){
+      const link_opacity = decide_link_opacity(links);
+      const link_lines = svg.selectAll('line')
+        .data(links);
+
+      link_lines.enter()
+        .append('line')
+        .merge(link_lines)
+        .at({
+          x1: d => scales.X(d.source.x),
+          y1: d => scales.Y(d.source.y),
+          x2: d => scales.X(d.target.x),
+          y2: d => scales.Y(d.target.y),
+          stroke: C.edge_color,
+          strokeWidth: 1,
+          opacity: link_opacity,
+        });
+    }
 }
 
 
@@ -596,4 +619,16 @@ function arrays_equal(arr_1, arr_2){
   // If the union of the two arrays is the same size as both they're the same.
   const size_of_union = unique([...arr_1, ...arr_2]).length
   return (size_of_union === arr_1.length) && (size_of_union === arr_2.length);
+}
+
+function downloadPlot(svg){
+  const svgData = svg.node().outerHTML;
+  const svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+  const svgUrl = URL.createObjectURL(svgBlob);
+  const downloadLink = document.createElement("a");
+  downloadLink.href = svgUrl;
+  downloadLink.download = "phecode_network.svg";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
 }
