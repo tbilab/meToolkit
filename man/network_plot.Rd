@@ -6,7 +6,7 @@
 \usage{
 network_plot(input, output, session, network_data,
   highlighted_codes = c(), snp_filter, viz_type = "free",
-  update_freq = 15, action_object)
+  export_mode = TRUE, update_freq = 15, action_object)
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
@@ -18,6 +18,8 @@ network_plot(input, output, session, network_data,
 \item{snp_filter}{Reactive object containing boolean containing info on if we've filtered by snp or not.}
 
 \item{viz_type}{Character string containing info on which type of network we want to draw. "bipartite" for a plot that puts one node type on either size, or free for a traditional force directed layout. Defaults to \code{'free'}.}
+
+\item{export_mode}{Boolean for if the visualization should run in an all svg mode with an export button. Defaults to \code{TRUE}.}
 
 \item{update_freq}{How many iterations of the layout simulation are run between redrawing the viz. Set to lower value for a smoother animation, higher for better performance. Default is \code{15} frames.}
 

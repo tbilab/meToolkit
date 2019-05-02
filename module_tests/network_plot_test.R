@@ -78,6 +78,7 @@ server <- function(input, output, session) {
     app_network_pattern,
     snp_filter = app_snp_filter,
     viz_type = 'free',
+    # export_mode = FALSE,
     update_freq = 15,
     action_object = action_object
   )

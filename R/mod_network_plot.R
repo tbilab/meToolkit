@@ -65,6 +65,7 @@ network_plot_UI <- function(
 #' @param highlighted_codes Reactive object containing array of code names that comprise connection pattern to highlight in patients.
 #' @param snp_filter Reactive object containing boolean containing info on if we've filtered by snp or not.
 #' @param viz_type Character string containing info on which type of network we want to draw. "bipartite" for a plot that puts one node type on either size, or free for a traditional force directed layout. Defaults to \code{'free'}.
+#' @param export_mode Boolean for if the visualization should run in an all svg mode with an export button. Defaults to \code{TRUE}.
 #' @param update_freq How many iterations of the layout simulation are run between redrawing the viz. Set to lower value for a smoother animation, higher for better performance. Default is \code{15} frames.
 #' @param action_object A \code{reactiveVal} that will be updated by the module upon isolation, deletion, or snp_filtering.
 #' @return Server component of interactive network plot. Returns type-payload list with the type \code{"isolation, deletion, snp_filtering"} to the passed \code{action_object} for updating app state.
@@ -79,6 +80,7 @@ network_plot <- function(
   highlighted_codes = c(),
   snp_filter,
   viz_type = 'free',
+  export_mode = TRUE,
   update_freq = 15,
   action_object ) {
 
@@ -102,7 +104,7 @@ network_plot <- function(
         highlighted_pattern = highlighted_codes(),
         viz_type = viz_type,
         update_freq = update_freq,
-        export_mode = TRUE
+        export_mode = export_mode
       )
     )
   })
