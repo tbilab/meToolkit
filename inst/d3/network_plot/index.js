@@ -1,4 +1,4 @@
-// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = TRUE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here::here('inst/d3/network_plot/helpers.js'))
+// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here::here('inst/d3/network_plot/helpers.js'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -18,6 +18,7 @@ const C = Object.assign(
     msg_loc: 'shiny_server',
     viz_type: 'bipartite',
     callouts: false,
+    export_mode: false,
     update_freq: 5, // How often do we send back layout simulation progress?
   },
   options);
@@ -309,6 +310,8 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       d => d.id
     );
 
+  node_circles.exit().remove();
+
   const all_nodes = node_circles.enter()
     .append('circle')
     .at({
@@ -336,6 +339,7 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
     })
     .on('click', on_click);
+
 
     // Callout boxes
     if(C.callouts){
@@ -454,18 +458,30 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
           strokeWidth: 1,
           opacity: link_opacity,
         });
+
+      // Make sure the nodes are above the links
+      svg.selectAll('circle').raise();
+    } else {
+      svg.selectAll('line.link_lines').remove();
     }
 }
 
-div.selectAppend('div.callout_button')
+const viz_button_styles = {
+  position: 'absolute',
+  cursor: 'pointer',
+  border: "1px solid black",
+  borderRadius: 5,
+  padding: 3,
+  backgroundColor: "rgba(239,237,245, 0.95)"
+};
+
+function append_callout_button(div){
+  div.selectAppend('div.callout_button')
   .html(`Turn On Callouts`)
+  .st(viz_button_styles)
   .st({
-    position: 'absolute',
     right: 0,
     top: 0,
-    height: 32,
-    width: 50,
-    cursor: 'pointer'
   })
   .on('click', () => {
     // Toggle callout status
@@ -474,5 +490,28 @@ div.selectAppend('div.callout_button')
     // Redraw viz with new callout status
     size_viz(viz.width, viz.height);
   });
+}
 
 
+div.selectAppend('div.export_mode_button')
+  .html(`Turn On Export Mode`)
+  .st(viz_button_styles)
+  .st({
+    left: 0,
+    bottom: 0,
+  })
+  .on('click', () => {
+    // Toggle callout status
+    C.export_mode = !C.export_mode;
+
+    if(C.export_mode){
+      append_download_button(div);
+      append_callout_button(div);
+    } else {
+      div.select('div.download_button').remove();
+      div.select('div.callout_button').remove();
+    }
+
+    // Redraw viz with new callout status
+    size_viz(viz.width, viz.height);
+  });
