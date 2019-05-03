@@ -278,4 +278,181 @@ function size_viz(width, height){
 }
 
 
+// Function to draw svg parts of network
+function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click, on_mouseover){
+
+  const x_max = scales.X.range()[1];
+  const y_max = scales.Y.range()[1];
+
+  const choose_stroke_width = (d) => {
+    const selected = selected_codes.includes(d.name);
+
+    return d.inverted ? 3:
+           selected ? 2 : 0;
+  };
+
+  const node_attrs = {
+    r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
+    cx: d => scales.X(d.x),
+    cy: d => scales.Y(d.y),
+    stroke: d => d.inverted ?  d.color: 'black',
+    strokeWidth: choose_stroke_width,
+    fill: d => d.inverted ? 'white': d.color,
+  };
+
+  const phenotype_nodes = nodes.filter(d => d.selectable);
+
+  // Bind data but only the phenotype nodes unless we're in export mode and need everything to be SVG
+  const node_circles = svg.selectAll('circle')
+    .data(
+      C.export_mode ? nodes: phenotype_nodes,
+      d => d.id
+    );
+
+  const all_nodes = node_circles.enter()
+    .append('circle')
+    .at({
+      r: 0,
+      cx: d => Math.random()*x_max,
+      cy: d => Math.random()*y_max,
+    })
+    .merge(node_circles)
+    .at(node_attrs);
+
+  // Add mouseover behavior for nodes that are selectable
+  all_nodes
+    .on('mouseover', function(d){
+      on_mouseover(d);
+
+      tooltip
+        .move([scales.X(d.x), scales.Y(d.y)])
+        .update(d.tooltip)
+        .show();
+    })
+    .on('mouseout', function(d){
+      tooltip.hide();
+
+      // Reset nodes that may have been highlighted
+      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
+    })
+    .on('click', on_click);
+
+
+
+
+
+    // Callout boxes
+
+    const box_padding = 2;
+
+    // Draw the sticky node names
+    const node_callouts = svg.selectAll('g.node_callout')
+      .data(phenotype_nodes, d => d.name);
+
+    const callout_g = node_callouts.enter()
+      .append('g.node_callout')
+      .st({
+        cursor: 'move',
+      })
+      .each(d => {
+        // How far away from the point is this callout?
+        d.callout_delta = [C.case_radius*C.code_radius_mult*1.2, 0];
+
+        // Prefill a fixed-size bounding box for background
+        d.bounding_box = {width: 20, height:20};
+      })
+      .merge(node_callouts)
+      .translate(d => [scales.X(d.x), scales.Y(d.y)]);
+
+    callout_g.selectAppend('line.callout_line')
+      .at({
+        x2: d => d.callout_delta[0] + d.bounding_box.width/2,
+        y2: d => d.callout_delta[1] - d.bounding_box.height/2,
+        stroke: 'black',
+        strokeWidth: 1.5,
+      });
+
+    callout_g.selectAppend('rect.callout_background')
+      .at({
+        x: d => d.callout_delta[0],
+        y: d => d.callout_delta[1] - d.bounding_box.height,
+        width: d => d.bounding_box.width,
+        height: d => d.bounding_box.height,
+        rx: 5,
+        ry: 5,
+        fill: 'white',
+        stroke: 'grey',
+        strokeWidth: 1,
+      })
+
+    callout_g.selectAppend('text.callout_title')
+      .text(d => d.name)
+      .at({
+        x: d => d.callout_delta[0] + box_padding,
+        y: d => d.callout_delta[1] - box_padding*2,
+        fontSize: 15,
+      })
+      .each(function(d){
+        const bbox = this.getBBox();
+        // grab bounding box size of filled text;
+        d.bounding_box = {width: bbox.width + box_padding*2, height: bbox.height + box_padding*2};
+      });
+
+
+
+    callout_g.call(
+      d3.drag()
+      .on("start", function(d){
+
+      })
+      .on("drag", function(d){
+
+        d.callout_delta[0] += d3.event.dx;
+        d.callout_delta[1] += d3.event.dy;
+
+        d3.select(this).select('rect')
+          .at({
+            x: d.callout_delta[0],
+            y: d.callout_delta[1] - d.bounding_box.height + 3*box_padding,
+          });
+
+        d3.select(this).select('line')
+          .at({
+            x2: d.callout_delta[0] + d.bounding_box.width/2,
+            y2: d.callout_delta[1] - d.bounding_box.height/2,
+          });
+
+        d3.select(this).select('text')
+          .at({
+            x: d.callout_delta[0] + box_padding,
+            y: d.callout_delta[1] + box_padding/2,
+          })
+
+      })
+      .on("end", function(d){
+
+      })
+    );
+
+
+    if(C.export_mode){
+      const link_opacity = decide_link_opacity(links);
+      const link_lines = svg.selectAll('line.link_lines')
+        .data(links);
+
+      link_lines.enter()
+        .append('line.link_lines')
+        .merge(link_lines)
+        .at({
+          x1: d => scales.X(d.source.x),
+          y1: d => scales.Y(d.source.y),
+          x2: d => scales.X(d.target.x),
+          y2: d => scales.Y(d.target.y),
+          stroke: C.edge_color,
+          strokeWidth: 1,
+          opacity: link_opacity,
+        });
+    }
+}
+
 
