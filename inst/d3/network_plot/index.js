@@ -1,4 +1,4 @@
-// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here::here('inst/d3/network_plot/helpers.js'))
+// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack",here::here('inst/d3/network_plot/helpers.js'), css = here::here('inst/d3/network_plot/network.css'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -364,8 +364,8 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
 
       callout_g.selectAppend('line.callout_line')
         .at({
-          x2: d => d.callout_delta[0] + d.bounding_box.width/2,
-          y2: d => d.callout_delta[1] - d.bounding_box.height/2,
+          x2: d => (d.callout_delta[0] | 0) + d.bounding_box.width/2,
+          y2: d => (d.callout_delta[1] | 0) - d.bounding_box.height/2,
           stroke: 'black',
           strokeWidth: 1.5,
         });
@@ -374,7 +374,6 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
         .at({
           x: d => d.callout_delta[0],
           y: d => d.callout_delta[1] - d.bounding_box.height,
-
           rx: 5,
           ry: 5,
           fill: 'white',
@@ -466,23 +465,19 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
     }
 }
 
-const viz_button_styles = {
-  position: 'absolute',
-  cursor: 'pointer',
-  border: "1px solid black",
-  borderRadius: 5,
-  padding: 3,
-  backgroundColor: "rgba(239,237,245, 0.95)"
-};
 
-function append_callout_button(div){
-  div.selectAppend('div.callout_button')
+
+const settings_menu = div.selectAppend('div.settings_menu');
+
+const download_button = settings_menu.selectAppend('div.download_button')
+  .html(button_icon)
+  .classed('hidden', true)
+  .on('click', () => downloadPlot(dom_elements.svg));
+
+const callout_button = settings_menu.selectAppend('div.callout_button')
   .html(`Turn On Callouts`)
-  .st(viz_button_styles)
-  .st({
-    right: 0,
-    top: 0,
-  })
+  .classed('viz_button', true)
+  .classed('hidden', true)
   .on('click', () => {
     // Toggle callout status
     C.callouts = !C.callouts;
@@ -490,28 +485,23 @@ function append_callout_button(div){
     // Redraw viz with new callout status
     size_viz(viz.width, viz.height);
   });
-}
 
-
-div.selectAppend('div.export_mode_button')
-  .html(`Turn On Export Mode`)
-  .st(viz_button_styles)
-  .st({
-    left: 0,
-    bottom: 0,
-  })
-  .on('click', () => {
-    // Toggle callout status
+const export_mode_button = settings_menu.selectAppend('div.export_mode_button')
+  .html(`${C.export_mode? 'Turn off e': 'E'}xport mode`)
+  .classed('viz_button', true)
+  .on('click', function(){
+    // Toggle export mode
     C.export_mode = !C.export_mode;
 
-    if(C.export_mode){
-      append_download_button(div);
-      append_callout_button(div);
-    } else {
-      div.select('div.download_button').remove();
-      div.select('div.callout_button').remove();
+    // Show buttons if export mode is on, hide otherwise.
+    callout_button.classed('hidden', !C.export_mode);
+    download_button.classed('hidden', !C.export_mode);
+
+    d3.select(this).html(`${C.export_mode? 'Turn off e': 'E'}xport mode`)
+
+    if(!C.export_mode){
+      C.callouts = false;
     }
 
-    // Redraw viz with new callout status
     size_viz(viz.width, viz.height);
-  });
+});

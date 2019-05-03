@@ -1,0 +1,32 @@
+.viz_button,
+.download_button {
+  cursor: pointer;
+}
+
+.viz_button {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 3px;
+  background-color: rgba(239,237,245, 0.95);
+  height: auto;
+  margin-top: 2px;
+  transform: scale(1);
+  transition: transform 500ms;
+}
+
+.viz_button.hidden,
+.download_button.hidden {
+  transform: scale(0);
+}
+
+.settings_menu {
+  position: absolute;
+  /*border: 1px solid black;
+  padding: 3px;
+  background-color: orangered;*/
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  right: 0;
+  bottom: 0;
+}
