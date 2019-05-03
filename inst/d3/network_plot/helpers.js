@@ -383,9 +383,12 @@ function sim_webworker(update_freq){
 
 // Function to draw canvas parts of network
 function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highlighted_nodes = []){
-
   // Clear canvas
   context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
+
+  // If we're in export mode don't do anything.
+  if(C.export_mode) return;
+
   context.save();
   // Scale edge opacity based upon how many edges we have
   context.globalAlpha = d3.scaleLinear().domain([0,5000]).range([0.5, 0.01])(links.length);

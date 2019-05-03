@@ -126,9 +126,8 @@ function setup_network_viz(dom_elements, on_node_click){
     // Draw svg nodes of network
     draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, d => highlight([d.name]));
 
-    if(!C.export_mode){
-      draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
-    }
+    draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
+
   };
 
   const new_patterns = function(patterns){
@@ -439,7 +438,9 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
     if(C.export_mode){
       const link_opacity = decide_link_opacity(links);
       const link_lines = svg.selectAll('line.link_lines')
-        .data(links);
+        .data(links, (d,i) => i);
+
+      link_lines.exit().remove();
 
       link_lines.enter()
         .append('line.link_lines')
