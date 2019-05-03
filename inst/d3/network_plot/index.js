@@ -344,6 +344,7 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
     // Callout boxes
     if(C.callouts){
       const box_padding = 2;
+      const start_x_delta = C.case_radius*C.code_radius_mult*1.2;
 
       // Draw the sticky node names
       const node_callouts = svg.selectAll('g.node_callout')
@@ -352,28 +353,31 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       const callout_g = node_callouts.enter()
         .append('g.node_callout')
         .style('cursor', 'move')
+        .merge(node_callouts)
         .each(d => {
           // How far away from the point is this callout?
-          d.callout_delta = [C.case_radius*C.code_radius_mult*1.2, 0];
+          //d.callout_delta = [C.case_radius*C.code_radius_mult*1.2, 0];
+
+          d.delta_x = d.delta_x || start_x_delta;
+          d.delta_y = d.delta_y || 0;
 
           // Prefill a fixed-size bounding box for background
-          d.bounding_box = {width: 20, height:20};
+          d.bounding_box = d.bounding_box || {width: 20, height:20};
         })
-        .merge(node_callouts)
         .translate(d => [scales.X(d.x), scales.Y(d.y)]);
 
       callout_g.selectAppend('line.callout_line')
         .at({
-          x2: d => (d.callout_delta[0] | 0) + d.bounding_box.width/2,
-          y2: d => (d.callout_delta[1] | 0) - d.bounding_box.height/2,
+          x2: d => d.delta_x + d.bounding_box.width/2,
+          y2: d => (d.delta_y || 0) - d.bounding_box.height/2,
           stroke: 'black',
           strokeWidth: 1.5,
         });
 
       const callout_rects = callout_g.selectAppend('rect.callout_background')
         .at({
-          x: d => d.callout_delta[0],
-          y: d => d.callout_delta[1] - d.bounding_box.height,
+          x: d => d.delta_x,
+          y: d => d.delta_y - d.bounding_box.height,
           rx: 5,
           ry: 5,
           fill: 'white',
@@ -384,8 +388,8 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       callout_g.selectAppend('text.callout_title')
         .text(d => d.name)
         .at({
-          x: d => d.callout_delta[0] + box_padding,
-          y: d => d.callout_delta[1] - box_padding*2,
+          x: d => d.delta_x + box_padding,
+          y: d => d.delta_y - box_padding*2,
           fontSize: 15,
         })
         .each(function(d){
@@ -399,8 +403,7 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
         .at({
           width: d => d.bounding_box.width,
           height: d => d.bounding_box.height,
-        })
-
+        });
 
       // Make sure that the phenotype nodes are above the callout lines
       callout_g.lower();
@@ -409,25 +412,25 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
         d3.drag()
           .on("drag", function(d){
 
-            d.callout_delta[0] += d3.event.dx;
-            d.callout_delta[1] += d3.event.dy;
+            d.delta_x += d3.event.dx;
+            d.delta_y += d3.event.dy;
 
             d3.select(this).select('rect')
               .at({
-                x: d.callout_delta[0],
-                y: d.callout_delta[1] - d.bounding_box.height + 3*box_padding,
+                x: d.delta_x,
+                y: d.delta_y - d.bounding_box.height + 3*box_padding,
               });
 
             d3.select(this).select('line')
               .at({
-                x2: d.callout_delta[0] + d.bounding_box.width/2,
-                y2: d.callout_delta[1] - d.bounding_box.height/2,
+                x2: d.delta_x + d.bounding_box.width/2,
+                y2: d.delta_y - d.bounding_box.height/2,
               });
 
             d3.select(this).select('text')
               .at({
-                x: d.callout_delta[0] + box_padding,
-                y: d.callout_delta[1] + box_padding/2,
+                x: d.delta_x + box_padding,
+                y: d.delta_y + box_padding/2,
               })
 
           })
