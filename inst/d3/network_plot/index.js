@@ -17,6 +17,7 @@ const C = Object.assign(
     progress_bar_color: 'orangered',
     msg_loc: 'shiny_server',
     viz_type: 'bipartite',
+    callouts: false,
     update_freq: 5, // How often do we send back layout simulation progress?
   },
   options);
@@ -337,103 +338,103 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
     })
     .on('click', on_click);
 
-
-
-
-
     // Callout boxes
+    if(C.callouts){
+      const box_padding = 2;
 
-    const box_padding = 2;
+      // Draw the sticky node names
+      const node_callouts = svg.selectAll('g.node_callout')
+        .data(phenotype_nodes, d => d.name);
 
-    // Draw the sticky node names
-    const node_callouts = svg.selectAll('g.node_callout')
-      .data(phenotype_nodes, d => d.name);
+      const callout_g = node_callouts.enter()
+        .append('g.node_callout')
+        .style('cursor', 'move')
+        .each(d => {
+          // How far away from the point is this callout?
+          d.callout_delta = [C.case_radius*C.code_radius_mult*1.2, 0];
 
-    const callout_g = node_callouts.enter()
-      .append('g.node_callout')
-      .st({
-        cursor: 'move',
-      })
-      .each(d => {
-        // How far away from the point is this callout?
-        d.callout_delta = [C.case_radius*C.code_radius_mult*1.2, 0];
+          // Prefill a fixed-size bounding box for background
+          d.bounding_box = {width: 20, height:20};
+        })
+        .merge(node_callouts)
+        .translate(d => [scales.X(d.x), scales.Y(d.y)]);
 
-        // Prefill a fixed-size bounding box for background
-        d.bounding_box = {width: 20, height:20};
-      })
-      .merge(node_callouts)
-      .translate(d => [scales.X(d.x), scales.Y(d.y)]);
+      callout_g.selectAppend('line.callout_line')
+        .at({
+          x2: d => d.callout_delta[0] + d.bounding_box.width/2,
+          y2: d => d.callout_delta[1] - d.bounding_box.height/2,
+          stroke: 'black',
+          strokeWidth: 1.5,
+        });
 
-    callout_g.selectAppend('line.callout_line')
-      .at({
-        x2: d => d.callout_delta[0] + d.bounding_box.width/2,
-        y2: d => d.callout_delta[1] - d.bounding_box.height/2,
-        stroke: 'black',
-        strokeWidth: 1.5,
-      });
+      const callout_rects = callout_g.selectAppend('rect.callout_background')
+        .at({
+          x: d => d.callout_delta[0],
+          y: d => d.callout_delta[1] - d.bounding_box.height,
 
-    callout_g.selectAppend('rect.callout_background')
-      .at({
-        x: d => d.callout_delta[0],
-        y: d => d.callout_delta[1] - d.bounding_box.height,
-        width: d => d.bounding_box.width,
-        height: d => d.bounding_box.height,
-        rx: 5,
-        ry: 5,
-        fill: 'white',
-        stroke: 'grey',
-        strokeWidth: 1,
-      })
+          rx: 5,
+          ry: 5,
+          fill: 'white',
+          stroke: 'grey',
+          strokeWidth: 1,
+        })
 
-    callout_g.selectAppend('text.callout_title')
-      .text(d => d.name)
-      .at({
-        x: d => d.callout_delta[0] + box_padding,
-        y: d => d.callout_delta[1] - box_padding*2,
-        fontSize: 15,
-      })
-      .each(function(d){
-        const bbox = this.getBBox();
-        // grab bounding box size of filled text;
-        d.bounding_box = {width: bbox.width + box_padding*2, height: bbox.height + box_padding*2};
-      });
+      callout_g.selectAppend('text.callout_title')
+        .text(d => d.name)
+        .at({
+          x: d => d.callout_delta[0] + box_padding,
+          y: d => d.callout_delta[1] - box_padding*2,
+          fontSize: 15,
+        })
+        .each(function(d){
+          const bbox = this.getBBox();
+          // grab bounding box size of filled text;
+          d.bounding_box = {width: bbox.width + box_padding*2, height: bbox.height + box_padding*2};
+        });
+
+      // Update the rectangle backgrounds with the calculated bounding boxes
+      callout_rects
+        .at({
+          width: d => d.bounding_box.width,
+          height: d => d.bounding_box.height,
+        })
 
 
+      // Make sure that the phenotype nodes are above the callout lines
+      callout_g.lower();
 
-    callout_g.call(
-      d3.drag()
-      .on("start", function(d){
+      callout_g.call(
+        d3.drag()
+          .on("drag", function(d){
 
-      })
-      .on("drag", function(d){
+            d.callout_delta[0] += d3.event.dx;
+            d.callout_delta[1] += d3.event.dy;
 
-        d.callout_delta[0] += d3.event.dx;
-        d.callout_delta[1] += d3.event.dy;
+            d3.select(this).select('rect')
+              .at({
+                x: d.callout_delta[0],
+                y: d.callout_delta[1] - d.bounding_box.height + 3*box_padding,
+              });
 
-        d3.select(this).select('rect')
-          .at({
-            x: d.callout_delta[0],
-            y: d.callout_delta[1] - d.bounding_box.height + 3*box_padding,
-          });
+            d3.select(this).select('line')
+              .at({
+                x2: d.callout_delta[0] + d.bounding_box.width/2,
+                y2: d.callout_delta[1] - d.bounding_box.height/2,
+              });
 
-        d3.select(this).select('line')
-          .at({
-            x2: d.callout_delta[0] + d.bounding_box.width/2,
-            y2: d.callout_delta[1] - d.bounding_box.height/2,
-          });
+            d3.select(this).select('text')
+              .at({
+                x: d.callout_delta[0] + box_padding,
+                y: d.callout_delta[1] + box_padding/2,
+              })
 
-        d3.select(this).select('text')
-          .at({
-            x: d.callout_delta[0] + box_padding,
-            y: d.callout_delta[1] + box_padding/2,
           })
+      );
 
-      })
-      .on("end", function(d){
-
-      })
-    );
-
+    } else {
+      // Remove old callouts (if they exist)
+      svg.selectAll('g.node_callout').remove();
+    }
 
     if(C.export_mode){
       const link_opacity = decide_link_opacity(links);
@@ -454,5 +455,23 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
         });
     }
 }
+
+div.selectAppend('div.callout_button')
+  .html(`Turn On Callouts`)
+  .st({
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    height: 32,
+    width: 50,
+    cursor: 'pointer'
+  })
+  .on('click', () => {
+    // Toggle callout status
+    C.callouts = !C.callouts;
+
+    // Redraw viz with new callout status
+    size_viz(viz.width, viz.height);
+  });
 
 
