@@ -475,7 +475,23 @@ const settings_menu = div.selectAppend('div.settings_menu');
 const download_button = settings_menu.selectAppend('div.download_button')
   .html(button_icon)
   .classed('hidden', true)
-  .on('click', () => downloadPlot(dom_elements.svg));
+  .on('click', () => downloadPlot(dom_elements.svg))
+  .on('mouseover', function(){
+      d3.select(this)
+        .select('svg')
+        .st({
+          stroke: 'blue',
+          strokeWidth: 3,
+        });
+    })
+    .on('mouseout', function(){
+       d3.select(this)
+        .select('svg')
+        .st({
+          stroke: 'black',
+          strokeWidth: 2,
+        });
+    });
 
 const callout_button = settings_menu.selectAppend('div.callout_button')
   .html(`Turn On Callouts`)

@@ -155,65 +155,20 @@ function setup_tooltip(div, C){
 
 // Function to setup the message sending buttons to send codes to shiny
 function setup_message_buttons(div, message_send_func){
-  const button_span = {
-    border: "1px solid black",
-    padding: "5px",
-    borderRadius: "8px",
-    boxShadow: "black 1px 1px 0px",
-    background: "lightyellow",
-    cursor: "pointer",
-    paddingRight: "5px"
-  };
 
-  const hidden_style = {
-    display: 'none',
-    left: -1000
-  };
+  const message_holders = div.selectAppend('div.message_holders');
 
-  const displayed_style = {
-    bottom: '10px',
-    left: '10px',
-    display:'block'
-  };
+  const message_buttons = message_holders.selectAll('div')
+    .data(['delete', 'isolate', 'invert'])
+    .enter().append('div.hidden')
+    .text(d => d)
+    .classed('viz_button', true)
+    .on('click', message_send_func);
 
-  const node_interaction_popup = div.selectAppend('div.node_message_buttons')
-    .attr('class', 'node_interaction_popup')
-    .st({
-      background:'white',
-      position:'absolute',
-      display: 'none'
-    });
-
-  const delete_codes_button = node_interaction_popup
-    .selectAppend('span#delete_button')
-    .attr('id', 'delete_button')
-    .st(button_span)
-    .text('Delete Codes')
-    .on('click', () => {
-      message_send_func('delete');
-    });
-
-  const isolate_codes_button = node_interaction_popup
-    .selectAppend('span#isolate_button')
-    .attr('id', 'isolate_button')
-    .st(button_span)
-    .text('Isolate Codes')
-    .on('click', () => {
-      message_send_func('isolate');
-    });
-
-  const invert_codes_button = node_interaction_popup
-    .selectAppend('span#invert_button')
-    .attr('id', 'invert_button')
-    .st(button_span)
-    .text('Invert Codes')
-    .on('click', () => {
-      message_send_func('invert');
-    });
 
   return {
-    show: () => node_interaction_popup.st(displayed_style),
-    hide: () => node_interaction_popup.st(hidden_style),
+    show: () => message_buttons.classed('hidden', false),
+    hide: () => message_buttons.classed('hidden', true),
   };
 }
 
@@ -433,8 +388,6 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
 }
 
 
-
-
 // Logic for what is done when a node is clicked.
 function on_node_click(d){
   const node = d3.select(this);
@@ -558,37 +511,6 @@ function downloadPlot(svg){
   document.body.removeChild(downloadLink);
 }
 
-function append_download_button(div){
-  div.selectAppend('div.download_button')
-    .html(button_icon)
-    .st({
-      position: 'absolute',
-      right: 0,
-      bottom: 0,
-      height: 32,
-      width: 32,
-      cursor: 'pointer'
-    })
-    .on('mouseover', function(){
-      d3.select(this)
-        .select('svg')
-        .st({
-          stroke: 'blue',
-          strokeWidth: 3,
-        });
-    })
-    .on('mouseout', function(){
-       d3.select(this)
-        .select('svg')
-        .st({
-          stroke: 'black',
-          strokeWidth: 2,
-        });
-    })
-    .on('click', () => {
-      downloadPlot(dom_elements.svg)
-    });
-}
 
 const button_icon = `
 <svg id="i-download" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
