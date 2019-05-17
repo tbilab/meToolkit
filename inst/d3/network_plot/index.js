@@ -252,11 +252,6 @@ r2d3.onRender(function(data, div, width, height, options){
     );
   }
 
-
-  // If we're in the export mode put a small download button in.
-  if(C.export_mode){
-    append_download_button(div);
-  }
 });
 
 
