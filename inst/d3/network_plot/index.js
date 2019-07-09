@@ -299,7 +299,8 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
   const phenotype_nodes = nodes.filter(d => d.selectable);
 
   // Bind data but only the phenotype nodes unless we're in export mode and need everything to be SVG
-  const node_circles = svg.selectAll('circle')
+  const node_holder = svg.selectAppend('g.nodes');
+  const node_circles = node_holder.selectAll('circle')
     .data(
       C.export_mode ? nodes: phenotype_nodes,
       d => d.id
@@ -334,7 +335,6 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
     })
     .on('click', on_click);
-
 
     // Callout boxes
     if(C.callouts){
@@ -401,7 +401,8 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
         });
 
       // Make sure that the phenotype nodes are above the callout lines
-      callout_g.lower();
+      callout_g.raise();
+      node_holder.raise();  // raise phenotypes
 
       callout_g.call(
         d3.drag()
@@ -438,7 +439,8 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
 
     if(C.export_mode){
       const link_opacity = decide_link_opacity(links);
-      const link_lines = svg.selectAll('line.link_lines')
+      const link_holder = svg.selectAppend('g.links')
+      const link_lines = link_holder.selectAll('line.link_lines')
         .data(links, (d,i) => i);
 
       link_lines.exit().remove();
@@ -457,6 +459,7 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
         });
 
       // Make sure the nodes are above the links
+      link_holder.lower();
       svg.selectAll('circle').raise();
     } else {
       svg.selectAll('line.link_lines').remove();
