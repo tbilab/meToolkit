@@ -296,6 +296,8 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
     fill: d => d.inverted ? 'white': d.color,
   };
 
+  // If we isolated the phenotypes before we need to remove them
+  svg.select('g.phenotypes').remove();
   const phenotype_nodes = nodes.filter(d => d.selectable);
 
   // Bind data but only the phenotype nodes unless we're in export mode and need everything to be SVG
@@ -317,6 +319,16 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
     })
     .merge(node_circles)
     .at(node_attrs);
+
+  // Build container for phenotypes
+  const phenotype_holder = svg.selectAppend('g.phenotypes');
+  // Swap all phenotype nodes into this container
+  all_nodes.filter(d => d.selectable)
+    .each(function(){
+      phenotype_holder.node().appendChild(this);
+    });
+  // raise container above everything else
+  phenotype_holder.raise();
 
   // Add mouseover behavior for nodes that are selectable
   all_nodes
@@ -400,9 +412,10 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
           height: d => d.bounding_box.height,
         });
 
-      // Make sure that the phenotype nodes are above the callout lines
+      // Raise callouts above everything else
       callout_g.raise();
-      node_holder.raise();  // raise phenotypes
+      // Make sure that the phenotype nodes are above the callout lines
+      phenotype_holder.raise()
 
       callout_g.call(
         d3.drag()
