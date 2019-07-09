@@ -5,7 +5,10 @@ function unique(data, key){
 };
 
 function decide_link_opacity(links){
-  return d3.scaleLinear().domain([0,5000]).range([0.4, 0.01])(links.length);
+  return Math.max(
+    d3.scaleLinear().domain([0,5000]).range([0.4, 0.06])(links.length),
+    0.06
+  );
 }
 // Sets up size object given a width and height and the constants object for sizing viz
 function setup_sizes(width, height, C){
