@@ -4,9 +4,7 @@
 // This code is run a single time
 // ===============================================================
 d3.selection.prototype.last = function() {
-  return d3.select(
-      this.nodes()[this.size() - 1]
-  );
+  return d3.select(this.nodes()[this.size() - 1]);
 };
 
 const margin = {left: 65, right: 10, top: 10, bottom: 10};
@@ -27,6 +25,11 @@ const or_hist = or_svg
   .append('g')
   .attr("transform", `translate(${margin.left},${margin.top})`);
 
+const brush = d3.brush().on('end', manhattan_brush);
+// attach the brush to the chart
+const gBrush = main_viz.append('g')
+  .attr('class', 'brush')
+  .call(brush);
 
 const main_quadtree = d3.quadtree();
 
@@ -69,11 +72,11 @@ r2d3.onRender(function(data, svg, width, height, options) {
   // Make sure viz is sized correctly.
   size_viz(width, height);
 
-  draw_manhattan(app_state);
+  draw_manhattan();
 });
 
 
-function draw_manhattan(app_state){
+function draw_manhattan(){
 
   let manhattan_points = main_viz.selectAll('circle')
     .data(data, d => d.code);
@@ -87,6 +90,8 @@ function draw_manhattan(app_state){
 
   // subscripe to the state object
   app_state.output.subscribe(({selected_codes}) => {
+
+
     const code_selected = d => (selected_codes.length === 0) || selected_codes.includes(d.code);
 
     manhattan_points
@@ -133,16 +138,9 @@ function size_viz(width, height){
     .y(d => manhattan_scales.y(d.log_pval))
     .addAll(data);
 
-  // create the d3-brush generator
-  const brush = d3.brush()
-    .extent([[0, 0], [width, manhattan_height]])
-    .on('end', manhattan_brush);
-
-  // attach the brush to the chart
-  const gBrush = main_viz.append('g')
-    .attr('class', 'brush')
-    .call(brush);
-
+  // Update the extent of the brush
+  brush.extent(main_quadtree.extent());
+  gBrush.call(brush);
 }
 
 function manhattan_brush(){
@@ -151,12 +149,17 @@ function manhattan_brush(){
 
   // if we have no selection, just reset the brush highlight to no nodes
   if(!selection) {
-    console.log('nothing selected!');
-    app_state.input.next({
-      type: 'manhattan_brush',
-      payload: []
-    });
-    return;
+    // If the selection is null the brush has been hidden and we do nothing
+    if(selection === null){
+      return;
+    } else {
+      console.log('nothing selected!');
+      app_state.input.next({
+        type: 'manhattan_brush',
+        payload: []
+      });
+      return;
+    }
   }
 
   // begin an array to collect the brushed nodes
@@ -194,19 +197,15 @@ function manhattan_brush(){
     payload: brushedNodes.map(d => d.code)
   });
 
+  // Clear the brush
+  gBrush.call(brush.move, null);
+
   app_state.output.subscribe(({selected_codes}) => {
     console.log('State event observed inside of brush');
   });
 }
 
-function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max = by_min){
-  const [[sx_min, sy_min],[sx_max, sy_max]] = selection;
 
-  const xs_intersect = (sx_min < bx_max) && (sx_max > bx_min);
-  const ys_intersect = (sy_min < by_max) && (sy_max > by_min);
-
-  return xs_intersect && ys_intersect;
-}
 
 // ===============================================================
 // Resizing
@@ -220,25 +219,9 @@ r2d3.onResize(function(width, height) {
 });
 
 
-//draw_button(div, 'a', app_state);
-//draw_button(div, 'b', app_state);
-
-// Function that draws a button with a count on it
-function draw_button(div, id, app_state){
-
-  div.append('button')
-    .text(id)
-    .on(
-      'click',
-      () => app_state.input.next({type: id, payload: Math.random()})
-    );
-
-  // subscripe to the state object
-  app_state.output.subscribe(event => {
-    console.log(`${JSON.stringify(event)} : observed from button ${id}`);
-  });
-}
-
+// ===============================================================
+// State control
+// ===============================================================
 
 function setup_state(){
   const initial_state = {
@@ -272,4 +255,18 @@ function process_action(state, {type, payload}) {
       console.log('unknown input');
   }
   return new_state;
+}
+
+
+// ===============================================================
+// Helper functions
+// ===============================================================
+
+function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max = by_min){
+  const [[sx_min, sy_min],[sx_max, sy_max]] = selection;
+
+  const xs_intersect = (sx_min < bx_max) && (sx_max > bx_min);
+  const ys_intersect = (sy_min < by_max) && (sy_max > by_min);
+
+  return xs_intersect && ys_intersect;
 }
