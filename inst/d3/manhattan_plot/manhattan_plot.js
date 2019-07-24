@@ -28,6 +28,9 @@ const or_hist = or_svg
   .append('g')
   .attr("transform", `translate(${margin.left},${margin.top})`);
 
+
+const main_quadtree = d3.quadtree();
+
 const manhattan_scales = {
   x: d3.scaleLinear(),
   y: d3.scaleLinear(),
@@ -41,15 +44,13 @@ const app_state = setup_state();
 // This code runs whenever data changes
 // ===============================================================
 r2d3.onRender(function(data, svg, width, height, options) {
-  // Make sure viz is sized correctly.
-  size_viz(width, height);
 
   let log_pval_max = 0,
       log_or_min = 0,
       log_or_max = 0;
 
   // Add a log_pval and log_or field to all points and keep track of extents
-  data.forEach(d => {
+  data.forEach((d,i) => {
     d.log_pval = -Math.log10(d.p_val);
     if(d.log_pval > log_pval_max) log_pval_max = d.log_pval;
 
@@ -58,11 +59,16 @@ r2d3.onRender(function(data, svg, width, height, options) {
     if(d.log_or > log_or_max) log_or_max = d.log_or;
 
     d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
+    d.index = i;
   });
 
   // Update the domains for the manhattan plot
   manhattan_scales.x.domain([0, data.length]);
   manhattan_scales.y.domain([0,log_pval_max]).nice();
+
+  // Make sure viz is sized correctly.
+  size_viz(width, height);
+
   draw_manhattan(options.selected);
 });
 
@@ -70,6 +76,7 @@ r2d3.onRender(function(data, svg, width, height, options) {
 function draw_manhattan(selected_codes){
 
   const any_selected = selected_codes.length !== 0;
+  const code_selected = d => !any_selected || selected_codes.includes(d.code);
 
   const manhattan_points = main_viz.selectAll('circle')
     .data(data, d => d.code);
@@ -77,10 +84,10 @@ function draw_manhattan(selected_codes){
   manhattan_points.enter()
     .append('circle')
     .merge(manhattan_points)
-    .attr('cx', (d,i) => manhattan_scales.x(i))
-    .attr('cy', (d,i) => manhattan_scales.y(d.log_pval))
-    .attr('r', (d,i) => 2)
-    .attr('fill', (d,i) => d[ !any_selected || selected_codes.includes(d.code) ? 'color': 'unselected_color']);
+    .attr('cx', d => manhattan_scales.x(d.index))
+    .attr('cy', d => manhattan_scales.y(d.log_pval))
+    .attr('r',  d => code_selected(d) ? 3 : 2)
+    .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
 
   const y_axis = main_viz.selectAppend("g#y-axis")
     .call(function(g){
@@ -91,10 +98,10 @@ function draw_manhattan(selected_codes){
   y_axis.selectAll('text')
     .last()
     .text('-Log10 P');
-
 }
 
 function size_viz(width, height){
+
   const manhattan_height = height*manhattan_prop;
   const or_height = height*(1 - manhattan_prop);
 
@@ -111,6 +118,78 @@ function size_viz(width, height){
   // Update the scale ranges
   manhattan_scales.x.range([0, width - margin.left - margin.right]);
   manhattan_scales.y.range([manhattan_height - margin.top - margin.bottom, 0]);
+
+  // generate a quadtree for faster lookups for brushing
+  // Rebuild the quadtree with new positions
+  //if(main_quadtree.data().length !== 0) {
+  //  main_quadtree.removeAll();
+  //}
+
+  main_quadtree
+    .x(d => manhattan_scales.x(d.index))
+    .y(d => manhattan_scales.y(d.log_pval))
+    .addAll(data);
+
+  // create the d3-brush generator
+  const brush = d3.brush()
+    .extent([[0, 0], [width, manhattan_height]])
+    .on('end', manhattan_brush);
+
+  // attach the brush to the chart
+  const gBrush = main_viz.append('g')
+    .attr('class', 'brush')
+    .call(brush);
+
+}
+
+function manhattan_brush(){
+
+  const { selection } = d3.event;
+
+  // if we have no selection, just reset the brush highlight to no nodes
+  if(!selection) {
+    console.log('nothing selected!');
+    return;
+  }
+
+  // begin an array to collect the brushed nodes
+  const brushedNodes = [];
+
+  // traverse all branches of the quad tree
+  main_quadtree.visit((node, x1, y1, x2, y2) => {
+
+    const overlaps_selection = selection_contains(
+      selection, x1, y1, x2, y2
+    );
+
+     // skip if it doesn't overlap the brush
+    if(!overlaps_selection){
+      return true;
+    }
+
+
+    // If we have overlap and we're a leaf node, investigate
+    if (!node.length) {
+      const d = node.data;
+      const dx = manhattan_scales.x(d.index);
+      const dy = manhattan_scales.y(d.log_pval);
+      if (selection_contains(selection, dx, dy)) {
+        brushedNodes.push(d);
+      }
+    }
+
+    // return false so that we traverse into branch (only useful for non-leaf nodes)
+    return false;
+  });
+}
+
+function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max = by_min){
+  const [[sx_min, sy_min],[sx_max, sy_max]] = selection;
+
+  const xs_intersect = (sx_min < bx_max) && (sx_max > bx_min);
+  const ys_intersect = (sy_min < by_max) && (sy_max > by_min);
+
+  return xs_intersect && ys_intersect;
 }
 
 // ===============================================================
@@ -121,7 +200,7 @@ function size_viz(width, height){
 r2d3.onResize(function(width, height) {
   console.log('The plot was just resized!');
   size_viz(width, height);
-  draw_manhattan(options.selected);
+  draw_manhattan([]);
 });
 
 
