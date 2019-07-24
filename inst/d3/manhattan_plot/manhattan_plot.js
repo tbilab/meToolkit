@@ -12,7 +12,6 @@ d3.selection.prototype.last = function() {
 const margin = {left: 65, right: 10, top: 10, bottom: 10};
 const manhattan_prop = 0.6;
 
-
 const main_svg = div.append('svg')
   .attr('id', 'main_viz');
 
@@ -37,6 +36,7 @@ const manhattan_scales = {
 };
 
 const {scan, shareReplay} = rxjs.operators;
+
 const app_state = setup_state();
 
 // ===============================================================
@@ -69,25 +69,30 @@ r2d3.onRender(function(data, svg, width, height, options) {
   // Make sure viz is sized correctly.
   size_viz(width, height);
 
-  draw_manhattan(options.selected);
+  draw_manhattan(app_state);
 });
 
 
-function draw_manhattan(selected_codes){
+function draw_manhattan(app_state){
 
-  const any_selected = selected_codes.length !== 0;
-  const code_selected = d => !any_selected || selected_codes.includes(d.code);
-
-  const manhattan_points = main_viz.selectAll('circle')
+  let manhattan_points = main_viz.selectAll('circle')
     .data(data, d => d.code);
 
-  manhattan_points.enter()
+  manhattan_points = manhattan_points.enter()
     .append('circle')
     .merge(manhattan_points)
     .attr('cx', d => manhattan_scales.x(d.index))
-    .attr('cy', d => manhattan_scales.y(d.log_pval))
-    .attr('r',  d => code_selected(d) ? 3 : 2)
-    .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
+    .attr('cy', d => manhattan_scales.y(d.log_pval));
+
+
+  // subscripe to the state object
+  app_state.output.subscribe(({selected_codes}) => {
+    const code_selected = d => (selected_codes.length === 0) || selected_codes.includes(d.code);
+
+    manhattan_points
+      .attr('r',  d => code_selected(d) ? 3 : 2)
+      .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
+  });
 
   const y_axis = main_viz.selectAppend("g#y-axis")
     .call(function(g){
@@ -121,9 +126,7 @@ function size_viz(width, height){
 
   // generate a quadtree for faster lookups for brushing
   // Rebuild the quadtree with new positions
-  //if(main_quadtree.data().length !== 0) {
-  //  main_quadtree.removeAll();
-  //}
+  main_quadtree.removeAll(main_quadtree.data());
 
   main_quadtree
     .x(d => manhattan_scales.x(d.index))
@@ -149,6 +152,10 @@ function manhattan_brush(){
   // if we have no selection, just reset the brush highlight to no nodes
   if(!selection) {
     console.log('nothing selected!');
+    app_state.input.next({
+      type: 'manhattan_brush',
+      payload: []
+    });
     return;
   }
 
@@ -167,7 +174,6 @@ function manhattan_brush(){
       return true;
     }
 
-
     // If we have overlap and we're a leaf node, investigate
     if (!node.length) {
       const d = node.data;
@@ -180,6 +186,16 @@ function manhattan_brush(){
 
     // return false so that we traverse into branch (only useful for non-leaf nodes)
     return false;
+  });
+
+  // Send result of brush event to the app state
+  app_state.input.next({
+    type: 'manhattan_brush',
+    payload: brushedNodes.map(d => d.code)
+  });
+
+  app_state.output.subscribe(({selected_codes}) => {
+    console.log('State event observed inside of brush');
   });
 }
 
@@ -200,16 +216,15 @@ function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max =
 r2d3.onResize(function(width, height) {
   console.log('The plot was just resized!');
   size_viz(width, height);
-  draw_manhattan([]);
+  draw_manhattan();
 });
 
 
-
-draw_button(div, 'a', app_state);
-draw_button(div, 'b', app_state);
+//draw_button(div, 'a', app_state);
+//draw_button(div, 'b', app_state);
 
 // Function that draws a button with a count on it
-function draw_button(div, id, state_input, state_output){
+function draw_button(div, id, app_state){
 
   div.append('button')
     .text(id)
@@ -224,10 +239,10 @@ function draw_button(div, id, state_input, state_output){
   });
 }
 
+
 function setup_state(){
   const initial_state = {
-    clicks: 0,
-    history: [],
+    selected_codes: []
   };
 
   const state_input = new rxjs.BehaviorSubject({type: 'initialize'});
@@ -243,27 +258,18 @@ function setup_state(){
   };
 }
 
+
 function process_action(state, {type, payload}) {
   let new_state = state;
   switch(type){
     case 'initialize':
       console.log('initializing state');
       break;
-    case 'a':
-      new_state.clicks += 1;
-      new_state.history.push(`button a pushed`);
-      break;
-    case 'b':
-      new_state.clicks += 1;
-      new_state.history.push(`button b pushed`);
+    case 'manhattan_brush':
+      new_state.selected_codes = payload;
       break;
     default:
       console.log('unknown input');
   }
   return new_state;
-}
-
-function desaturate(color, k = 1) {
-  const {l, c, h} = d3.lch(color);
-  return d3.lch(l, c + 18 * k, h);
 }
