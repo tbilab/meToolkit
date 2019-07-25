@@ -7,8 +7,9 @@ d3.selection.prototype.last = function() {
   return d3.select(this.nodes()[this.size() - 1]);
 };
 
-const margin = {left: 65, right: 10, top: 10, bottom: 10};
+const margin = {left: 65, right: 10, top: 10, bottom: 20};
 const manhattan_prop = 0.6;
+const num_hist_bins = 100;
 
 const main_svg = div.append('svg')
   .attr('id', 'main_viz');
@@ -18,8 +19,7 @@ const main_viz = main_svg
   .attr("transform", `translate(${margin.left},${margin.top})`);
 
 const or_svg = div.append('svg')
-  .attr('id', 'or_hist')
-  .style('background', 'forestgreen');
+  .attr('id', 'or_hist');
 
 const or_hist = or_svg
   .append('g')
@@ -36,6 +36,17 @@ const main_quadtree = d3.quadtree();
 const manhattan_scales = {
   x: d3.scaleLinear(),
   y: d3.scaleLinear(),
+};
+
+const histogram_scales = {
+  x: d3.scaleLinear(),
+  y: d3.scaleLinear(),
+};
+
+const y_axis_label_style = {
+  x: 4,
+  textAnchor: 'start',
+  fontWeight: 'bold',
 };
 
 const {scan, shareReplay} = rxjs.operators;
@@ -73,6 +84,7 @@ r2d3.onRender(function(data, svg, width, height, options) {
   size_viz(width, height);
 
   draw_manhattan();
+  draw_histogram();
 });
 
 
@@ -90,12 +102,12 @@ function draw_manhattan(){
   const y_axis = main_viz.selectAppend("g#y-axis")
     .call(function(g){
       g.attr("transform", `translate(${-5},0)`)
-      .call(d3.axisLeft(manhattan_scales.y).tickSizeOuter(0));
+      .call(d3.axisLeft(manhattan_scales.y).tickSizeOuter(0))
+      .call(g => g.select(".tick:last-of-type text").clone()
+            .at(y_axis_label_style)
+            .text('-Log10 P'));
     });
 
-  y_axis.selectAll('text')
-    .last()
-    .text('-Log10 P');
 
   // Reset button to jump back to default selection
   const reset_button = main_viz.selectAppend('text#clear_button')
@@ -127,7 +139,59 @@ function draw_manhattan(){
   });
 
 
+}
 
+
+function draw_histogram(){
+
+  const log_ors = data.map(d => d.log_or);
+
+  histogram_scales.x.domain(d3.extent(log_ors)).nice();
+
+  const or_bins = d3.histogram()
+    .domain(histogram_scales.x.domain())
+    .thresholds(histogram_scales.x.ticks(num_hist_bins))
+  (log_ors);
+
+  histogram_scales.y.domain([0, d3.max(or_bins, d => d.length)]).nice();
+
+  let hist_bars = or_hist
+    .attr("fill", "steelblue")
+    .selectAll("rect")
+    .data(or_bins);
+
+  hist_bars = hist_bars.enter().append('rect')
+    .merge(hist_bars)
+    .attr("x", d =>  histogram_scales.x(d.x0) + 1)
+    .attr("width", d => Math.max(0,  histogram_scales.x(d.x1) -  histogram_scales.x(d.x0) - 1))
+    .attr("y", d =>  histogram_scales.y(d.length))
+    .attr("height", d =>  histogram_scales.y(0) -  histogram_scales.y(d.length));
+
+
+  or_hist.selectAppend("g.x-axis")
+    .call(g =>
+      g.attr("transform", `translate(0,${histogram_scales.y.range()[0]})`)
+        .call(d3.axisBottom(histogram_scales.x).tickSizeOuter(0))
+        .call(g => g.append("text")
+            .attr("x", histogram_scales.x.range()[1])
+            .attr("y", -4)
+            .attr("fill", "#000")
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "end")
+            .text('Log Odds-Ratio'))
+    );
+
+  or_hist.selectAppend("g.y-axis")
+    .call(
+      g => g
+        //.attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(histogram_scales.y))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.select(".tick:last-of-type text").clone()
+            .at(y_axis_label_style)
+            .text('# of Codes'))
+    );
+  console.log('drawing histogram!')
 }
 
 function size_viz(width, height){
@@ -148,6 +212,9 @@ function size_viz(width, height){
   // Update the scale ranges
   manhattan_scales.x.range([0, width - margin.left - margin.right]);
   manhattan_scales.y.range([manhattan_height - margin.top - margin.bottom, 0]);
+
+  histogram_scales.x.range([0, width - margin.left - margin.right]);
+  histogram_scales.y.range([or_height - margin.top - margin.bottom, 0]);
 
   // generate a quadtree for faster lookups for brushing
   // Rebuild the quadtree with new positions
@@ -224,7 +291,6 @@ function manhattan_brush(){
     console.log('State event observed inside of brush');
   });
 }
-
 
 
 // ===============================================================
