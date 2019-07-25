@@ -87,18 +87,6 @@ function draw_manhattan(){
     .attr('cx', d => manhattan_scales.x(d.index))
     .attr('cy', d => manhattan_scales.y(d.log_pval));
 
-
-  // subscripe to the state object
-  app_state.output.subscribe(({selected_codes}) => {
-
-
-    const code_selected = d => (selected_codes.length === 0) || selected_codes.includes(d.code);
-
-    manhattan_points
-      .attr('r',  d => code_selected(d) ? 3 : 2)
-      .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
-  });
-
   const y_axis = main_viz.selectAppend("g#y-axis")
     .call(function(g){
       g.attr("transform", `translate(${-5},0)`)
@@ -108,6 +96,38 @@ function draw_manhattan(){
   y_axis.selectAll('text')
     .last()
     .text('-Log10 P');
+
+  // Reset button to jump back to default selection
+  const reset_button = main_viz.selectAppend('text#clear_button')
+      .attr('x', manhattan_scales.x.range()[1])
+      .attr('y', 10)
+      .attr('text-anchor', 'end')
+      .text('Reset selection')
+      .attr('font-size', 0)
+      .on('click', function(){
+        app_state.input.next({
+          type: 'manhattan_brush',
+          payload: []
+        });
+      });
+
+  // subscripe to the state object
+  app_state.output.subscribe(({selected_codes}) => {
+
+    const empty_selection = selected_codes.length === 0;
+
+    const code_selected = d => empty_selection || selected_codes.includes(d.code);
+
+    manhattan_points
+      .attr('r',  d => code_selected(d) ? 3 : 2)
+      .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
+
+    reset_button.attr('font-size', empty_selection ? 0: 18);
+
+  });
+
+
+
 }
 
 function size_viz(width, height){
