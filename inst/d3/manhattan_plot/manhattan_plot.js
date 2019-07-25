@@ -43,11 +43,6 @@ const histogram_scales = {
   y: d3.scaleLinear(),
 };
 
-const y_axis_label_style = {
-  x: 4,
-  textAnchor: 'start',
-  fontWeight: 'bold',
-};
 
 const {scan, shareReplay} = rxjs.operators;
 
@@ -103,10 +98,17 @@ function draw_manhattan(){
     .call(function(g){
       g.attr("transform", `translate(${-5},0)`)
       .call(d3.axisLeft(manhattan_scales.y).tickSizeOuter(0))
-      .call(g => g.select(".tick:last-of-type text").clone()
-            .at(y_axis_label_style)
-            .text('-Log10 P'));
+      .call(add_axis_label('-Log10 P'));
     });
+
+
+  main_viz.selectAppend("g.x-axis")
+    .call(g =>
+      g.attr("transform", `translate(0,${manhattan_scales.y.range()[0]})`)
+        .call(d3.axisBottom(histogram_scales.x).ticks(1).tickSizeOuter(0))
+        .call(add_axis_label('PheCode', false))
+        .call(g => g.select(".tick:first-of-type").remove())
+    );
 
 
   // Reset button to jump back to default selection
@@ -172,26 +174,16 @@ function draw_histogram(){
     .call(g =>
       g.attr("transform", `translate(0,${histogram_scales.y.range()[0]})`)
         .call(d3.axisBottom(histogram_scales.x).tickSizeOuter(0))
-        .call(g => g.append("text")
-            .attr("x", histogram_scales.x.range()[1])
-            .attr("y", -4)
-            .attr("fill", "#000")
-            .attr("font-weight", "bold")
-            .attr("text-anchor", "end")
-            .text('Log Odds-Ratio'))
+        .call(add_axis_label('Log Odds-Ratio', false))
     );
 
   or_hist.selectAppend("g.y-axis")
     .call(
-      g => g
-        //.attr("transform", `translate(${margin.left},0)`)
-        .call(d3.axisLeft(histogram_scales.y))
-        .call(g => g.select(".domain").remove())
-        .call(g => g.select(".tick:last-of-type text").clone()
-            .at(y_axis_label_style)
-            .text('# of Codes'))
+      g => g.attr("transform", `translate(${-5},0)`)
+        .call(d3.axisLeft(histogram_scales.y).tickSizeOuter(0))
+        .call(add_axis_label('# of Codes'))
     );
-  console.log('drawing histogram!')
+  //console.log('drawing histogram!')
 }
 
 function size_viz(width, height){
@@ -347,6 +339,31 @@ function process_action(state, {type, payload}) {
 // ===============================================================
 // Helper functions
 // ===============================================================
+
+function add_axis_label(label, y_axis = true){
+
+  const bump_axis = y_axis ? 'x': 'y';
+
+  const axis_label_style = {
+    [bump_axis]: y_axis ? -3: 8,
+    textAnchor: 'end',
+    fontWeight: 'bold',
+    fontSize: '0.7rem'
+  };
+
+  return g => {
+    g.select(".tick:last-of-type line").remove();
+
+    g.select(".tick:last-of-type text")
+            .at(axis_label_style)
+            .text(label);
+  };
+}
+
+
+function remove_axis_spine(g){
+   g.select(".domain").remove()
+}
 
 function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max = by_min){
   const [[sx_min, sy_min],[sx_max, sy_max]] = selection;
