@@ -6,7 +6,7 @@
 const {scan, shareReplay} = rxjs.operators;
 
 const margin = {left: 65, right: 10, top: 10, bottom: 20};
-const manhattan_prop = 0.6;
+const manhattan_prop = 0.7;
 const num_hist_bins = 100;
 
 // Holds the histogram data for us. Needs to be
@@ -51,6 +51,15 @@ const hist_brush = d3.brushX().on('end', on_hist_brush);
 // Then attach the brush objects to their holder g's
 manhattan_brush_g.call(manhattan_brush);
 hist_brush_g.call(hist_brush);
+
+function reset_brushes(brush_id = 'all'){
+  if(brush_id === 'histogram' || brush_id === 'all'){
+    hist_brush_g.call(hist_brush.move, null);
+  }
+  if(brush_id === 'manhattan' || brush_id === 'all'){
+    manhattan_brush_g.call(manhattan_brush.move, null);
+  }
+}
 
 // Initialize a quadtree to help us filter through the manhattan points much faster
 const main_quadtree = d3.quadtree();
@@ -97,10 +106,12 @@ function process_action(state, {type, payload}) {
       break;
     case 'manhattan_brush':
       new_state.selected_codes = payload;
+      //  reset the histogram brush now that it's been overridden
+      reset_brushes('all');
       break;
     case 'reset_button':
       // Clear the histogram brush
-      hist_brush_g.call(hist_brush.move, null);
+      reset_brushes('all');
 
       new_state.selected_codes = [];
       break;
@@ -134,10 +145,42 @@ r2d3.onRender(function(data, svg, width, height, options) {
 
   // Make sure viz is sized correctly.
   size_viz(width, height);
-
-  draw_manhattan();
-  draw_histogram();
 });
+
+function update_w_new_data(data){
+  let log_pval_max = 0,
+      log_or_min = 0,
+      log_or_max = 0;
+
+  // Add a log_pval and log_or field to all points and keep track of extents
+  data.forEach((d,i) => {
+    d.log_pval = -Math.log10(d.p_val);
+    if(d.log_pval > log_pval_max) log_pval_max = d.log_pval;
+
+    d.log_or = Math.log(d.OR);
+    if(d.log_or < log_or_min) log_or_min = d.log_or;
+    if(d.log_or > log_or_max) log_or_max = d.log_or;
+
+    d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
+    d.index = i;
+  });
+
+  // Update the domains for the manhattan plot
+  manhattan_scales.x.domain([0, data.length]);
+  manhattan_scales.y.domain([0,log_pval_max]).nice();
+
+  // Next for the histogram
+  const log_ors = data.map(d => d.log_or);
+
+  histogram_scales.x.domain(d3.extent(log_ors)).nice();
+
+  or_bins = d3.histogram()
+    .domain(histogram_scales.x.domain())
+    .thresholds(histogram_scales.x.ticks(num_hist_bins))
+    (log_ors);
+
+  histogram_scales.y.domain([0, d3.max(or_bins, d => d.length)]).nice();
+}
 
 
 function draw_manhattan(){
@@ -196,42 +239,6 @@ function draw_manhattan(){
 }
 
 
-function update_w_new_data(data){
-  let log_pval_max = 0,
-      log_or_min = 0,
-      log_or_max = 0;
-
-  // Add a log_pval and log_or field to all points and keep track of extents
-  data.forEach((d,i) => {
-    d.log_pval = -Math.log10(d.p_val);
-    if(d.log_pval > log_pval_max) log_pval_max = d.log_pval;
-
-    d.log_or = Math.log(d.OR);
-    if(d.log_or < log_or_min) log_or_min = d.log_or;
-    if(d.log_or > log_or_max) log_or_max = d.log_or;
-
-    d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
-    d.index = i;
-  });
-
-  // Update the domains for the manhattan plot
-  manhattan_scales.x.domain([0, data.length]);
-  manhattan_scales.y.domain([0,log_pval_max]).nice();
-
-  // Next for the histogram
-  const log_ors = data.map(d => d.log_or);
-
-  histogram_scales.x.domain(d3.extent(log_ors)).nice();
-
-  or_bins = d3.histogram()
-    .domain(histogram_scales.x.domain())
-    .thresholds(histogram_scales.x.ticks(num_hist_bins))
-    (log_ors);
-
-  histogram_scales.y.domain([0, d3.max(or_bins, d => d.length)]).nice();
-}
-
-
 function draw_histogram(){
 
   let hist_bars = or_hist
@@ -261,52 +268,6 @@ function draw_histogram(){
         .call(d3.axisLeft(histogram_scales.y).tickSizeOuter(0))
         .call(add_axis_label('# of Codes'))
     );
-}
-
-
-function size_viz(width, height){
-
-  const manhattan_height = height*manhattan_prop;
-  const or_height = height*(1 - manhattan_prop);
-
-  // Adjust the sizes of the svgs
-  main_svg
-    .attr('height', manhattan_height)
-    .attr('width', width);
-
-  or_svg
-    .attr('height', or_height)
-    .attr('width', width);
-
-  // Calculate the sizes needed and return scales for use
-  // Update the scale ranges
-  manhattan_scales.x.range([0, width - margin.left - margin.right]);
-  manhattan_scales.y.range([manhattan_height - margin.top - margin.bottom, 0]);
-
-  const hist_x_range = [0, width - margin.left - margin.right];
-  const hist_y_range = [or_height - margin.top - margin.bottom, 0];
-  histogram_scales.x.range(hist_x_range);
-  histogram_scales.y.range(hist_y_range);
-
-
-  // generate a quadtree for faster lookups for brushing
-  // Rebuild the quadtree with new positions
-  main_quadtree.removeAll(main_quadtree.data());
-
-  main_quadtree
-    .x(d => manhattan_scales.x(d.index))
-    .y(d => manhattan_scales.y(d.log_pval))
-    .addAll(data);
-
-  // Update the extent of the brush
-  manhattan_brush.extent(main_quadtree.extent());
-  manhattan_brush_g.call(manhattan_brush);
-
-  hist_brush.extent([
-    [hist_x_range[0], hist_y_range[1]],
-    [hist_x_range[1], hist_y_range[0]]
-  ]);
-  hist_brush_g.call(hist_brush);
 }
 
 
@@ -380,8 +341,7 @@ function on_manhattan_brush(){
     payload: brushedNodes.map(d => d.code)
   });
 
-  // Clear the brush
-  manhattan_brush_g.call(manhattan_brush.move, null);
+
 
   state_output.subscribe(({selected_codes}) => {
     //console.log('State event observed inside of brush');
@@ -393,12 +353,56 @@ function on_manhattan_brush(){
 // Resizing
 // This is called by r2d3 runs whenever the plot is resized
 // ===============================================================
-r2d3.onResize(function(width, height) {
-  //console.log('The plot was just resized!');
-  size_viz(width, height);
-  draw_manhattan();
-});
+r2d3.onResize(size_viz);
 
+function size_viz(width, height){
+
+  const manhattan_height = height*manhattan_prop;
+  const or_height = height*(1 - manhattan_prop);
+
+  // Adjust the sizes of the svgs
+  main_svg
+    .attr('height', manhattan_height)
+    .attr('width', width);
+
+  or_svg
+    .attr('height', or_height)
+    .attr('width', width);
+
+  // Calculate the sizes needed and return scales for use
+  // Update the scale ranges
+  manhattan_scales.x.range([0, width - margin.left - margin.right]);
+  manhattan_scales.y.range([manhattan_height - margin.top - margin.bottom, 0]);
+
+  const hist_x_range = [0, width - margin.left - margin.right];
+  const hist_y_range = [or_height - margin.top - margin.bottom, 0];
+  histogram_scales.x.range(hist_x_range);
+  histogram_scales.y.range(hist_y_range);
+
+
+  // generate a quadtree for faster lookups for brushing
+  // Rebuild the quadtree with new positions
+  main_quadtree.removeAll(main_quadtree.data());
+
+  main_quadtree
+    .x(d => manhattan_scales.x(d.index))
+    .y(d => manhattan_scales.y(d.log_pval))
+    .addAll(data);
+
+  // Update the extent of the brush
+  manhattan_brush.extent(main_quadtree.extent());
+  manhattan_brush_g.call(manhattan_brush);
+
+  hist_brush.extent([
+    [hist_x_range[0], hist_y_range[1]],
+    [hist_x_range[1], hist_y_range[0]]
+  ]);
+  hist_brush_g.call(hist_brush);
+
+  // Finally draw the plots with new sizes
+  draw_manhattan();
+  draw_histogram();
+}
 
 
 // ===============================================================
