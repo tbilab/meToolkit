@@ -46,15 +46,27 @@ const hist_brush_g = or_hist.append('g')
 // ================================================================
 // First initialize the brush objects
 const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
-const hist_brush = d3.brushX().on('end', on_hist_brush);
+const hist_brush = d3.brushX()
+  .on('end', on_hist_brush);
 
 // Then attach the brush objects to their holder g's
 manhattan_brush_g.call(manhattan_brush);
 hist_brush_g.call(hist_brush);
 
+hist_brush_g.select('.selection')
+  .attr('fill-opacity', 0.1);
+
+hist_brush_g.selectAll('.handle')
+  .at({
+    width: 15,
+    strokeWidth: 2,
+    fill: 'darkgrey',
+    rx: 10,
+  });
+
 function reset_brushes(brush_id = 'all'){
   if(brush_id === 'histogram' || brush_id === 'all'){
-    hist_brush_g.call(hist_brush.move, null);
+    hist_brush_g.call(hist_brush.move, histogram_scales.x.range());
   }
   if(brush_id === 'manhattan' || brush_id === 'all'){
     manhattan_brush_g.call(manhattan_brush.move, null);
@@ -103,6 +115,7 @@ function process_action(state, {type, payload}) {
     case 'new_data':
       //console.log('data was added');
       new_state.all_data = payload;
+      reset_brushes(brush_id = 'all');
       break;
     case 'manhattan_brush':
       new_state.selected_codes = payload;
@@ -276,7 +289,7 @@ function on_hist_brush(){
   const { selection } = d3.event;
 
   // if we have no selection, just reset the brush highlight to no nodes
-  if(!selection) return;
+  if((selection[0] == histogram_scales.x.range()[0]) && (selection[1] == histogram_scales.x.range()[1])) return;
 
   // Send result of brush event to the app state
   state_input.next({
@@ -393,9 +406,13 @@ function size_viz(width, height){
   manhattan_brush.extent(main_quadtree.extent());
   manhattan_brush_g.call(manhattan_brush);
 
+  // The plus and minus one is so we can detect when the user has reset the extent
+  // rather than just happen to drag the selection to the edges. When the user resets the
+  // brush will be set to the exact range, whereas if they drag the whole way they will go one beyond
+  // the end of the range.
   hist_brush.extent([
-    [hist_x_range[0], hist_y_range[1]],
-    [hist_x_range[1], hist_y_range[0]]
+    [hist_x_range[0] - 1, hist_y_range[1]],
+    [hist_x_range[1] + 1, hist_y_range[0]]
   ]);
   hist_brush_g.call(hist_brush);
 
