@@ -9,40 +9,50 @@ const margin = {left: 65, right: 10, top: 10, bottom: 20};
 const manhattan_prop = 0.6;
 const num_hist_bins = 100;
 
+// Holds the histogram data for us. Needs to be
+// modified every time we resize the plot.
+let or_bins;
 
 // ================================================================
 // Setup DOM elements
 // ================================================================
+
+// Start with adding two svgs for the two main plots
 const main_svg = div.append('svg')
   .attr('id', 'main_viz');
 
+const or_svg = div.append('svg')
+  .attr('id', 'or_hist');
+
+// Then we append a g element that has padding added to it to those svgs
 const main_viz = main_svg
   .append('g')
   .attr("transform", `translate(${margin.left},${margin.top})`);
-
-const or_svg = div.append('svg')
-  .attr('id', 'or_hist');
 
 const or_hist = or_svg
   .append('g')
   .attr("transform", `translate(${margin.left},${margin.top})`);
 
+// Next we append some gs within those gs to house our brushes for filtering data
+// attach the brush to the chart
+const manhattan_brush_g = main_viz.append('g')
+  .attr('class', 'brush');
+
+const hist_brush_g = or_hist.append('g')
+  .attr('class', 'brush');
 
 // ================================================================
 // Setup brushes
 // ================================================================
+// First initialize the brush objects
 const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
 const hist_brush = d3.brushX().on('end', on_hist_brush);
 
-// attach the brush to the chart
-const manhattan_brush_g = main_viz.append('g')
-  .attr('class', 'brush')
-  .call(manhattan_brush);
+// Then attach the brush objects to their holder g's
+manhattan_brush_g.call(manhattan_brush);
+hist_brush_g.call(hist_brush);
 
-const hist_brush_g = or_hist.append('g')
-  .attr('class', 'brush')
-  .call(hist_brush);
-
+// Initialize a quadtree to help us filter through the manhattan points much faster
 const main_quadtree = d3.quadtree();
 
 
@@ -97,26 +107,24 @@ function process_action(state, {type, payload}) {
 // ===============================================================
 r2d3.onRender(function(data, svg, width, height, options) {
 
-  let log_pval_max = 0,
-      log_or_min = 0,
-      log_or_max = 0;
+  //let log_pval_max = 0,
+  //    log_or_min = 0,
+  //    log_or_max = 0;
+//
+  //// Add a log_pval and log_or field to all points and keep track of extents
+  //data.forEach((d,i) => {
+  //  d.log_pval = -Math.log10(d.p_val);
+  //  if(d.log_pval > log_pval_max) log_pval_max = d.log_pval;
+//
+  //  d.log_or = Math.log(d.OR);
+  //  if(d.log_or < log_or_min) log_or_min = d.log_or;
+  //  if(d.log_or > log_or_max) log_or_max = d.log_or;
+//
+  //  d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
+  //  d.index = i;
+  //});
 
-  // Add a log_pval and log_or field to all points and keep track of extents
-  data.forEach((d,i) => {
-    d.log_pval = -Math.log10(d.p_val);
-    if(d.log_pval > log_pval_max) log_pval_max = d.log_pval;
-
-    d.log_or = Math.log(d.OR);
-    if(d.log_or < log_or_min) log_or_min = d.log_or;
-    if(d.log_or > log_or_max) log_or_max = d.log_or;
-
-    d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
-    d.index = i;
-  });
-
-  // Update the domains for the manhattan plot
-  manhattan_scales.x.domain([0, data.length]);
-  manhattan_scales.y.domain([0,log_pval_max]).nice();
+  update_w_new_data(data);
 
   // Make sure viz is sized correctly.
   size_viz(width, height);
@@ -181,26 +189,51 @@ function draw_manhattan(){
   });
 }
 
+function update_w_new_data(data){
+  let log_pval_max = 0,
+      log_or_min = 0,
+      log_or_max = 0;
 
-function draw_histogram(){
+  // Add a log_pval and log_or field to all points and keep track of extents
+  data.forEach((d,i) => {
+    d.log_pval = -Math.log10(d.p_val);
+    if(d.log_pval > log_pval_max) log_pval_max = d.log_pval;
 
+    d.log_or = Math.log(d.OR);
+    if(d.log_or < log_or_min) log_or_min = d.log_or;
+    if(d.log_or > log_or_max) log_or_max = d.log_or;
+
+    d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
+    d.index = i;
+  });
+
+  // Update the domains for the manhattan plot
+  manhattan_scales.x.domain([0, data.length]);
+  manhattan_scales.y.domain([0,log_pval_max]).nice();
+
+  // Next for the histogram
   const log_ors = data.map(d => d.log_or);
 
   histogram_scales.x.domain(d3.extent(log_ors)).nice();
 
-  const or_bins = d3.histogram()
+  or_bins = d3.histogram()
     .domain(histogram_scales.x.domain())
     .thresholds(histogram_scales.x.ticks(num_hist_bins))
-  (log_ors);
+    (log_ors);
 
   histogram_scales.y.domain([0, d3.max(or_bins, d => d.length)]).nice();
+}
+
+
+function draw_histogram(){
 
   let hist_bars = or_hist
     .attr("fill", "steelblue")
-    .selectAll("rect")
+    .selectAll("rect.histogram_bar")
     .data(or_bins);
 
   hist_bars = hist_bars.enter().append('rect')
+    .attr('class', 'histogram_bar')
     .merge(hist_bars)
     .attr("x", d =>  histogram_scales.x(d.x0) + 1)
     .attr("width", d => Math.max(0,  histogram_scales.x(d.x1) -  histogram_scales.x(d.x0) - 1))
