@@ -116,7 +116,6 @@ function process_action(state, {type, payload}) {
     case 'initialize':
       break;
     case 'new_data':
-      //console.log('data was added');
       new_state.all_data = payload;
       reset_brushes(brush_id = 'all');
       break;
@@ -143,12 +142,12 @@ function process_action(state, {type, payload}) {
 
       new_state.selected_codes = new_state
         .all_data
-        .filter(d => (d.log_or > payload[0]) &&(d.log_or < payload[1]))
+        .filter(d => (d.log_or > payload[0]) && (d.log_or < payload[1]))
         .map(d => d.code);
 
       break;
     default:
-      //console.log('unknown input');
+      console.log('unknown input');
   }
 
   new_state.last_type = type;
@@ -217,7 +216,8 @@ function draw_manhattan(){
     .append('circle')
     .merge(manhattan_points)
     .attr('cx', d => manhattan_scales.x(d.index))
-    .attr('cy', d => manhattan_scales.y(d.log_pval));
+    .attr('cy', d => manhattan_scales.y(d.log_pval))
+    .on('mouseover', d => console.log(d.code));
 
   const y_axis = main_viz.selectAppend("g#y-axis")
     .call(function(g){
@@ -253,7 +253,7 @@ function draw_manhattan(){
     const {selected_codes} = state;
     const empty_selection = selected_codes.length === 0;
 
-    const code_selected = d => empty_selection || selected_codes.includes(d.code);
+    const code_selected = d => selected_codes.includes(d.code);
 
     manhattan_points
       .attr('r',  d => code_selected(d) ? 3 : 2)
@@ -308,7 +308,6 @@ function on_hist_brush(){
     type: 'histogram_filter',
     payload: selection.map(x => histogram_scales.x.invert(x))
   });
-  //console.log('The histogram was brushed!');
 }
 
 function manhattan_filter(state, selection){
