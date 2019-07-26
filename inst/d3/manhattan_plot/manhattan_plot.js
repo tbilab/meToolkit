@@ -98,13 +98,18 @@ function process_action(state, {type, payload}) {
     case 'manhattan_brush':
       new_state.selected_codes = payload;
       break;
+    case 'reset_button':
+      // Clear the histogram brush
+      hist_brush_g.call(hist_brush.move, null);
+
+      new_state.selected_codes = [];
+      break;
     case 'histogram_filter':
       new_state.selected_codes = new_state
         .all_data
         .filter(d => (d.log_or > payload[0]) &&(d.log_or < payload[1]))
         .map(d => d.code);
 
-      //console.log('we got a histogram filter!');
       break;
     default:
       //console.log('unknown input');
@@ -170,8 +175,8 @@ function draw_manhattan(){
       .attr('font-size', 0)
       .on('click', function(){
         state_input.next({
-          type: 'manhattan_brush',
-          payload: []
+          type: 'reset_button',
+          payload: null
         });
       });
 
@@ -189,6 +194,7 @@ function draw_manhattan(){
     reset_button.attr('font-size', empty_selection ? 0: 18);
   });
 }
+
 
 function update_w_new_data(data){
   let log_pval_max = 0,
@@ -306,13 +312,15 @@ function size_viz(width, height){
 
 function on_hist_brush(){
 
-  // Convert from the pixel positin to log odds ratio range
-  const [min_lor, max_lor] = d3.event.selection.map(x => histogram_scales.x.invert(x));
+  const { selection } = d3.event;
+
+  // if we have no selection, just reset the brush highlight to no nodes
+  if(!selection) return;
 
   // Send result of brush event to the app state
   state_input.next({
     type: 'histogram_filter',
-    payload: d3.event.selection.map(x => histogram_scales.x.invert(x))
+    payload: selection.map(x => histogram_scales.x.invert(x))
   });
   //console.log('The histogram was brushed!');
 }
