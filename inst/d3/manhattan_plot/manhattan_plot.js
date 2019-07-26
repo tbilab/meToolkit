@@ -74,6 +74,7 @@ const histogram_scales = {
 // Initalize State
 // ================================================================
 const initial_state = {
+  all_data: null,
   selected_codes: []
 };
 
@@ -89,14 +90,27 @@ function process_action(state, {type, payload}) {
   let new_state = state;
   switch(type){
     case 'initialize':
-      console.log('initializing state');
+      break;
+    case 'new_data':
+      //console.log('data was added');
+      new_state.all_data = payload;
       break;
     case 'manhattan_brush':
       new_state.selected_codes = payload;
       break;
+    case 'histogram_filter':
+      new_state.selected_codes = new_state
+        .all_data
+        .filter(d => (d.log_or > payload[0]) &&(d.log_or < payload[1]))
+        .map(d => d.code);
+
+      //console.log('we got a histogram filter!');
+      break;
     default:
-      console.log('unknown input');
+      //console.log('unknown input');
   }
+
+  new_state.last_type = type;
   return new_state;
 }
 
@@ -106,23 +120,10 @@ function process_action(state, {type, payload}) {
 // This code runs whenever data changes
 // ===============================================================
 r2d3.onRender(function(data, svg, width, height, options) {
-
-  //let log_pval_max = 0,
-  //    log_or_min = 0,
-  //    log_or_max = 0;
-//
-  //// Add a log_pval and log_or field to all points and keep track of extents
-  //data.forEach((d,i) => {
-  //  d.log_pval = -Math.log10(d.p_val);
-  //  if(d.log_pval > log_pval_max) log_pval_max = d.log_pval;
-//
-  //  d.log_or = Math.log(d.OR);
-  //  if(d.log_or < log_or_min) log_or_min = d.log_or;
-  //  if(d.log_or > log_or_max) log_or_max = d.log_or;
-//
-  //  d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
-  //  d.index = i;
-  //});
+  state_input.next({
+    type: 'new_data',
+    payload: data
+  });
 
   update_w_new_data(data);
 
@@ -175,8 +176,8 @@ function draw_manhattan(){
       });
 
   // subscripe to the state object
-  state_output.subscribe(({selected_codes}) => {
-
+  state_output.subscribe(state => {
+    const {selected_codes} = state;
     const empty_selection = selected_codes.length === 0;
 
     const code_selected = d => empty_selection || selected_codes.includes(d.code);
@@ -295,7 +296,6 @@ function size_viz(width, height){
   manhattan_brush.extent(main_quadtree.extent());
   manhattan_brush_g.call(manhattan_brush);
 
-  //debugger;
   hist_brush.extent([
     [hist_x_range[0], hist_y_range[1]],
     [hist_x_range[1], hist_y_range[0]]
@@ -306,7 +306,15 @@ function size_viz(width, height){
 
 function on_hist_brush(){
 
-  console.log('The histogram was brushed!');
+  // Convert from the pixel positin to log odds ratio range
+  const [min_lor, max_lor] = d3.event.selection.map(x => histogram_scales.x.invert(x));
+
+  // Send result of brush event to the app state
+  state_input.next({
+    type: 'histogram_filter',
+    payload: d3.event.selection.map(x => histogram_scales.x.invert(x))
+  });
+  //console.log('The histogram was brushed!');
 }
 
 
@@ -320,7 +328,7 @@ function on_manhattan_brush(){
     if(selection === null){
       return;
     } else {
-      console.log('nothing selected!');
+      //console.log('nothing selected!');
       state_input.next({
         type: 'manhattan_brush',
         payload: []
@@ -368,7 +376,7 @@ function on_manhattan_brush(){
   manhattan_brush_g.call(manhattan_brush.move, null);
 
   state_output.subscribe(({selected_codes}) => {
-    console.log('State event observed inside of brush');
+    //console.log('State event observed inside of brush');
   });
 }
 
@@ -378,7 +386,7 @@ function on_manhattan_brush(){
 // This is called by r2d3 runs whenever the plot is resized
 // ===============================================================
 r2d3.onResize(function(width, height) {
-  console.log('The plot was just resized!');
+  //console.log('The plot was just resized!');
   size_viz(width, height);
   draw_manhattan();
 });
