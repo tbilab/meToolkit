@@ -25,11 +25,17 @@ const or_hist = or_svg
   .append('g')
   .attr("transform", `translate(${margin.left},${margin.top})`);
 
-const brush = d3.brush().on('end', manhattan_brush);
+const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
+const hist_brush = d3.brush().on('end', on_hist_brush);
+
 // attach the brush to the chart
-const gBrush = main_viz.append('g')
+const manhattan_brush_g = main_viz.append('g')
   .attr('class', 'brush')
-  .call(brush);
+  .call(manhattan_brush);
+
+const hist_brush_g = or_hist.append('g')
+  .attr('class', 'brush')
+  .call(hist_brush);
 
 const main_quadtree = d3.quadtree();
 
@@ -139,8 +145,6 @@ function draw_manhattan(){
     reset_button.attr('font-size', empty_selection ? 0: 18);
 
   });
-
-
 }
 
 
@@ -218,11 +222,18 @@ function size_viz(width, height){
     .addAll(data);
 
   // Update the extent of the brush
-  brush.extent(main_quadtree.extent());
-  gBrush.call(brush);
+  manhattan_brush.extent(main_quadtree.extent());
+  manhattan_brush_g.call(manhattan_brush);
 }
 
-function manhattan_brush(){
+
+function on_hist_brush(){
+
+  console.log('The histogram was brushed!')
+}
+
+
+function on_manhattan_brush(){
 
   const { selection } = d3.event;
 
@@ -277,7 +288,7 @@ function manhattan_brush(){
   });
 
   // Clear the brush
-  gBrush.call(brush.move, null);
+  manhattan_brush_g.call(manhattan_brush.move, null);
 
   app_state.output.subscribe(({selected_codes}) => {
     console.log('State event observed inside of brush');
