@@ -96,6 +96,7 @@ const histogram_scales = {
 // ================================================================
 const initial_state = {
   all_data: null,
+  or_bounds: [-Infinity, Infinity],
   selected_codes: []
 };
 
@@ -109,6 +110,8 @@ const state_output = state_input.asObservable()
 // Controls how inputs are managed
 function process_action(state, {type, payload}) {
   let new_state = state;
+
+  //debugger;
   switch(type){
     case 'initialize':
       break;
@@ -118,9 +121,15 @@ function process_action(state, {type, payload}) {
       reset_brushes(brush_id = 'all');
       break;
     case 'manhattan_brush':
-      new_state.selected_codes = payload;
+      const newly_selected = manhattan_filter(state, payload);
+
+      if( newly_selected.length !== 0){
+        // If we have an empty selection just don't update. Hopefully not too confusing
+        new_state.selected_codes = newly_selected;
+      }
+
       //  reset the histogram brush now that it's been overridden
-      reset_brushes('all');
+      reset_brushes('manhattan');
       break;
     case 'reset_button':
       // Clear the histogram brush
@@ -129,6 +138,9 @@ function process_action(state, {type, payload}) {
       new_state.selected_codes = [];
       break;
     case 'histogram_filter':
+
+      new_state.or_bounds = payload;
+
       new_state.selected_codes = new_state
         .all_data
         .filter(d => (d.log_or > payload[0]) &&(d.log_or < payload[1]))
@@ -299,28 +311,11 @@ function on_hist_brush(){
   //console.log('The histogram was brushed!');
 }
 
-
-function on_manhattan_brush(){
-
-  const { selection } = d3.event;
-
-  // if we have no selection, just reset the brush highlight to no nodes
-  if(!selection) {
-    // If the selection is null the brush has been hidden and we do nothing
-    if(selection === null){
-      return;
-    } else {
-      //console.log('nothing selected!');
-      state_input.next({
-        type: 'manhattan_brush',
-        payload: []
-      });
-      return;
-    }
-  }
+function manhattan_filter(state, selection){
+  const {or_bounds} = state;
 
   // begin an array to collect the brushed nodes
-  const brushedNodes = [];
+  const selected_codes = [];
 
   // traverse all branches of the quad tree
   main_quadtree.visit((node, x1, y1, x2, y2) => {
@@ -340,7 +335,11 @@ function on_manhattan_brush(){
       const dx = manhattan_scales.x(d.index);
       const dy = manhattan_scales.y(d.log_pval);
       if (selection_contains(selection, dx, dy)) {
-        brushedNodes.push(d);
+
+        const in_or_bounds = (d.log_or > or_bounds[0]) && (d.log_or < or_bounds[1]);
+        if(in_or_bounds){
+          selected_codes.push(d.code);
+        }
       }
     }
 
@@ -348,17 +347,22 @@ function on_manhattan_brush(){
     return false;
   });
 
+  return selected_codes;
+}
+
+function on_manhattan_brush(){
+
+  const { selection } = d3.event;
+
+  // if we have no selection, just reset the brush highlight to no nodes
+  if(!selection) return;
+
   // Send result of brush event to the app state
   state_input.next({
     type: 'manhattan_brush',
-    payload: brushedNodes.map(d => d.code)
+    payload: selection
   });
 
-
-
-  state_output.subscribe(({selected_codes}) => {
-    //console.log('State event observed inside of brush');
-  });
 }
 
 
