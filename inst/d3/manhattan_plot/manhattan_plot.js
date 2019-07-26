@@ -3,14 +3,16 @@
 // Initialization
 // This code is run a single time
 // ===============================================================
-d3.selection.prototype.last = function() {
-  return d3.select(this.nodes()[this.size() - 1]);
-};
+const {scan, shareReplay} = rxjs.operators;
 
 const margin = {left: 65, right: 10, top: 10, bottom: 20};
 const manhattan_prop = 0.6;
 const num_hist_bins = 100;
 
+
+// ================================================================
+// Setup DOM elements
+// ================================================================
 const main_svg = div.append('svg')
   .attr('id', 'main_viz');
 
@@ -25,8 +27,12 @@ const or_hist = or_svg
   .append('g')
   .attr("transform", `translate(${margin.left},${margin.top})`);
 
+
+// ================================================================
+// Setup brushes
+// ================================================================
 const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
-const hist_brush = d3.brush().on('end', on_hist_brush);
+const hist_brush = d3.brushX().on('end', on_hist_brush);
 
 // attach the brush to the chart
 const manhattan_brush_g = main_viz.append('g')
@@ -39,6 +45,10 @@ const hist_brush_g = or_hist.append('g')
 
 const main_quadtree = d3.quadtree();
 
+
+// ================================================================
+// Initalize Scales
+// ================================================================
 const manhattan_scales = {
   x: d3.scaleLinear(),
   y: d3.scaleLinear(),
@@ -50,9 +60,36 @@ const histogram_scales = {
 };
 
 
-const {scan, shareReplay} = rxjs.operators;
+// ================================================================
+// Initalize State
+// ================================================================
+const initial_state = {
+  selected_codes: []
+};
 
-const app_state = setup_state();
+const state_input = new rxjs.BehaviorSubject({type: 'initialize'});
+const state_output = state_input.asObservable()
+  .pipe(
+    scan(process_action, initial_state),
+    shareReplay(1)
+  );
+
+// Controls how inputs are managed
+function process_action(state, {type, payload}) {
+  let new_state = state;
+  switch(type){
+    case 'initialize':
+      console.log('initializing state');
+      break;
+    case 'manhattan_brush':
+      new_state.selected_codes = payload;
+      break;
+    default:
+      console.log('unknown input');
+  }
+  return new_state;
+}
+
 
 // ===============================================================
 // Rendering
@@ -107,7 +144,6 @@ function draw_manhattan(){
       .call(add_axis_label('-Log10 P'));
     });
 
-
   main_viz.selectAppend("g.x-axis")
     .call(g =>
       g.attr("transform", `translate(0,${manhattan_scales.y.range()[0]})`)
@@ -115,7 +151,6 @@ function draw_manhattan(){
         .call(add_axis_label('PheCode', false))
         .call(g => g.select(".tick:first-of-type").remove())
     );
-
 
   // Reset button to jump back to default selection
   const reset_button = main_viz.selectAppend('text#clear_button')
@@ -125,14 +160,14 @@ function draw_manhattan(){
       .text('Reset selection')
       .attr('font-size', 0)
       .on('click', function(){
-        app_state.input.next({
+        state_input.next({
           type: 'manhattan_brush',
           payload: []
         });
       });
 
   // subscripe to the state object
-  app_state.output.subscribe(({selected_codes}) => {
+  state_output.subscribe(({selected_codes}) => {
 
     const empty_selection = selected_codes.length === 0;
 
@@ -143,7 +178,6 @@ function draw_manhattan(){
       .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
 
     reset_button.attr('font-size', empty_selection ? 0: 18);
-
   });
 }
 
@@ -187,8 +221,8 @@ function draw_histogram(){
         .call(d3.axisLeft(histogram_scales.y).tickSizeOuter(0))
         .call(add_axis_label('# of Codes'))
     );
-  //console.log('drawing histogram!')
 }
+
 
 function size_viz(width, height){
 
@@ -209,8 +243,11 @@ function size_viz(width, height){
   manhattan_scales.x.range([0, width - margin.left - margin.right]);
   manhattan_scales.y.range([manhattan_height - margin.top - margin.bottom, 0]);
 
-  histogram_scales.x.range([0, width - margin.left - margin.right]);
-  histogram_scales.y.range([or_height - margin.top - margin.bottom, 0]);
+  const hist_x_range = [0, width - margin.left - margin.right];
+  const hist_y_range = [or_height - margin.top - margin.bottom, 0];
+  histogram_scales.x.range(hist_x_range);
+  histogram_scales.y.range(hist_y_range);
+
 
   // generate a quadtree for faster lookups for brushing
   // Rebuild the quadtree with new positions
@@ -224,12 +261,19 @@ function size_viz(width, height){
   // Update the extent of the brush
   manhattan_brush.extent(main_quadtree.extent());
   manhattan_brush_g.call(manhattan_brush);
+
+  //debugger;
+  hist_brush.extent([
+    [hist_x_range[0], hist_y_range[1]],
+    [hist_x_range[1], hist_y_range[0]]
+  ]);
+  hist_brush_g.call(hist_brush);
 }
 
 
 function on_hist_brush(){
 
-  console.log('The histogram was brushed!')
+  console.log('The histogram was brushed!');
 }
 
 
@@ -244,7 +288,7 @@ function on_manhattan_brush(){
       return;
     } else {
       console.log('nothing selected!');
-      app_state.input.next({
+      state_input.next({
         type: 'manhattan_brush',
         payload: []
       });
@@ -282,7 +326,7 @@ function on_manhattan_brush(){
   });
 
   // Send result of brush event to the app state
-  app_state.input.next({
+  state_input.next({
     type: 'manhattan_brush',
     payload: brushedNodes.map(d => d.code)
   });
@@ -290,7 +334,7 @@ function on_manhattan_brush(){
   // Clear the brush
   manhattan_brush_g.call(manhattan_brush.move, null);
 
-  app_state.output.subscribe(({selected_codes}) => {
+  state_output.subscribe(({selected_codes}) => {
     console.log('State event observed inside of brush');
   });
 }
@@ -298,53 +342,14 @@ function on_manhattan_brush(){
 
 // ===============================================================
 // Resizing
-// This code runs whenever the plot is resized
+// This is called by r2d3 runs whenever the plot is resized
 // ===============================================================
-
 r2d3.onResize(function(width, height) {
   console.log('The plot was just resized!');
   size_viz(width, height);
   draw_manhattan();
 });
 
-
-// ===============================================================
-// State control
-// ===============================================================
-
-function setup_state(){
-  const initial_state = {
-    selected_codes: []
-  };
-
-  const state_input = new rxjs.BehaviorSubject({type: 'initialize'});
-  const state_output = state_input.asObservable()
-    .pipe(
-      scan(process_action, initial_state),
-      shareReplay(1)
-    );
-
-  return {
-    input: state_input,
-    output: state_output,
-  };
-}
-
-
-function process_action(state, {type, payload}) {
-  let new_state = state;
-  switch(type){
-    case 'initialize':
-      console.log('initializing state');
-      break;
-    case 'manhattan_brush':
-      new_state.selected_codes = payload;
-      break;
-    default:
-      console.log('unknown input');
-  }
-  return new_state;
-}
 
 
 // ===============================================================
@@ -370,7 +375,6 @@ function add_axis_label(label, y_axis = true){
             .text(label);
   };
 }
-
 
 function remove_axis_spine(g){
    g.select(".domain").remove()
