@@ -106,39 +106,67 @@ const histogram_scales = {
 // ================================================================
 // Code table
 // ================================================================
-
-const code_table = $(code_table_div.node()).DataTable({
+let code_table;
+data.forEach(d => d.selected = 0);
+code_table = $(code_table_div.node()).DataTable({
   data: data,
   columns: [
-    {title: 'Code', data: 'code'},
-    {title: 'OR', data: 'OR', render: format_val},
-    {title: 'P-Value', data: 'p_val', render: format_val},
-    {title: 'Description', data: 'description'},
-    {title: 'Category', data: 'category'}
+    {title: 'Code',        data: 'code'        },
+    {title: 'OR',          data: 'OR',         searchable: false, render: format_val},
+    {title: 'P-Value',     data: 'p_val',      searchable: false, render: format_val},
+    {title: 'Description', data: 'description' },
+    {title: 'Category',    data: 'category'    },
+    {title: 'Selected',    data: 'selected',  render: d => d == 1 ? 'Yes': 'No'}
   ],
   scrollY: `${height*table_prop}px`
 });
 
-function select_codes_on_table(codes_to_select, sort_table = false){
-  code_table
-    .rows()
-    .every(function(rowIdx, tableLoop, rowLoop) {
-      if (codes_to_select.includes(this.data().code)) {
-        $(this.nodes()).addClass('selected');
+
+
+function update_table_selection(codes_to_select, sort_table = false){
+  console.log(codes_to_select);
+  // Loop through every row in the table
+  code_table.rows()
+    .every(function(row_index) {
+      const curr_node = $(this.nodes());
+      const selected_cell = code_table.cell(row_index, 5);
+
+      // Reset all nodes to unselected
+      selected_cell.data(0);
+      curr_node.removeClass('selected');
+
+      // Test if the current node is selected
+      if(codes_to_select.includes(this.data().code)) {
+        console.log('Selecting code!')
+
+        // If it is, change data to reflect that
+        selected_cell.data(1)
+        curr_node.addClass('selected');
       }
     });
+
+    if(sort_table){
+      // Sort table on selected to bring selections to top.
+      code_table
+        .order( [ 5, 'desc' ] )
+        .draw();
+    }
 }
 
 $(code_table_div.select('tbody').node())
   .on('click', 'tr', function(){
+    // Add the selected class to the code's row
     $(this).toggleClass('selected');
+    const new_selection = Array.from(code_table.rows('.selected').data()).map(d => d.code);
+    update_table_selection(new_selection);
 
-    // Send result of brush event to the app state
+    // Send new array of selected codes to state
     state_input.next({
       type: 'table_selection',
-      payload: Array.from(code_table.rows('.selected').data()).map(d => d.code)
+      payload: new_selection
     });
   });
+
 
 // ================================================================
 // Initalize State
@@ -175,8 +203,7 @@ function process_action(state, {type, payload}) {
         // If we have an empty selection just don't update. Hopefully not too confusing
         new_state.selected_codes = newly_selected;
         // Update table with newly selected codes
-        select_codes_on_table(newly_selected);
-
+        update_table_selection(newly_selected, true);
       }
 
       //  reset the histogram brush now that it's been overridden
@@ -185,8 +212,8 @@ function process_action(state, {type, payload}) {
     case 'reset_button':
       // Clear the histogram brush
       reset_brushes('all');
-
       new_state.selected_codes = [];
+      update_table_selection(new_state.selected_codes, true);
       break;
     case 'histogram_filter':
 
