@@ -35,14 +35,7 @@ const code_table_div = div.append('div')
   .style('height', '20%')
   .append('table')
   .attr('class', 'display compact')
-  .attr('id', 'code_table')
-  //.html(` <thead><tr>
-  //          <th>PheCode</th>
-  //          <th>OR</th>
-  //          <th>P-Value</th>
-  //          <th>Description</th>
-  //          <th>Category</th>
-  //        </tr></thead>`);
+  .attr('id', 'code_table');
 
 // Then we append a g element that has padding added to it to those svgs
 const main_viz = main_svg
@@ -111,7 +104,6 @@ const histogram_scales = {
 };
 
 
-
 // ================================================================
 // Code table
 // ================================================================
@@ -138,10 +130,14 @@ function select_codes_on_table(codes_to_select, sort_table = false){
 }
 
 $(code_table_div.select('tbody').node())
-  .on( 'click', 'tr', function () {
+  .on('click', 'tr', function(){
     $(this).toggleClass('selected');
 
-    code_table.rows('.selected').data();
+    // Send result of brush event to the app state
+    state_input.next({
+      type: 'table_selection',
+      payload: Array.from(code_table.rows('.selected').data()).map(d => d.code)
+    });
   });
 
 // ================================================================
@@ -201,6 +197,12 @@ function process_action(state, {type, payload}) {
         .map(d => d.code);
 
       break;
+
+    case 'table_selection':
+      new_state.selected_codes = payload;
+      reset_brushes('all');
+
+      break
     default:
       console.log('unknown input');
   }
