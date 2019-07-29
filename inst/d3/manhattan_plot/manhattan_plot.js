@@ -1,12 +1,21 @@
-// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c(here::here('inst/d3/manhattan_plot/rx.js'), 'd3-jetpack')
+// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/manhattan_plot/rx.js'), here::here('inst/d3/manhattan_plot/datatables.min.js')), css = here::here('inst/d3/manhattan_plot/datatables.min.css')
 // ===============================================================
 // Initialization
-// This code is run a single time
+// This code is run a single timex
 // ===============================================================
 const {scan, shareReplay} = rxjs.operators;
 
 const margin = {left: 65, right: 10, top: 10, bottom: 20};
-const manhattan_prop = 0.7;
+
+const manhattan_unit = 3;
+const hist_unit = 1;
+const table_unit = 1;
+const total_units = manhattan_unit + hist_unit + table_unit + 1;
+
+const manhattan_prop = manhattan_unit/total_units;
+const hist_prop = hist_unit/total_units;
+const table_prop = table_unit/total_units;
+
 const num_hist_bins = 100;
 
 // Holds the histogram data for us. Needs to be
@@ -16,13 +25,24 @@ let or_bins;
 // ================================================================
 // Setup DOM elements
 // ================================================================
-
-// Start with adding two svgs for the two main plots
 const main_svg = div.append('svg')
   .attr('id', 'main_viz');
 
 const or_svg = div.append('svg')
   .attr('id', 'or_hist');
+
+const code_table_div = div.append('div')
+  .style('height', '20%')
+  .append('table')
+  .attr('class', 'display compact')
+  .attr('id', 'code_table')
+  //.html(` <thead><tr>
+  //          <th>PheCode</th>
+  //          <th>OR</th>
+  //          <th>P-Value</th>
+  //          <th>Description</th>
+  //          <th>Category</th>
+  //        </tr></thead>`);
 
 // Then we append a g element that has padding added to it to those svgs
 const main_viz = main_svg
@@ -91,6 +111,39 @@ const histogram_scales = {
 };
 
 
+
+// ================================================================
+// Code table
+// ================================================================
+const code_table = $(code_table_div.node()).DataTable({
+  data: data,
+  columns: [
+    {title: 'Code', data: 'code'},
+    {title: 'OR', data: 'OR'},
+    {title: 'P-Value', data: 'p_val'},
+    {title: 'Description', data: 'description'},
+    {title: 'Category', data: 'category'}
+  ],
+  scrollY: `${height*table_prop}px`
+});
+
+function select_codes_on_table(codes_to_select, sort_table = false){
+  code_table
+    .rows()
+    .every(function(rowIdx, tableLoop, rowLoop) {
+      if (codes_to_select.includes(this.data().code)) {
+        $(this.nodes()).addClass('selected');
+      }
+    });
+}
+
+$(code_table_div.select('tbody').node())
+  .on( 'click', 'tr', function () {
+    $(this).toggleClass('selected');
+
+    code_table.rows('.selected').data();
+  });
+
 // ================================================================
 // Initalize State
 // ================================================================
@@ -125,6 +178,9 @@ function process_action(state, {type, payload}) {
       if( newly_selected.length !== 0){
         // If we have an empty selection just don't update. Hopefully not too confusing
         new_state.selected_codes = newly_selected;
+        // Update table with newly selected codes
+        select_codes_on_table(newly_selected);
+
       }
 
       //  reset the histogram brush now that it's been overridden
@@ -139,7 +195,6 @@ function process_action(state, {type, payload}) {
     case 'histogram_filter':
 
       new_state.or_bounds = payload;
-
       new_state.selected_codes = new_state
         .all_data
         .filter(d => (d.log_or > payload[0]) && (d.log_or < payload[1]))
@@ -374,7 +429,8 @@ r2d3.onResize(size_viz);
 function size_viz(width, height){
 
   const manhattan_height = height*manhattan_prop;
-  const or_height = height*(1 - manhattan_prop);
+  const or_height = height*hist_prop;
+  const table_height = height*table_prop;
 
   // Adjust the sizes of the svgs
   main_svg
