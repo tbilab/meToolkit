@@ -34,8 +34,7 @@ const or_svg = div.append('svg')
 const code_table_div = div.append('div')
   .style('height', '20%')
   .append('table')
-  .attr('class', 'display compact')
-  .attr('id', 'code_table');
+  .attr('class', 'display compact');
 
 // Then we append a g element that has padding added to it to those svgs
 const main_viz = main_svg
@@ -107,12 +106,13 @@ const histogram_scales = {
 // ================================================================
 // Code table
 // ================================================================
+
 const code_table = $(code_table_div.node()).DataTable({
   data: data,
   columns: [
     {title: 'Code', data: 'code'},
-    {title: 'OR', data: 'OR'},
-    {title: 'P-Value', data: 'p_val'},
+    {title: 'OR', data: 'OR', render: format_val},
+    {title: 'P-Value', data: 'p_val', render: format_val},
     {title: 'Description', data: 'description'},
     {title: 'Category', data: 'category'}
   ],
@@ -367,6 +367,7 @@ function on_hist_brush(){
   });
 }
 
+
 function manhattan_filter(state, selection){
   const {or_bounds} = state;
 
@@ -405,6 +406,7 @@ function manhattan_filter(state, selection){
 
   return selected_codes;
 }
+
 
 function on_manhattan_brush(){
 
@@ -518,4 +520,8 @@ function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max =
   const ys_intersect = (sy_min < by_max) && (sy_max > by_min);
 
   return xs_intersect && ys_intersect;
+}
+
+function format_val(d){
+  return d3.format(".3")(d);
 }
