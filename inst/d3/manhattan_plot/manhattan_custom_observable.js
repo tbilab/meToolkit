@@ -53,6 +53,15 @@ const manhattan_brush_g = main_viz.append('g')
 const hist_brush_g = or_hist.append('g')
   .attr('class', 'brush');
 
+// Reset button that shows up when there is something selected
+// allowing the user to back out to default.
+const reset_button = main_viz.selectAppend('text#clear_button')
+  .attr('x', 5)
+  .attr('y', 0)
+  .attr('text-anchor', 'start')
+  .text('Reset')
+  .on('click', () => app_state.pass_action('reset_button', null));
+
 
 // ================================================================
 // Global variables that get accessed in state functions
@@ -145,10 +154,12 @@ class App_State{
         // Update OR bounds
         this.modify_property('or_bounds', payload);
         // Calculate and update the newly selected codes
+        const currently_selected = this.get('selected_codes');
         this.modify_property(
           'selected_codes',
           this.get('data')
-            .filter(d => (d.log_or > payload[0]) && (d.log_or < payload[1]))
+            .filter(d => currently_selected.includes(d.code) ) // filter to codes that are selected
+            .filter(d => (d.log_or > payload[0]) && (d.log_or < payload[1])) // filter out codes now outside boundaries
             .map(d => d.code)
         );
         break;
@@ -204,6 +215,17 @@ function new_state(state){
     //table_select_codes = draw_table(data);
   }
 
+  if(state.has_changed('selected_codes') || state.has_changed('or_bounds')){
+    const default_bounds = tuples_equal(state.get('or_bounds'), [-Infinity, Infinity]);
+    const no_codes_selected = state.get('selected_codes').length === 0;
+
+    if(default_bounds && no_codes_selected){
+      hide_reset();
+    } else {
+      show_reset();
+    }
+  }
+
   if(state.has_changed('selected_codes')){
     manhattan_plot.highlight(state.get('selected_codes'));
   }
@@ -256,6 +278,8 @@ function draw_manhattan(data){
   // Make sure that the neccesary info is provided before drawing.
   if(data === null) return;
 
+  let currently_selected_points;
+
   const default_point = {
     r: 3,
     fillOpacity: 1,
@@ -305,6 +329,8 @@ function draw_manhattan(data){
     );
 
   const disable_codes = or_bounds => {
+
+    //debugger;
     const is_disable = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
 
     manhattan_points
@@ -312,14 +338,15 @@ function draw_manhattan(data){
       .at(disabled_point)
       .each(d => d.disabled = true);
 
-    manhattan_points
-      .filter(d => !is_disable(d))
+    const non_disabled_points = manhattan_points
+      .filter(d => !is_disable(d) && !currently_selected_points.includes(d.code))
+      .at(default_point)
       .raise()
       .each(d => d.disabled = false);
   };
 
   const highlight_codes = selected_codes => {
-
+    currently_selected_points = selected_codes;
     manhattan_points
       .filter(d => selected_codes.includes(d.code))
       .raise()
@@ -329,6 +356,13 @@ function draw_manhattan(data){
     manhattan_points
       .filter(d => !selected_codes.includes(d.code) && !d.disabled)
       .at(default_point);
+
+    // Reset button to jump back to default selection
+   //if(selected_codes.length !== 0){
+   //  show_reset();
+   //} else {
+   //  hide_reset();
+   //}
   };
 
   highlight_codes([]);
@@ -339,6 +373,15 @@ function draw_manhattan(data){
   };
 }
 
+function show_reset(){
+  reset_button.attr('font-size', 15);
+}
+
+function hide_reset(){
+  reset_button.attr('font-size', 0);
+}
+
+hide_reset();
 
 function draw_histogram(data){
 
@@ -368,14 +411,6 @@ function draw_histogram(data){
         .call(d3.axisLeft(histogram_scales.y).tickSizeOuter(0))
         .call(add_axis_label('# of Codes'))
     );
-
-  //// Initialize selector brush.
-  //hist_brush_g.call(hist_brush);
-//
-  //// Default to covering whole range
-  //const x_range = histogram_scales.x.range();
-//
-  //manhattan_brush_g.call(manhattan_brush.move, x_range);
 }
 
 
@@ -545,12 +580,15 @@ function initialize_histogram_brush(data){
   function on_hist_brush(){
 
     const { selection } = d3.event;
-
     // if we have no selection, just reset the brush highlight to no nodes
     if(!selection) return;
     // Is this move just a result of a reset? If so ignore it.
-    const is_reset_pos = (selection[0] == histogram_scales.x.range()[0]) && (selection[1] == histogram_scales.x.range()[1]);
-    if(is_reset_pos) return;
+    const is_reset_pos = tuples_equal(selection, histogram_scales.x.range())
+
+    if(is_reset_pos){
+      console.log('histogram brush was reset')
+      return;
+    }
 
     const or_min = histogram_scales.x.invert(selection[0]);
     const or_max = histogram_scales.x.invert(selection[1]);
@@ -692,4 +730,8 @@ function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max =
 
 function format_val(d){
   return d3.format(".3")(d);
+}
+
+function tuples_equal(a,b){
+  return (a[0] === b[0]) && (a[1] === b[1]);
 }
