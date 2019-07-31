@@ -53,47 +53,10 @@ const manhattan_brush_g = main_viz.append('g')
 const hist_brush_g = or_hist.append('g')
   .attr('class', 'brush');
 
-// ================================================================
-// Setup brushes
-// ================================================================
-// First initialize the brush objects
-//const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
-//const hist_brush = d3.brushX()
-//  .on('end', on_hist_brush);
-//
-//// Then attach the brush objects to their holder g's
-//initialize_brushes();
-//
-//hist_brush_g.select('.selection')
-//  .attr('fill-opacity', 0.1);
-//
-//hist_brush_g.selectAll('.handle')
-//  .at({
-//    width: 15,
-//    strokeWidth: 2,
-//    fill: 'darkgrey',
-//  });
-//
-//function initialize_brushes(){
-//  // Then attach the brush objects to their holder g's
-//  manhattan_brush_g.call(manhattan_brush);
-//  hist_brush_g.call(hist_brush);
-//}
-//
-//function reset_brushes(brush_id = 'all'){
-//  if(brush_id === 'histogram' || brush_id === 'all'){
-//    hist_brush_g.call(hist_brush.move, histogram_scales.x.range());
-//  }
-//  if(brush_id === 'manhattan' || brush_id === 'all'){
-//    manhattan_brush_g.call(manhattan_brush.move, null);
-//  }
-//}
-
 
 // ================================================================
 // Global variables that get accessed in state functions
 // ================================================================
-
 
 // Scales
 // ================================================================
@@ -175,13 +138,12 @@ class App_State{
         this.modify_property('sizes', payload);
         break;
       case 'manhattan_brush':
-        console.log('manhattan plot was brushed!')
         const newly_selected = manhattan_filter(this.get('or_bounds'), payload);
         this.modify_property('selected_codes', newly_selected);
         break;
-      case 'histogram_filter':
+      case 'hist_brush':
         // Update OR bounds
-        this.modify_property('or_bounds', newly_selected);
+        this.modify_property('or_bounds', payload);
         // Calculate and update the newly selected codes
         this.modify_property(
           'selected_codes',
@@ -206,7 +168,7 @@ class App_State{
   }
 }
 
-let manhattan_select_codes, table_select_codes;
+let manhattan_plot, table_select_codes;
 
 function new_state(state){
   const changed_props = state.fresh_properties();
@@ -233,7 +195,7 @@ function new_state(state){
   // Draw plots
   if(state.has_changed('sizes') || state.has_changed('data')){
 
-    manhattan_select_codes = draw_manhattan(data);
+    manhattan_plot = draw_manhattan(data);
     initialize_manhattan_brush(data);
 
     draw_histogram(data);
@@ -243,12 +205,13 @@ function new_state(state){
   }
 
   if(state.has_changed('selected_codes')){
-    manhattan_select_codes(state.get('selected_codes'));
+    manhattan_plot.highlight(state.get('selected_codes'));
   }
 
 
   if(state.has_changed('or_bounds')){
     console.log('User has changed or_bounds!');
+    manhattan_plot.disable(this.get('or_bounds'));
     //set_histogram_brush(state.get('or_bounds'));
   }
 
@@ -293,6 +256,24 @@ function draw_manhattan(data){
   // Make sure that the neccesary info is provided before drawing.
   if(data === null) return;
 
+  const default_point = {
+    r: 3,
+    fillOpacity: 1,
+    fill: d => d.unselected_color,
+  };
+
+  const disabled_point = {
+    r: 1,
+    fillOpacity: 0.4,
+    fill: 'grey',
+  };
+
+  const highlighted_point = {
+    r: 3,
+    fillOpacity: 1,
+    fill: d => d.color,
+  };
+
   const code_selected = d => selected_codes.includes(d.code);
 
   let manhattan_points = main_viz.selectAll('circle')
@@ -302,7 +283,8 @@ function draw_manhattan(data){
     .append('circle')
     .merge(manhattan_points)
     .attr('cx', d => manhattan_scales.x(d.index))
-    .attr('cy', d => manhattan_scales.y(d.log_pval));
+    .attr('cy', d => manhattan_scales.y(d.log_pval))
+    .at(default_point);
     //.on('mouseover', d => {});
 
 
@@ -322,17 +304,37 @@ function draw_manhattan(data){
         .call(g => g.select(".tick:first-of-type").remove())
     );
 
-
-  const highlight_codes = selected_codes => {
-    const code_selected = d => selected_codes.includes(d.code);
+  const disable_codes = or_bounds => {
+    const is_disable = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
 
     manhattan_points
-      .attr('r',  d => code_selected(d) ? 3 : 2)
-      .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
+      .filter(d => is_disable(d))
+      .at(disabled_point)
+      .each(d => d.disabled = true);
+
+    manhattan_points
+      .filter(d => !is_disable(d))
+      .each(d => d.disabled = false);
+  };
+
+  const highlight_codes = selected_codes => {
+
+    manhattan_points
+      .filter(d => selected_codes.includes(d.code))
+      .at(highlighted_point);
+
+    // Make sure points that are not disabled but not highlighted are back at default settings
+    manhattan_points
+      .filter(d => !selected_codes.includes(d.code) && !d.disabled)
+      .at(default_point);
   };
 
   highlight_codes([]);
-  return highlight_codes;
+
+  return {
+    highlight: highlight_codes,
+    disable: disable_codes
+  };
 }
 
 
@@ -525,7 +527,7 @@ function initialize_histogram_brush(data){
 
   hist_brush_g.selectAll('.handle')
     .at({
-      width: 15,
+      //width: 15,
       strokeWidth: 2,
       fill: 'darkgrey',
     });
@@ -547,29 +549,8 @@ function initialize_histogram_brush(data){
     const or_min = histogram_scales.x.invert(selection[0]);
     const or_max = histogram_scales.x.invert(selection[1]);
 
-    app_state.pass_action('or_bounds', [or_min, or_max]);
+    app_state.pass_action('hist_brush', [or_min, or_max]);
   }
-}
-
-
-function on_hist_brush(){
-
-  const selection = d3.event.selection;
-
-  // if we have no selection, just reset the brush highlight to no nodes
-  const x_range = histogram_scales.x.range();
-
-  const empty_selection = selection == null;
-  //if(empty_selection) return;
-
-  const default_positions = (selection[0] == x_range[0]) && (selection[1] == x_range[1]);
-  if(default_positions || empty_selection) return;
-
-  // Send result of brush event to the app state
-  state_input.next({
-    type: 'histogram_filter',
-    payload: selection.map(x => histogram_scales.x.invert(x))
-  });
 }
 
 
@@ -584,8 +565,6 @@ function setup_quadtree(tree_data){
     .y(d => manhattan_scales.y(d.log_pval))
     .addAll(tree_data);
 }
-
-
 
 
 function manhattan_filter(or_bounds, selection){
