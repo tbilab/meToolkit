@@ -57,44 +57,45 @@ const hist_brush_g = or_hist.append('g')
 // Setup brushes
 // ================================================================
 // First initialize the brush objects
-const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
-const hist_brush = d3.brushX()
-  .on('end', on_hist_brush);
-
-// Then attach the brush objects to their holder g's
-initialize_brushes();
-
-hist_brush_g.select('.selection')
-  .attr('fill-opacity', 0.1);
-
-hist_brush_g.selectAll('.handle')
-  .at({
-    width: 15,
-    strokeWidth: 2,
-    fill: 'darkgrey',
-  });
-
-function initialize_brushes(){
-  // Then attach the brush objects to their holder g's
-  manhattan_brush_g.call(manhattan_brush);
-  hist_brush_g.call(hist_brush);
-}
-
-function reset_brushes(brush_id = 'all'){
-  if(brush_id === 'histogram' || brush_id === 'all'){
-    hist_brush_g.call(hist_brush.move, histogram_scales.x.range());
-  }
-  if(brush_id === 'manhattan' || brush_id === 'all'){
-    manhattan_brush_g.call(manhattan_brush.move, null);
-  }
-}
-
-// Initialize a quadtree to help us filter through the manhattan points much faster
-const main_quadtree = d3.quadtree();
+//const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
+//const hist_brush = d3.brushX()
+//  .on('end', on_hist_brush);
+//
+//// Then attach the brush objects to their holder g's
+//initialize_brushes();
+//
+//hist_brush_g.select('.selection')
+//  .attr('fill-opacity', 0.1);
+//
+//hist_brush_g.selectAll('.handle')
+//  .at({
+//    width: 15,
+//    strokeWidth: 2,
+//    fill: 'darkgrey',
+//  });
+//
+//function initialize_brushes(){
+//  // Then attach the brush objects to their holder g's
+//  manhattan_brush_g.call(manhattan_brush);
+//  hist_brush_g.call(hist_brush);
+//}
+//
+//function reset_brushes(brush_id = 'all'){
+//  if(brush_id === 'histogram' || brush_id === 'all'){
+//    hist_brush_g.call(hist_brush.move, histogram_scales.x.range());
+//  }
+//  if(brush_id === 'manhattan' || brush_id === 'all'){
+//    manhattan_brush_g.call(manhattan_brush.move, null);
+//  }
+//}
 
 
 // ================================================================
-// Initalize Scales
+// Global variables that get accessed in state functions
+// ================================================================
+
+
+// Scales
 // ================================================================
 const manhattan_scales = {
   x: d3.scaleLinear(),
@@ -106,113 +107,10 @@ const histogram_scales = {
   y: d3.scaleLinear(),
 };
 
-
+// Quadtree
 // ================================================================
-// Code table
-// ================================================================
-function draw_table(data){
-  data.forEach(d => d.selected = 0);
-  const code_table = $(code_table_div.node()).DataTable({
-    data: data,
-    columns: [
-      {title: 'Code',        data: 'code'        },
-      {title: 'OR',          data: 'OR',         searchable: false, render: format_val},
-      {title: 'P-Value',     data: 'p_val',      searchable: false, render: format_val},
-      {title: 'Description', data: 'description' },
-      {title: 'Category',    data: 'category'    },
-      {title: 'Selected',    data: 'selected',   render: d => d == 1 ? 'Yes': 'No'}
-    ],
-    scrollY: `${height*table_prop}px`
-  });
+const main_quadtree = d3.quadtree();
 
-  const update_table_selection = (codes_to_select, sort_table = false) => {
-     code_table.rows()
-      .every(function(row_index) {
-        const curr_node = $(this.nodes());
-        const selected_cell = code_table.cell(row_index, 5);
-
-        // Reset all nodes to unselected
-        selected_cell.data(0);
-        curr_node.removeClass('selected');
-
-        // Test if the current node is selected
-        if(codes_to_select.includes(this.data().code)) {
-
-          // If it is, change data to reflect that
-          selected_cell.data(1);
-          curr_node.addClass('selected');
-        }
-      });
-
-      if(sort_table){
-        // Sort table on selected to bring selections to top.
-        code_table
-          .order( [ 5, 'desc' ] )
-          .draw();
-      }
-  };
-
-  return update_table_selection;
-}
-
-//let code_table;
-//data.forEach(d => d.selected = 0);
-//code_table = $(code_table_div.node()).DataTable({
-//  data: data,
-//  columns: [
-//    {title: 'Code',        data: 'code'        },
-//    {title: 'OR',          data: 'OR',         searchable: false, render: format_val},
-//    {title: 'P-Value',     data: 'p_val',      searchable: false, render: format_val},
-//    {title: 'Description', data: 'description' },
-//    {title: 'Category',    data: 'category'    },
-//    {title: 'Selected',    data: 'selected',   render: d => d == 1 ? 'Yes': 'No'}
-//  ],
-//  scrollY: `${height*table_prop}px`
-//});
-
-
-function update_table_selection(codes_to_select, sort_table = false){
-  //console.log(codes_to_select);
-  // Loop through every row in the table
-  code_table.rows()
-    .every(function(row_index) {
-      const curr_node = $(this.nodes());
-      const selected_cell = code_table.cell(row_index, 5);
-
-      // Reset all nodes to unselected
-      selected_cell.data(0);
-      curr_node.removeClass('selected');
-
-      // Test if the current node is selected
-      if(codes_to_select.includes(this.data().code)) {
-
-        // If it is, change data to reflect that
-        selected_cell.data(1);
-        curr_node.addClass('selected');
-      }
-    });
-
-    if(sort_table){
-      // Sort table on selected to bring selections to top.
-      code_table
-        .order( [ 5, 'desc' ] )
-        .draw();
-    }
-}
-
-$(code_table_div.select('tbody').node())
-  .on('click', 'tr', function(){
-    // Add the selected class to the code's row
-    $(this).toggleClass('selected');
-    const new_selection = Array.from(code_table.rows('.selected').data()).map(d => d.code);
-    update_table_selection(new_selection);
-
-    // Send new array of selected codes to state
-    state_input.next({
-      type: 'table_selection',
-      payload: new_selection
-    });
-  });
 
 
 // ================================================================
@@ -277,6 +175,7 @@ class App_State{
         this.modify_property('sizes', payload);
         break;
       case 'manhattan_brush':
+        console.log('manhattan plot was brushed!')
         const newly_selected = manhattan_filter(this.get('or_bounds'), payload);
         this.modify_property('selected_codes', newly_selected);
         break;
@@ -307,8 +206,9 @@ class App_State{
   }
 }
 
+let manhattan_select_codes, table_select_codes;
+
 function new_state(state){
-  let manhattan_select_codes, table_select_codes;
   const changed_props = state.fresh_properties();
 
   // The flow of drawing the whole viz. Only refreshing components if they need to be.
@@ -317,23 +217,32 @@ function new_state(state){
   if(state.has_changed('sizes')) size_viz(state.get('sizes'));
 
   // From here on out we need data so let's check if we have data before proceeding
-  if(!state.get('data')) return;
+  const data = state.get('data');
+  if(!data) return;
 
   // add log odds ratios to data
-  if(state.has_changed('data')) process_new_data(state.get('data'));
+  if(state.has_changed('data')) process_new_data(data);
 
 
   // Update scales and the quadtree for selecting points
   if(state.has_changed('sizes') || state.has_changed('data')){
-    reset_scales(state.get('data'), state.get('sizes'));
-    reset_quadtree(state.get('data'), manhattan_scales);
+    reset_scales(data, state.get('sizes'));
+    setup_quadtree(data, manhattan_scales);
   }
 
-  // Draw manhattan plot
+  // Draw plots
   if(state.has_changed('sizes') || state.has_changed('data') || state.has_changed('selected_codes')){
-    manhattan_select_codes = draw_manhattan(state.get('data'));
-    draw_histogram(state.get('data'));
-    table_select_codes = draw_table(state.get('data'));
+
+    manhattan_select_codes = draw_manhattan(data);
+    initialize_manhattan_brush(data);
+
+    draw_histogram(data);
+
+    //table_select_codes = draw_table(data);
+  }
+
+  if(state.has_changed('selected_codes')){
+    manhattan_select_codes(state.get('selected_codes'));
   }
 
 
@@ -349,10 +258,10 @@ function new_state(state){
 }
 
 const initial_state = {
-  data: null,
+  data: data,
   or_bounds: [-Infinity, Infinity],
   selected_codes: [],
-  sizes: [100,100],
+  sizes: [height, width],
 };
 
 const app_state = new App_State(initial_state, new_state);
@@ -375,44 +284,11 @@ r2d3.onResize(function(width, height){
   app_state.pass_action('new_sizes', [width, height]);
 });
 
+// ================================================================
+// Main drawing functions.
+// ================================================================
 
-function update_w_new_data(data){
-  let log_pval_max = 0,
-      log_or_min = 0,
-      log_or_max = 0;
-
-  // Add a log_pval and log_or field to all points and keep track of extents
-  data.forEach((d,i) => {
-    d.log_pval = -Math.log10(d.p_val);
-    if(d.log_pval > log_pval_max) log_pval_max = d.log_pval;
-
-    d.log_or = Math.log(d.OR);
-    if(d.log_or < log_or_min) log_or_min = d.log_or;
-    if(d.log_or > log_or_max) log_or_max = d.log_or;
-
-    d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
-    d.index = i;
-  });
-
-  // Update the domains for the manhattan plot
-  manhattan_scales.x.domain([0, data.length]);
-  manhattan_scales.y.domain([0,log_pval_max]).nice();
-
-  // Next for the histogram
-  const log_ors = data.map(d => d.log_or);
-
-  histogram_scales.x.domain(d3.extent(log_ors)).nice();
-
-  or_bins = d3.histogram()
-    .domain(histogram_scales.x.domain())
-    .thresholds(histogram_scales.x.ticks(num_hist_bins))
-    (log_ors);
-
-  histogram_scales.y.domain([0, d3.max(or_bins, d => d.length)]).nice();
-}
-
-
-function draw_manhattan(data, selected_codes){
+function draw_manhattan(data){
   // Make sure that the neccesary info is provided before drawing.
   if(data === null) return;
 
@@ -428,15 +304,9 @@ function draw_manhattan(data, selected_codes){
     .attr('cy', d => manhattan_scales.y(d.log_pval));
     //.on('mouseover', d => {});
 
-  const highlight_codes = selected_codes => {
-    const code_selected = d => selected_codes.includes(d.code);
 
-    manhattan_points
-      .attr('r',  d => code_selected(d) ? 3 : 2)
-      .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
-  };
-
-  const y_axis = main_viz.selectAppend("g#y-axis")
+  // Draw the axes
+  main_viz.selectAppend("g#y-axis")
     .call(function(g){
       g.attr("transform", `translate(${-5},0)`)
       .call(d3.axisLeft(manhattan_scales.y).tickSizeOuter(0))
@@ -451,26 +321,17 @@ function draw_manhattan(data, selected_codes){
         .call(g => g.select(".tick:first-of-type").remove())
     );
 
-  //// Update the extent of the manhattan brush
-  //manhattan_brush.extent(main_quadtree.extent());
-  //manhattan_brush_g.call(manhattan_brush);
 
-  // Reset button to jump back to default selection
- //if(selected_codes.length !== 0){
- //  main_viz.selectAppend('text#clear_button')
- //    .attr('x', manhattan_scales.x.range()[1])
- //    .attr('y', 10)
- //    .attr('text-anchor', 'end')
- //    .text('Reset selection')
- //    .attr('font-size', 0);
- //    //.on('click', function(){
- //    //  state_input.next({
- //    //    type: 'reset_button',
- //    //    payload: null
- //    //  });
- //    //});
- //}
-  highlight_codes([])
+  const highlight_codes = selected_codes => {
+    const code_selected = d => selected_codes.includes(d.code);
+
+    manhattan_points
+      .attr('r',  d => code_selected(d) ? 3 : 2)
+      .attr('fill', d => d[ code_selected(d) ? 'color': 'unselected_color']);
+  };
+
+  highlight_codes([]);
+  return highlight_codes;
 }
 
 
@@ -513,9 +374,152 @@ function draw_histogram(data){
 }
 
 
+function draw_table(data){
+  data.forEach(d => d.selected = 0);
+  const code_table = $(code_table_div.node()).DataTable({
+    data: data,
+    columns: [
+      {title: 'Code',        data: 'code'        },
+      {title: 'OR',          data: 'OR',         searchable: false, render: format_val},
+      {title: 'P-Value',     data: 'p_val',      searchable: false, render: format_val},
+      {title: 'Description', data: 'description' },
+      {title: 'Category',    data: 'category'    },
+      {title: 'Selected',    data: 'selected',   render: d => d == 1 ? 'Yes': 'No'}
+    ],
+    scrollY: `${height*table_prop}px`
+  });
+
+  const update_table_selection = (codes_to_select, sort_table = false) => {
+     code_table.rows()
+      .every(function(row_index) {
+        const curr_node = $(this.nodes());
+        const selected_cell = code_table.cell(row_index, 5);
+
+        // Reset all nodes to unselected
+        selected_cell.data(0);
+        curr_node.removeClass('selected');
+
+        // Test if the current node is selected
+        if(codes_to_select.includes(this.data().code)) {
+
+          // If it is, change data to reflect that
+          selected_cell.data(1);
+          curr_node.addClass('selected');
+        }
+      });
+
+      if(sort_table){
+        // Sort table on selected to bring selections to top.
+        code_table
+          .order( [ 5, 'desc' ] )
+          .draw();
+      }
+  };
+
+  $(code_table_div.select('tbody').node())
+    .on('click', 'tr', function(){
+      // Add the selected class to the code's row
+      $(this).toggleClass('selected');
+      const new_selection = Array.from(code_table.rows('.selected').data()).map(d => d.code);
+      update_table_selection(new_selection);
+
+      // Send new array of selected codes to state
+      state_input.next({
+        type: 'table_selection',
+        payload: new_selection
+      });
+    });
+
+
+  return update_table_selection;
+}
+
+
+// ================================================================
+// On load functions for resizing and processing raw data
+// ================================================================
+
+function size_viz([width, height]){
+  const manhattan_height = height*manhattan_prop;
+  const or_height = height*hist_prop;
+  //const table_height = height*table_prop;
+
+  // Adjust the sizes of the svgs
+  main_svg
+    .attr('height', manhattan_height)
+    .attr('width', width);
+
+  or_svg
+    .attr('height', or_height)
+    .attr('width', width);
+}
+
+
+function process_new_data(data){
+  // Add a log_pval and log_or field to all points and keep track of extents
+  data.forEach((d,i) => {
+    d.log_pval = -Math.log10(d.p_val);
+    d.log_or = Math.log(d.OR);
+    d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
+    d.index = i;
+  });
+}
+
+
+// ================================================================
+// Brush setup functions.
+// ================================================================
+
+function initialize_manhattan_brush(data){
+  // Initialize a quadtree to help us filter through the manhattan points much faster
+  const main_quadtree = d3.quadtree()
+    .x(d => manhattan_scales.x(d.index))
+    .y(d => manhattan_scales.y(d.log_pval))
+    .addAll(data);
+
+  const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
+
+  // Add a g element and call the brush on it.
+  const manhattan_brush_g = main_viz
+    .selectAppend('g#manhattan_brush')
+    .attr('class', 'brush');
+
+  manhattan_brush_g.call(manhattan_brush);
+
+
+
+  function on_manhattan_brush(){
+    const { selection } = d3.event;
+
+    // if we have no selection, just reset the brush highlight to no nodes
+    if(!selection) return;
+
+    // debugger;
+    console.log('trying to hide brush');
+    manhattan_brush_g.call(manhattan_brush.move, null);
+
+    // Send result of brush event to the app state
+    app_state.pass_action('manhattan_brush', selection);
+}
+}
+
+
+function setup_quadtree(tree_data){
+  if(tree_data === null) return;
+  // generate a quadtree for faster lookups for brushing
+  // Rebuild the quadtree with new positions
+  main_quadtree.removeAll(main_quadtree.data());
+
+  main_quadtree
+    .x(d => manhattan_scales.x(d.index))
+    .y(d => manhattan_scales.y(d.log_pval))
+    .addAll(tree_data);
+}
+
+
 function set_histogram_brush([start, end]){
   // Move histogram brush to where it's needed.
-  manhattan_brush_g.call(manhattan_brush.move, [histogram_scales.x(start), histogram_scales.x(end)]);
+  //manhattan_brush_g.call(manhattan_brush.move, [histogram_scales.x(start), histogram_scales.x(end)]);
 }
 
 
@@ -580,60 +584,6 @@ function manhattan_filter(or_bounds, selection){
 }
 
 
-function on_manhattan_brush(){
-
-  const { selection } = d3.event;
-
-  // if we have no selection, just reset the brush highlight to no nodes
-  if(!selection) return;
-
-  // Send result of brush event to the app state
-
-  app_state.pass_action('manhattan_brush', selection);
-
-}
-
-
-function size_viz([width, height]){
-  const manhattan_height = height*manhattan_prop;
-  const or_height = height*hist_prop;
-  //const table_height = height*table_prop;
-
-  // Adjust the sizes of the svgs
-  main_svg
-    .attr('height', manhattan_height)
-    .attr('width', width);
-
-  or_svg
-    .attr('height', or_height)
-    .attr('width', width);
-}
-
-
-function reset_quadtree(tree_data, manhattan_scales){
-  if(tree_data === null) return;
-  // generate a quadtree for faster lookups for brushing
-  // Rebuild the quadtree with new positions
-  main_quadtree.removeAll(main_quadtree.data());
-
-  main_quadtree
-    .x(d => manhattan_scales.x(d.index))
-    .y(d => manhattan_scales.y(d.log_pval))
-    .addAll(tree_data);
-}
-
-
-function process_new_data(data){
-  // Add a log_pval and log_or field to all points and keep track of extents
-  data.forEach((d,i) => {
-    d.log_pval = -Math.log10(d.p_val);
-    d.log_or = Math.log(d.OR);
-    d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
-    d.index = i;
-  });
-}
-
-
 function reset_scales(data, sizes){
 
   const [width, height] = sizes;
@@ -650,7 +600,7 @@ function reset_scales(data, sizes){
 
   manhattan_scales.y
     .domain([0, max_log_pval])
-    .range([(manhattan_prop*height) - margin.top - margin.bottom, 0])
+    .range([(manhattan_prop*height) - margin.top - margin.bottom, 0]);
 
 
   // ===============================================================
@@ -661,7 +611,7 @@ function reset_scales(data, sizes){
 
   histogram_scales.x
     .range([0, width - margin.left - margin.right])
-    .domain(d3.extent(log_ors)).nice()
+    .domain(d3.extent(log_ors)).nice();
 
   or_bins = d3.histogram()
     .domain(histogram_scales.x.domain())
@@ -670,7 +620,7 @@ function reset_scales(data, sizes){
 
   histogram_scales.y
     .range([hist_height - margin.top - margin.bottom, 0])
-    .domain([0, d3.max(or_bins, d => d.length)]).nice()
+    .domain([0, d3.max(or_bins, d => d.length)]).nice();
 }
 
 
