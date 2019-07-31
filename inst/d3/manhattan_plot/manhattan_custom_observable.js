@@ -231,12 +231,13 @@ function new_state(state){
   }
 
   // Draw plots
-  if(state.has_changed('sizes') || state.has_changed('data') || state.has_changed('selected_codes')){
+  if(state.has_changed('sizes') || state.has_changed('data')){
 
     manhattan_select_codes = draw_manhattan(data);
     initialize_manhattan_brush(data);
 
     draw_histogram(data);
+    initialize_histogram_brush(data);
 
     //table_select_codes = draw_table(data);
   }
@@ -248,7 +249,7 @@ function new_state(state){
 
   if(state.has_changed('or_bounds')){
     console.log('User has changed or_bounds!');
-    set_histogram_brush(state.get('or_bounds'));
+    //set_histogram_brush(state.get('or_bounds'));
   }
 
   // Make all the props completed.
@@ -487,15 +488,12 @@ function initialize_manhattan_brush(data){
   manhattan_brush_g.call(manhattan_brush);
 
 
-
   function on_manhattan_brush(){
     const { selection } = d3.event;
 
     // if we have no selection, just reset the brush highlight to no nodes
     if(!selection) return;
 
-    // debugger;
-    console.log('trying to hide brush');
     manhattan_brush_g.call(manhattan_brush.move, null);
 
     // Send result of brush event to the app state
@@ -504,22 +502,53 @@ function initialize_manhattan_brush(data){
 }
 
 
-function setup_quadtree(tree_data){
-  if(tree_data === null) return;
-  // generate a quadtree for faster lookups for brushing
-  // Rebuild the quadtree with new positions
-  main_quadtree.removeAll(main_quadtree.data());
+function initialize_histogram_brush(data){
 
-  main_quadtree
-    .x(d => manhattan_scales.x(d.index))
-    .y(d => manhattan_scales.y(d.log_pval))
-    .addAll(tree_data);
-}
+  const hist_brush = d3.brushX()
+    .on('end', on_hist_brush);
 
+  const reset_pos = [
+    histogram_scales.x.range()[0] - 1,
+    histogram_scales.x.range()[1] + 1
+  ];
 
-function set_histogram_brush([start, end]){
-  // Move histogram brush to where it's needed.
-  //manhattan_brush_g.call(manhattan_brush.move, [histogram_scales.x(start), histogram_scales.x(end)]);
+  // Add a g element and call the brush on it.
+  const hist_brush_g = or_hist
+    .selectAppend('g#hist_brush')
+    .attr('class', 'brush');
+
+  hist_brush_g.call(hist_brush);
+  set_brush_pos(reset_pos);
+
+  hist_brush_g.select('.selection')
+    .attr('fill-opacity', 0.1);
+
+  hist_brush_g.selectAll('.handle')
+    .at({
+      width: 15,
+      strokeWidth: 2,
+      fill: 'darkgrey',
+    });
+
+  function set_brush_pos([min, max]){
+    hist_brush_g.call(hist_brush.move, [min, max]);
+  }
+
+  function on_hist_brush(){
+
+    const { selection } = d3.event;
+
+    // if we have no selection, just reset the brush highlight to no nodes
+    if(!selection) return;
+    // Is this move just a result of a reset? If so ignore it.
+    const is_reset_pos = (selection[0] == reset_pos[0]) && (selection[1] == reset_pos[1]);
+    if(is_reset_pos) return;
+
+    const or_min = histogram_scales.x.invert(selection[0]);
+    const or_max = histogram_scales.x.invert(selection[1]);
+
+    app_state.pass_action('or_bounds', [or_min, or_max]);
+  }
 }
 
 
@@ -542,6 +571,21 @@ function on_hist_brush(){
     payload: selection.map(x => histogram_scales.x.invert(x))
   });
 }
+
+
+function setup_quadtree(tree_data){
+  if(tree_data === null) return;
+  // generate a quadtree for faster lookups for brushing
+  // Rebuild the quadtree with new positions
+  main_quadtree.removeAll(main_quadtree.data());
+
+  main_quadtree
+    .x(d => manhattan_scales.x(d.index))
+    .y(d => manhattan_scales.y(d.log_pval))
+    .addAll(tree_data);
+}
+
+
 
 
 function manhattan_filter(or_bounds, selection){
