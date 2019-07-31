@@ -314,6 +314,7 @@ function draw_manhattan(data){
 
     manhattan_points
       .filter(d => !is_disable(d))
+      .raise()
       .each(d => d.disabled = false);
   };
 
@@ -321,6 +322,7 @@ function draw_manhattan(data){
 
     manhattan_points
       .filter(d => selected_codes.includes(d.code))
+      .raise()
       .at(highlighted_point);
 
     // Make sure points that are not disabled but not highlighted are back at default settings
@@ -506,13 +508,17 @@ function initialize_manhattan_brush(data){
 
 function initialize_histogram_brush(data){
 
-  const hist_brush = d3.brushX()
-    .on('end', on_hist_brush);
+  const [x_min, x_max] = histogram_scales.x.range();
+  const [y_min, y_max] = histogram_scales.y.range();
 
-  const reset_pos = [
-    histogram_scales.x.range()[0] - 1,
-    histogram_scales.x.range()[1] + 1
+  const selection_range = [
+    [x_min - 1, y_max],
+    [x_max + 1, y_min]
   ];
+
+  const hist_brush = d3.brushX()
+    .extent(selection_range)
+    .on('end', on_hist_brush);
 
   // Add a g element and call the brush on it.
   const hist_brush_g = or_hist
@@ -520,7 +526,7 @@ function initialize_histogram_brush(data){
     .attr('class', 'brush');
 
   hist_brush_g.call(hist_brush);
-  set_brush_pos(reset_pos);
+  set_brush_pos(histogram_scales.x.range());
 
   hist_brush_g.select('.selection')
     .attr('fill-opacity', 0.1);
@@ -543,7 +549,7 @@ function initialize_histogram_brush(data){
     // if we have no selection, just reset the brush highlight to no nodes
     if(!selection) return;
     // Is this move just a result of a reset? If so ignore it.
-    const is_reset_pos = (selection[0] == reset_pos[0]) && (selection[1] == reset_pos[1]);
+    const is_reset_pos = (selection[0] == histogram_scales.x.range()[0]) && (selection[1] == histogram_scales.x.range()[1]);
     if(is_reset_pos) return;
 
     const or_min = histogram_scales.x.invert(selection[0]);
