@@ -179,7 +179,7 @@ class App_State{
   }
 }
 
-let manhattan_plot, table_select_codes;
+let manhattan_plot, hist_brush, table_select_codes;
 
 function new_state(state){
   const changed_props = state.fresh_properties();
@@ -210,9 +210,9 @@ function new_state(state){
     initialize_manhattan_brush(data);
 
     draw_histogram(data);
-    initialize_histogram_brush(data);
+    hist_brush = initialize_histogram_brush(data);
 
-    //table_select_codes = draw_table(data);
+    table_select_codes = draw_table(data);
   }
 
   if(state.has_changed('selected_codes') || state.has_changed('or_bounds')){
@@ -234,7 +234,18 @@ function new_state(state){
   if(state.has_changed('or_bounds')){
     console.log('User has changed or_bounds!');
     manhattan_plot.disable(this.get('or_bounds'));
-    //set_histogram_brush(state.get('or_bounds'));
+
+    // Check if the vis was just reset.
+    if(tuples_equal(state.get('or_bounds'), [-Infinity, Infinity])){
+      hist_brush.reset();
+    }
+
+  }
+
+  // Check if viz has been reset
+  if(state.has_changed('or_bounds')){
+    console.log('User has changed or_bounds!');
+    manhattan_plot.disable(this.get('or_bounds'));
   }
 
   // Make all the props completed.
@@ -281,7 +292,7 @@ function draw_manhattan(data){
   let currently_selected_points;
 
   const default_point = {
-    r: 3,
+    r: 2,
     fillOpacity: 1,
     fill: d => d.unselected_color,
   };
@@ -356,13 +367,6 @@ function draw_manhattan(data){
     manhattan_points
       .filter(d => !selected_codes.includes(d.code) && !d.disabled)
       .at(default_point);
-
-    // Reset button to jump back to default selection
-   //if(selected_codes.length !== 0){
-   //  show_reset();
-   //} else {
-   //  hide_reset();
-   //}
   };
 
   highlight_codes([]);
@@ -373,15 +377,16 @@ function draw_manhattan(data){
   };
 }
 
+
 function show_reset(){
   reset_button.attr('font-size', 15);
 }
+
 
 function hide_reset(){
   reset_button.attr('font-size', 0);
 }
 
-hide_reset();
 
 function draw_histogram(data){
 
@@ -416,6 +421,8 @@ function draw_histogram(data){
 
 function draw_table(data){
   data.forEach(d => d.selected = 0);
+
+  // Initialize table.
   const code_table = $(code_table_div.node()).DataTable({
     data: data,
     columns: [
@@ -426,9 +433,13 @@ function draw_table(data){
       {title: 'Category',    data: 'category'    },
       {title: 'Selected',    data: 'selected',   render: d => d == 1 ? 'Yes': 'No'}
     ],
-    scrollY: `${height*table_prop}px`
+    scrollY: `${height*table_prop}px`,
+    retrieve: true
   });
 
+
+
+  // Function for updating table with selected codes
   const update_table_selection = (codes_to_select, sort_table = false) => {
      code_table.rows()
       .every(function(row_index) {
@@ -456,18 +467,26 @@ function draw_table(data){
       }
   };
 
+  function sort_table(){
+     code_table
+      .order( [ 5, 'desc' ] )
+      .draw();
+  }
+
+
+  // Bind listeners to click events on a row, for selection from within table.
   $(code_table_div.select('tbody').node())
     .on('click', 'tr', function(){
       // Add the selected class to the code's row
       $(this).toggleClass('selected');
-      const new_selection = Array.from(code_table.rows('.selected').data()).map(d => d.code);
-      update_table_selection(new_selection);
 
-      // Send new array of selected codes to state
-      state_input.next({
-        type: 'table_selection',
-        payload: new_selection
-      });
+      // Send this selection to the state
+      app_state.pass_action(
+        'table_selection',
+        Array.from(code_table.rows('.selected').data()).map(d => d.code)
+      );
+
+      sort_table();
     });
 
 
@@ -500,7 +519,7 @@ function process_new_data(data){
   data.forEach((d,i) => {
     d.log_pval = -Math.log10(d.p_val);
     d.log_or = Math.log(d.OR);
-    d.unselected_color = d3.interpolateLab(d.color, "white")(0.7);
+    d.unselected_color = d3.interpolateLab(d.color, "white")(0.66);
     d.index = i;
   });
 }
@@ -582,19 +601,21 @@ function initialize_histogram_brush(data){
     const { selection } = d3.event;
     // if we have no selection, just reset the brush highlight to no nodes
     if(!selection) return;
-    // Is this move just a result of a reset? If so ignore it.
-    const is_reset_pos = tuples_equal(selection, histogram_scales.x.range())
 
-    if(is_reset_pos){
-      console.log('histogram brush was reset')
-      return;
-    }
+    // Is this move just a result of a reset? If so ignore it.
+    const is_reset_pos = tuples_equal(selection, histogram_scales.x.range()) ;
+    if(is_reset_pos) return;
 
     const or_min = histogram_scales.x.invert(selection[0]);
     const or_max = histogram_scales.x.invert(selection[1]);
 
     app_state.pass_action('hist_brush', [or_min, or_max]);
   }
+
+  return {
+    set: set_brush_pos,
+    reset: () => set_brush_pos(histogram_scales.x.range()),
+  };
 }
 
 
