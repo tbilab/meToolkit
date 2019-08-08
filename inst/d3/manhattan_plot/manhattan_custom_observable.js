@@ -25,6 +25,8 @@ let or_bins;
 // ================================================================
 // Setup DOM elements
 // ================================================================
+div.style('overflow', 'scroll');
+
 const main_svg = div.append('svg')
   .attr('id', 'main_viz');
 
@@ -84,7 +86,6 @@ const histogram_scales = {
 const main_quadtree = d3.quadtree();
 
 
-
 // ================================================================
 // Initalize State
 // ================================================================
@@ -131,7 +132,6 @@ class App_State{
   get(prop){
     return this.state[prop];
   }
-
 
   // Individual app components pass info to this
   // which then modifies the internal state accordingly
@@ -422,27 +422,60 @@ function draw_histogram(data){
 function draw_table(data){
   data.forEach(d => d.selected = 0);
 
+  let selected_codes = [];
+
+  function Code_Row(d){
+
+    this.code = d.code;
+    this.OR = d.OR;
+    this.p_val = d.p_val;
+    this.Description = d.description;
+    this.Category = d.category;
+    this.Selected = false;
+
+    //this.Selected = function(){
+    //  return selected_codes.includes(this.Code) ? 1: 0;
+    //};
+  }
+
+  const table_data = data.map(d => new Code_Row(d));
+
   // Initialize table.
   const code_table = $(code_table_div.node()).DataTable({
-    data: data,
+    data: table_data,
     columns: [
       {title: 'Code',        data: 'code'        },
       {title: 'OR',          data: 'OR',         searchable: false, render: format_val},
       {title: 'P-Value',     data: 'p_val',      searchable: false, render: format_val},
-      {title: 'Description', data: 'description' },
-      {title: 'Category',    data: 'category'    },
-      {title: 'Selected',    data: 'selected',   render: d => d == 1 ? 'Yes': 'No'}
+      {title: 'Description', data: 'Description'},
+      {title: 'Category',    data: 'Category' },
+      {title: 'Selected',    data: 'Selected',   render: d => d ? 'Yes': 'No'}
     ],
     scrollY: `${height*table_prop}px`,
     retrieve: true
   });
 
 
+  // START HERE
+  // Currently figuring out how to speed up the selection of codes and sorting of the table
+  // I think there should be a way of defining a seperate sort function outside the data.
+
 
   // Function for updating table with selected codes
   const update_table_selection = (codes_to_select, sort_table = false) => {
-     code_table.rows()
+
+     code_table
+      .rows()
+      .invalidate()
+      .draw()
       .every(function(row_index) {
+
+        // Test if the current node is selected
+        if(codes_to_select.includes(this.data().code)) {
+          // Invalidate the row to let datatables know that it needs to reead the selected property again.
+          this.invalidate();
+
+        }
         const curr_node = $(this.nodes());
         const selected_cell = code_table.cell(row_index, 5);
 
@@ -479,14 +512,44 @@ function draw_table(data){
     .on('click', 'tr', function(){
       // Add the selected class to the code's row
       $(this).toggleClass('selected');
+      $(this).toggleClass('currently_selected');
 
+
+      // Get up-to-date list of selected codes;
+      const codes_to_select = Array.from(code_table.rows('.selected').data()).map(d => d.code);
+
+      // Goes through all selected rows and makes sure they are set to true and then redraws that row.
+      code_table.rows('.currently_selected').every(function(row) {
+        const row_data = this.data();
+        row_data.Selected = !row_data.Selected;
+        this.draw();
+      });
+
+      // Need to build logic for unselecting a code efficiently.
+      // This will probably entail me figuring out how to grab access directly to the selected row rather than just finding everything by the current class.
+      // Maybe add a class of current selection?
+      // Need to probably modify the code below to not undo what I just modified.
+
+
+
+     // debugger;
       // Send this selection to the state
-      app_state.pass_action(
-        'table_selection',
-        Array.from(code_table.rows('.selected').data()).map(d => d.code)
-      );
+      app_state.pass_action('table_selection', codes_to_select);
 
-      sort_table();
+      // Update selected codes
+      selected_codes = codes_to_select;
+
+      // Invalidate this rowv
+      code_table.rows(this).invalidate();
+
+      code_table.draw();
+
+      //code_table
+      //  .rows()
+      //  .invalidate()
+      //  .draw();
+//
+      //sort_table();
     });
 
 
