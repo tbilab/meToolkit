@@ -1,9 +1,8 @@
-// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/manhattan_plot/rx.js'), here::here('inst/d3/manhattan_plot/datatables.min.js')), css = here::here('inst/d3/manhattan_plot/datatables.min.css')
+// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/manhattan_plot/datatables.min.js')), css = here::here('inst/d3/manhattan_plot/datatables.min.css')
 // ===============================================================
 // Initialization
-// This code is run a single timex
+// This code is run a single time
 // ===============================================================
-const {scan, shareReplay, tap} = rxjs.operators;
 
 const margin = {left: 65, right: 10, top: 10, bottom: 20};
 
