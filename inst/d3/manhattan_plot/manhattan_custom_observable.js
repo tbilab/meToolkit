@@ -26,6 +26,26 @@ let or_bins;
 // ================================================================
 div.style('overflow', 'scroll');
 
+const buttons = div.append('div.buttons')
+  .st({
+     position: 'fixed',
+     right: 10,
+     top: 10,
+     display: 'block'
+   });
+
+const send_button = buttons.append('button')
+  .text('Send selection')
+  .on('click', send_selection_to_shiny);
+
+// Reset button that shows up when there is something selected
+// allowing the user to back out to default.
+const reset_button = buttons.append('button#clear_button')
+  .text('Reset')
+  .style('display', 'none')
+  .on('click', () => app_state.pass_action('reset_button', null));
+
+
 const main_svg = div.append('svg')
   .attr('id', 'main_viz');
 
@@ -61,23 +81,6 @@ const manhattan_brush_g = main_viz.append('g')
 const hist_brush_g = or_hist.append('g')
   .attr('class', 'brush');
 
-// Reset button that shows up when there is something selected
-// allowing the user to back out to default.
-const reset_button = main_viz.selectAppend('text#clear_button')
-  .attr('x', 5)
-  .attr('y', 0)
-  .attr('text-anchor', 'start')
-  .attr('font-size', '0.75em')
-  .text('Reset')
-  .style('cursor', 'pointer')
-  .on('mouseover', function(){
-    d3.select(this).attr('font-size', '0.9em')
-  })
-  .on('mouseout', function(){
-    d3.select(this).attr('font-size', '0.75em')
-  })
-  .on('click', () => app_state.pass_action('reset_button', null));
-
 
 // ================================================================
 // Global variables that get accessed in state functions
@@ -103,7 +106,6 @@ const main_quadtree = d3.quadtree();
 // ================================================================
 // Initalize State
 // ================================================================
-
 class App_State{
 
   constructor(initial_state, on_new_state){
@@ -197,7 +199,6 @@ let manhattan_plot, hist_brush, table_select_codes;
 
 function new_state(state){
   const changed_props = state.fresh_properties();
-  //debugger;
 
   // The flow of drawing the whole viz. Only refreshing components if they need to be.
 
@@ -393,12 +394,12 @@ function draw_manhattan(data){
 
 
 function show_reset(){
-  reset_button.attr('font-size', 15);
+  reset_button.style('display', 'block');
 }
 
 
 function hide_reset(){
-  reset_button.attr('font-size', 0);
+  reset_button.style('display', 'none');
 }
 
 
@@ -507,6 +508,7 @@ function fill_tooltip(d, loc){
    .html(d.tooltip);
 }
 
+
 function hide_tooltip(){
   tooltip
     .st({
@@ -516,22 +518,23 @@ function hide_tooltip(){
     });
 }
 
+function send_selection_to_shiny(){
+  const currently_selected = app_state.get('selected_codes');
+  debugger;
+}
+
 // ================================================================
 // On load functions for resizing and processing raw data
 // ================================================================
 
 function size_viz([width, height]){
-  const manhattan_height = height*manhattan_prop;
-  const or_height = height*hist_prop;
-  //const table_height = height*table_prop;
-
   // Adjust the sizes of the svgs
   main_svg
-    .attr('height', manhattan_height)
+    .attr('height', height*manhattan_prop)
     .attr('width', width);
 
   or_svg
-    .attr('height', or_height)
+    .attr('height', height*hist_prop)
     .attr('width', width);
 }
 
@@ -777,6 +780,7 @@ function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max =
 function format_val(d){
   return d3.format(".3")(d);
 }
+
 
 function tuples_equal(a,b){
   return (a[0] === b[0]) && (a[1] === b[1]);
