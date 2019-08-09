@@ -3,7 +3,6 @@
 // Initialization
 // This code is run a single time
 // ===============================================================
-
 const margin = {left: 65, right: 10, top: 10, bottom: 20};
 
 const manhattan_unit = 3;
@@ -45,12 +44,13 @@ const reset_button = buttons.append('button#clear_button')
   .style('display', 'none')
   .on('click', () => app_state.pass_action('reset_button', null));
 
-
 const main_svg = div.append('svg')
   .attr('id', 'main_viz');
 
 const or_svg = div.append('svg')
   .attr('id', 'or_hist');
+
+div.append('hr');
 
 const code_table_div = div.append('div')
   .style('height', '20%')
@@ -80,7 +80,6 @@ const manhattan_brush_g = main_viz.append('g')
 
 const hist_brush_g = or_hist.append('g')
   .attr('class', 'brush');
-
 
 // ================================================================
 // Global variables that get accessed in state functions
@@ -246,7 +245,6 @@ function new_state(state){
     table_select_codes(state.get('selected_codes'));
   }
 
-
   if(state.has_changed('or_bounds')){
     manhattan_plot.disable(this.get('or_bounds'));
 
@@ -281,6 +279,7 @@ const app_state = new App_State(initial_state, new_state);
 r2d3.onRender(function(data, svg, width, height, options) {
   app_state.pass_action('new_data', data);
   app_state.pass_action('new_sizes', [width, height]);
+  app_state.pass_action('table_selection', options.selected);
 });
 
 // ===============================================================
@@ -508,7 +507,6 @@ function fill_tooltip(d, loc){
    .html(d.tooltip);
 }
 
-
 function hide_tooltip(){
   tooltip
     .st({
@@ -520,7 +518,7 @@ function hide_tooltip(){
 
 function send_selection_to_shiny(){
   const currently_selected = app_state.get('selected_codes');
-  debugger;
+  // Hook up the to app code here.
 }
 
 // ================================================================
