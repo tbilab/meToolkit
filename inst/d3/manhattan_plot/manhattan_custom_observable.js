@@ -239,7 +239,6 @@ function new_state(state){
     if(tuples_equal(state.get('or_bounds'), [-Infinity, Infinity])){
       hist_brush.reset();
     }
-
   }
 
   // Check if viz has been reset
@@ -250,8 +249,6 @@ function new_state(state){
 
   // Make all the props completed.
   changed_props.forEach(p => state.mark_completed(p));
-
-  //debugger;
 }
 
 const initial_state = {
@@ -420,30 +417,17 @@ function draw_histogram(data){
 
 
 function draw_table(data){
-  data.forEach(d => d.selected = 0);
-
-  let selected_codes = [];
-
-  function Code_Row(d){
-    this.code = d.code;
-    this.OR = d.OR;
-    this.p_val = d.p_val;
-    this.Description = d.description;
-    this.Category = d.category;
-    this.Selected = false;
-  }
-
-  const table_data = data.map(d => new Code_Row(d));
+  data.forEach(d => d.Selected = 0);
 
   // Initialize table.
   const code_table = $(code_table_div.node()).DataTable({
-    data: table_data,
+    data: data,
     columns: [
       {title: 'Code',        data: 'code'        },
       {title: 'OR',          data: 'OR',         searchable: false, render: format_val},
       {title: 'P-Value',     data: 'p_val',      searchable: false, render: format_val},
-      {title: 'Description', data: 'Description'},
-      {title: 'Category',    data: 'Category' },
+      {title: 'Description', data: 'description'},
+      {title: 'Category',    data: 'category' },
       {title: 'Selected',    data: 'Selected',   render: d => d ? 'Yes': 'No'}
     ],
     rowId: d => d.code,
@@ -455,8 +439,6 @@ function draw_table(data){
   // Function for updating table with selected codes
   const update_table_selection = (codes_to_select, sort_table = false) => {
 
-
-    const row_ids_for_selection = codes_to_select.map(code => `#${code}`);
 
     // Zero out the previously selected codes
     code_table
@@ -470,25 +452,19 @@ function draw_table(data){
       .invalidate()
       .draw();
 
+
+    const row_ids_for_selection = codes_to_select.map(code => `#${code}`);
     // Update the newly selected codes
     code_table
-    .rows(row_ids_for_selection)
-    .every(function(){
-      // Get reference to row data and toggle selectedness
-      const row_data = this.data();
-      row_data.Selected = true;
-      $(this.node()).addClass('selected');
-    })
-    .invalidate()
-    .draw();
-
-
-    if(sort_table){
-      // Sort table on selected to bring selections to top.
-      code_table
-        .order( [ 5, 'desc' ] )
-        .draw();
-    }
+      .rows(row_ids_for_selection)
+      .every(function(){
+        // Get reference to row data and toggle selectedness
+        const row_data = this.data();
+        row_data.Selected = true;
+        $(this.node()).addClass('selected');
+      })
+      .invalidate()
+      .draw();
   };
 
   // Bind listeners to click events on a row, for selection from within table.
@@ -496,14 +472,11 @@ function draw_table(data){
     .on('click', 'tr', function(){
       // Add the selected class to the code's row for highlighting
       $(this).toggleClass('selected');
-
       // Get up-to-date list of selected codes;
       const codes_to_select = Array.from(code_table.rows('.selected').data()).map(d => d.code);
-
       // Send this selection to the state
       app_state.pass_action('table_selection', codes_to_select);
     });
-
 
   return update_table_selection;
 }
@@ -751,9 +724,11 @@ function add_axis_label(label, y_axis = true){
   };
 }
 
+
 function remove_axis_spine(g){
    g.select(".domain").remove()
 }
+
 
 function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max = by_min){
   const [[sx_min, sy_min],[sx_max, sy_max]] = selection;
@@ -763,6 +738,7 @@ function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max =
 
   return xs_intersect && ys_intersect;
 }
+
 
 function format_val(d){
   return d3.format(".3")(d);
