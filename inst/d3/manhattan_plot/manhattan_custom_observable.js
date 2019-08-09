@@ -8,7 +8,7 @@ const margin = {left: 65, right: 10, top: 10, bottom: 20};
 
 const manhattan_unit = 3;
 const hist_unit = 1;
-const table_unit = 1;
+const table_unit = 2;
 const total_units = manhattan_unit + hist_unit + table_unit + 1;
 
 const manhattan_prop = manhattan_unit/total_units;
@@ -37,6 +37,13 @@ const code_table_div = div.append('div')
   .append('table')
   .attr('class', 'display compact');
 
+const tooltip = div.selectAppend('div.tooltip')
+  .st({
+    background:'rgba(255,255,255,0.7)',
+    position:'fixed',
+    fontSize: 18,
+  });
+
 // Then we append a g element that has padding added to it to those svgs
 const main_viz = main_svg
   .append('g')
@@ -60,7 +67,15 @@ const reset_button = main_viz.selectAppend('text#clear_button')
   .attr('x', 5)
   .attr('y', 0)
   .attr('text-anchor', 'start')
+  .attr('font-size', '0.75em')
   .text('Reset')
+  .style('cursor', 'pointer')
+  .on('mouseover', function(){
+    d3.select(this).attr('font-size', '0.9em')
+  })
+  .on('mouseout', function(){
+    d3.select(this).attr('font-size', '0.75em')
+  })
   .on('click', () => app_state.pass_action('reset_button', null));
 
 
@@ -313,8 +328,13 @@ function draw_manhattan(data){
     .merge(manhattan_points)
     .attr('cx', d => manhattan_scales.x(d.index))
     .attr('cy', d => manhattan_scales.y(d.log_pval))
-    .at(default_point);
-    //.on('mouseover', d => {});
+    .at(default_point)
+    .on('mouseover', function(d){
+      fill_tooltip(d, [d3.event.clientX, d3.event.clientY]);
+    })
+    .on('mouseout', function(d){
+      hide_tooltip();
+    });
 
 
   // Draw the axes
@@ -476,6 +496,25 @@ function draw_table(data){
   return update_table_selection;
 }
 
+
+function fill_tooltip(d, loc){
+  tooltip
+   .st({
+     left: loc[0] + 10,
+     top:  loc[1] + 10,
+     display: 'block'
+   })
+   .html(d.tooltip);
+}
+
+function hide_tooltip(){
+  tooltip
+    .st({
+      left: 0,
+      top: 0,
+      display: 'none',
+    });
+}
 
 // ================================================================
 // On load functions for resizing and processing raw data
