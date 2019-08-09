@@ -185,12 +185,14 @@ function new_state(state){
 
   // The flow of drawing the whole viz. Only refreshing components if they need to be.
 
-  // Set the sizes of the various dom elements
-  if(state.has_changed('sizes')) size_viz(state.get('sizes'));
-
-  // From here on out we need data so let's check if we have data before proceeding
+  // From here on out we need data and sizes so let's check if we have data before proceeding
+  const sizes = state.get('sizes');
+  if(!sizes) return;
   const data = state.get('data');
   if(!data) return;
+
+  // Set the sizes of the various dom elements
+  if(state.has_changed('sizes')) size_viz(state.get('sizes'));
 
   // add log odds ratios to data
   if(state.has_changed('data')) process_new_data(data);
@@ -232,7 +234,6 @@ function new_state(state){
 
 
   if(state.has_changed('or_bounds')){
-    console.log('User has changed or_bounds!');
     manhattan_plot.disable(this.get('or_bounds'));
 
     // Check if the vis was just reset.
@@ -243,7 +244,6 @@ function new_state(state){
 
   // Check if viz has been reset
   if(state.has_changed('or_bounds')){
-    console.log('User has changed or_bounds!');
     manhattan_plot.disable(this.get('or_bounds'));
   }
 
@@ -252,10 +252,12 @@ function new_state(state){
 }
 
 const initial_state = {
-  data: data,
+  //data: data,
+  data: null,
   or_bounds: [-Infinity, Infinity],
   selected_codes: [],
-  sizes: [height, width],
+  //sizes: [height, width],
+  sizes: null,
 };
 
 const app_state = new App_State(initial_state, new_state);
@@ -290,13 +292,13 @@ function draw_manhattan(data){
 
   const default_point = {
     r: 2,
-    fillOpacity: 1,
+    fillOpacity: 0.85,
     fill: d => d.unselected_color,
   };
 
   const disabled_point = {
     r: 1,
-    fillOpacity: 0.4,
+    fillOpacity: 0.1,
     fill: 'grey',
   };
 
@@ -438,8 +440,6 @@ function draw_table(data){
 
   // Function for updating table with selected codes
   const update_table_selection = (codes_to_select, sort_table = false) => {
-
-
     // Zero out the previously selected codes
     code_table
       .rows('.selected')
