@@ -227,6 +227,7 @@ function new_state(state){
 
   if(state.has_changed('selected_codes')){
     manhattan_plot.highlight(state.get('selected_codes'));
+    table_select_codes(state.get('selected_codes'));
   }
 
 
@@ -424,17 +425,12 @@ function draw_table(data){
   let selected_codes = [];
 
   function Code_Row(d){
-
     this.code = d.code;
     this.OR = d.OR;
     this.p_val = d.p_val;
     this.Description = d.description;
     this.Category = d.category;
     this.Selected = false;
-
-    //this.Selected = function(){
-    //  return selected_codes.includes(this.Code) ? 1: 0;
-    //};
   }
 
   const table_data = data.map(d => new Code_Row(d));
@@ -450,61 +446,50 @@ function draw_table(data){
       {title: 'Category',    data: 'Category' },
       {title: 'Selected',    data: 'Selected',   render: d => d ? 'Yes': 'No'}
     ],
+    rowId: d => d.code,
     scrollY: `${height*table_prop}px`,
     retrieve: true
   });
 
 
-  // START HERE
-  // Currently figuring out how to speed up the selection of codes and sorting of the table
-  // I think there should be a way of defining a seperate sort function outside the data.
-
-
   // Function for updating table with selected codes
   const update_table_selection = (codes_to_select, sort_table = false) => {
 
-     code_table
-      .rows()
+
+    const row_ids_for_selection = codes_to_select.map(code => `#${code}`);
+
+    // Zero out the previously selected codes
+    code_table
+      .rows('.selected')
+      .every(function(){
+        // Get reference to row data and toggle selectedness
+        const row_data = this.data();
+        row_data.Selected = false;
+        $(this.node()).removeClass('selected');
+      })
       .invalidate()
-      .draw()
-      .every(function(row_index) {
-
-        // Test if the current node is selected
-        if(codes_to_select.includes(this.data().code)) {
-          // Invalidate the row to let datatables know that it needs to reead the selected property again.
-          this.invalidate();
-
-        }
-        const curr_node = $(this.nodes());
-        const selected_cell = code_table.cell(row_index, 5);
-
-        // Reset all nodes to unselected
-        selected_cell.data(0);
-        curr_node.removeClass('selected');
-
-        // Test if the current node is selected
-        if(codes_to_select.includes(this.data().code)) {
-
-          // If it is, change data to reflect that
-          selected_cell.data(1);
-          curr_node.addClass('selected');
-        }
-      });
-
-      if(sort_table){
-        // Sort table on selected to bring selections to top.
-        code_table
-          .order( [ 5, 'desc' ] )
-          .draw();
-      }
-  };
-
-  function sort_table(){
-     code_table
-      .order( [ 5, 'desc' ] )
       .draw();
-  }
 
+    // Update the newly selected codes
+    code_table
+    .rows(row_ids_for_selection)
+    .every(function(){
+      // Get reference to row data and toggle selectedness
+      const row_data = this.data();
+      row_data.Selected = true;
+      $(this.node()).addClass('selected');
+    })
+    .invalidate()
+    .draw();
+
+
+    if(sort_table){
+      // Sort table on selected to bring selections to top.
+      code_table
+        .order( [ 5, 'desc' ] )
+        .draw();
+    }
+  };
 
   // Bind listeners to click events on a row, for selection from within table.
   $(code_table_div.select('tbody').node())
@@ -517,16 +502,6 @@ function draw_table(data){
 
       // Send this selection to the state
       app_state.pass_action('table_selection', codes_to_select);
-
-      // Grab current row object
-      const current_row = code_table.row(this);
-
-      // Get reference to row data and toggle selectedness
-      const row_data = current_row.data();
-      row_data.Selected = !row_data.Selected;
-
-      // Tell table to update with new selection choice
-      current_row.invalidate().draw();
     });
 
 
