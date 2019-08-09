@@ -510,46 +510,24 @@ function draw_table(data){
   // Bind listeners to click events on a row, for selection from within table.
   $(code_table_div.select('tbody').node())
     .on('click', 'tr', function(){
-      // Add the selected class to the code's row
+      // Add the selected class to the code's row for highlighting
       $(this).toggleClass('selected');
-      $(this).toggleClass('currently_selected');
-
 
       // Get up-to-date list of selected codes;
       const codes_to_select = Array.from(code_table.rows('.selected').data()).map(d => d.code);
 
-      // Goes through all selected rows and makes sure they are set to true and then redraws that row.
-      code_table.rows('.currently_selected').every(function(row) {
-        const row_data = this.data();
-        row_data.Selected = !row_data.Selected;
-        this.draw();
-      });
-
-      // Need to build logic for unselecting a code efficiently.
-      // This will probably entail me figuring out how to grab access directly to the selected row rather than just finding everything by the current class.
-      // Maybe add a class of current selection?
-      // Need to probably modify the code below to not undo what I just modified.
-
-
-
-     // debugger;
       // Send this selection to the state
       app_state.pass_action('table_selection', codes_to_select);
 
-      // Update selected codes
-      selected_codes = codes_to_select;
+      // Grab current row object
+      const current_row = code_table.row(this);
 
-      // Invalidate this rowv
-      code_table.rows(this).invalidate();
+      // Get reference to row data and toggle selectedness
+      const row_data = current_row.data();
+      row_data.Selected = !row_data.Selected;
 
-      code_table.draw();
-
-      //code_table
-      //  .rows()
-      //  .invalidate()
-      //  .draw();
-//
-      //sort_table();
+      // Tell table to update with new selection choice
+      current_row.invalidate().draw();
     });
 
 
