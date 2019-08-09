@@ -27,21 +27,24 @@ div.style('overflow', 'scroll');
 
 const buttons = div.append('div.buttons')
   .st({
+     textAlign: 'center',
      position: 'fixed',
      right: 10,
-     top: 10,
-     display: 'block'
-   });
+     top: 2,
+  });
 
 const send_button = buttons.append('button')
   .text('Send selection')
+  .style('display', 'inline-block')
   .on('click', send_selection_to_shiny);
 
 // Reset button that shows up when there is something selected
 // allowing the user to back out to default.
-const reset_button = buttons.append('button#clear_button')
+const reset_button = buttons.append('button')
   .text('Reset')
-  .style('display', 'none')
+  .style('display', 'inline-block')
+
+  //.style('display', 'none')
   .on('click', () => app_state.pass_action('reset_button', null));
 
 const main_svg = div.append('svg')
@@ -393,7 +396,7 @@ function draw_manhattan(data){
 
 
 function show_reset(){
-  reset_button.style('display', 'block');
+  reset_button.style('display', 'inline-block');
 }
 
 
@@ -507,6 +510,7 @@ function fill_tooltip(d, loc){
    .html(d.tooltip);
 }
 
+
 function hide_tooltip(){
   tooltip
     .st({
@@ -515,6 +519,7 @@ function hide_tooltip(){
       display: 'none',
     });
 }
+
 
 function send_selection_to_shiny(){
   const currently_selected = app_state.get('selected_codes');
@@ -546,7 +551,6 @@ function process_new_data(data){
     d.index = i;
   });
 }
-
 
 // ================================================================
 // Brush setup functions.
