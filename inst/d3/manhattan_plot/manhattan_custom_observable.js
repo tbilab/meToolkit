@@ -182,6 +182,7 @@ let manhattan_plot, hist_brush, table_select_codes;
 
 function new_state(state){
   const changed_props = state.fresh_properties();
+  //debugger;
 
   // The flow of drawing the whole viz. Only refreshing components if they need to be.
 
@@ -202,10 +203,6 @@ function new_state(state){
   if(state.has_changed('sizes') || state.has_changed('data')){
     reset_scales(data, state.get('sizes'));
     setup_quadtree(data, manhattan_scales);
-  }
-
-  // Draw plots
-  if(state.has_changed('sizes') || state.has_changed('data')){
 
     manhattan_plot = draw_manhattan(data);
     initialize_manhattan_brush(data);
@@ -227,7 +224,8 @@ function new_state(state){
     }
   }
 
-  if(state.has_changed('selected_codes')){
+  // Make sure manhattan and table have selected codes.
+  if(state.has_changed('selected_codes') || state.has_changed('sizes')){
     manhattan_plot.highlight(state.get('selected_codes'));
     table_select_codes(state.get('selected_codes'));
   }
@@ -252,16 +250,13 @@ function new_state(state){
 }
 
 const initial_state = {
-  //data: data,
   data: null,
   or_bounds: [-Infinity, Infinity],
   selected_codes: [],
-  //sizes: [height, width],
   sizes: null,
 };
 
 const app_state = new App_State(initial_state, new_state);
-
 
 // ===============================================================
 // Rendering
