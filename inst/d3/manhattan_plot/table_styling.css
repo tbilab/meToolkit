@@ -7,6 +7,10 @@ tr:nth-of-type(odd) {
 	background: #eee;
 }
 
+tr.selected{
+  background: orangered;
+}
+
 th {
 	background: #333;
 	color: white;
@@ -20,14 +24,6 @@ td, th {
 	padding: 6px;
 	border: 1px solid #ccc;
 	text-align: left;
-}
-
-th.des:after {
-  content: "hey";
-}
-
-th.aes:after {
-  content: "C"
 }
 
 .fixed_header{

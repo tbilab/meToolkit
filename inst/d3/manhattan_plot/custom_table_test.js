@@ -6,6 +6,8 @@
 const margin = {left: 65, right: 10, top: 10, bottom: 20};
 const up_cursor = 'n-resize';
 const down_cursor = 's-resize';
+const selected_row_color = 'orangered';
+
 
 const manhattan_unit = 3;
 const hist_unit = 1;
@@ -39,6 +41,8 @@ const header_height = 25;
 const header_padding = 5;
 const body_height = table_height - header_height - header_padding;
 
+let selected_codes = ['411.00', '411.10'];
+
 const dom_target = div.append('div')
   .style('height', 500)
   .style('overflow', 'scroll');
@@ -51,7 +55,7 @@ const columns_to_show = [
 ];
 
 columns_to_show.forEach(col => {
-  col.sorted = 'unsorted';
+  col.sort_inc = false;
 });
 
 const table_data = data;
@@ -87,7 +91,9 @@ const rows = table.append('tbody')
   .selectAll('tr')
   .data(table_data)
   .enter()
-  .append('tr');
+  .append('tr')
+  .classed('selected', d => selected_codes.includes(d.code))
+  .on('click', on_row_click);
 
 // Fill in rows with each columns data
 rows.selectAll('td')
@@ -102,27 +108,41 @@ rows.selectAll('td')
   .text(d => d.value);
 
 
+function on_row_click(d){
+  const row = d3.select(this);
+  const new_selection = !row.classed('selected');
+
+  // toggle selection class
+  row.classed('selected', new_selection);
+
+  if(new_selection){
+    selected_codes.push(d.code);
+  } else {
+    // Remove code if user has selected a previously selected code
+    selected_codes = selected_codes.filter(code => code !== d.code);
+  }
+
+  console.log(selected_codes)
+}
+
 function column_sort(selected_column){
-  console.log('clicking was done!');
 
   const id_to_sort = selected_column.id;
-
-  const sort_type = ['unsorted', 'inc'].includes(selected_column.sorted) ? 'dec': 'inc';
-  selected_column.sorted = sort_type;
-  const sort_increasing = sort_type === 'inc';
+  const sort_increasing = selected_column.sort_inc;
 
   // Update mouseover cursor to reflect new sorting option
   d3.select(this)
    .attr('title', `Click to sort in ${sort_increasing ? 'decreasing': 'increasing'} order`)
    .style('cursor', sort_increasing? down_cursor: up_cursor);
 
-  rows.sort(function(a,b){
-   if(sort_increasing){
-     return b[id_to_sort] < a[id_to_sort] ? -1: 1;
-   } else {
-     return b[id_to_sort] < a[id_to_sort] ? 1: -1;
-   }
+  rows.sort((a,b) => {
+    const b_smaller =  b[id_to_sort] < a[id_to_sort];
+    const direction_scalar = sort_increasing ? 1: -1;
+    return direction_scalar * (b_smaller ? -1: 1);
   });
+
+  // Update sorting direction.
+  selected_column.sort_inc = !selected_column.sort_inc;
 }
 
 
