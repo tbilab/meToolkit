@@ -4,6 +4,8 @@
 // This code is run a single time
 // ===============================================================
 const margin = {left: 65, right: 10, top: 10, bottom: 20};
+const up_cursor = 'n-resize';
+const down_cursor = 's-resize';
 
 const manhattan_unit = 3;
 const hist_unit = 1;
@@ -37,11 +39,9 @@ const header_height = 25;
 const header_padding = 5;
 const body_height = table_height - header_height - header_padding;
 
-
 const dom_target = div.append('div')
   .style('height', 500)
   .style('overflow', 'scroll');
-  //.style('background-color', 'orangered');
 
 const columns_to_show = [
   {name: 'Code', id: 'code', is_num: false},
@@ -50,6 +50,9 @@ const columns_to_show = [
   {name: 'P-Value', id: 'p_val', is_num: true},
 ];
 
+columns_to_show.forEach(col => {
+  col.sorted = 'unsorted';
+});
 
 const table_data = data;
 
@@ -68,6 +71,9 @@ table.append('thead')
   .data(columns_to_show).enter()
   .append('th')
   .text(d => d.name)
+  .style('cursor', down_cursor)
+  .attr('title', "Click to sort in decreasing order")
+  .attr('class', 'tool table_header')
   .on('click', column_sort);
 
 // Initialize rows for every datapoint
@@ -97,8 +103,26 @@ rows.selectAll('td')
 
 
 function column_sort(selected_column){
-  console.log('clicking was done!')
-  rows.sort((a,b) => b[selected_column] < a[selected_column]);
+  console.log('clicking was done!');
+
+  const id_to_sort = selected_column.id;
+
+  const sort_type = ['unsorted', 'inc'].includes(selected_column.sorted) ? 'dec': 'inc';
+  selected_column.sorted = sort_type;
+  const sort_increasing = sort_type === 'inc';
+
+  // Update mouseover cursor to reflect new sorting option
+  d3.select(this)
+   .attr('title', `Click to sort in ${sort_increasing ? 'decreasing': 'increasing'} order`)
+   .style('cursor', sort_increasing? down_cursor: up_cursor);
+
+  rows.sort(function(a,b){
+   if(sort_increasing){
+     return b[id_to_sort] < a[id_to_sort] ? -1: 1;
+   } else {
+     return b[id_to_sort] < a[id_to_sort] ? 1: -1;
+   }
+  });
 }
 
 

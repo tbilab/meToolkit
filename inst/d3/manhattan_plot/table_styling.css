@@ -23,11 +23,11 @@ td, th {
 }
 
 th.des:after {
-  content: "\21E9";
+  content: "hey";
 }
 
 th.aes:after {
-  content: "\21E7";
+  content: "C"
 }
 
 .fixed_header{
@@ -57,3 +57,5 @@ th.aes:after {
   text-align: left;
   width: 200px;
 }
+
+
