@@ -53,4 +53,7 @@ td, th {
   width: 200px;
 }
 
+tr.found_in_search {
+  border: 2px solid steelblue;
+}
 

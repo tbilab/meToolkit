@@ -25,6 +25,10 @@ function setup_table(dom_target, sizes){
     .text('Bring selected codes to top')
     .on('click', raise_selected_codes);
 
+  control_panel.append('input')
+    .attr('type', 'text')
+    .on('input', on_code_search)
+
   const table = div.append('div')
     .style('height', `${sizes.height}px`)
     .style('overflow', 'scroll')
@@ -132,15 +136,34 @@ function setup_table(dom_target, sizes){
   }
 
   function raise_selected_codes(){
-    debugger;
     rows.sort((a,b) => {
       const a_selected = selected_codes.includes(a.code);
       const b_selected = selected_codes.includes(b.code);
-
       return b_selected - a_selected
     })
-    //rows.selectAll('.selected').raise();
   }
+
+  function on_code_search(){
+    const current_search = this.value;
+
+    // Only start searching if the query is over two letters long for efficiency.
+    if(current_search.length < 2) {
+      rows.classed('found_in_search', false);
+      return;
+    }
+
+    rows.each(function(d){
+      d.found_in_search = d.code.includes(current_search);
+      d3.select(this).classed('found_in_search', d.found_in_search);
+    })
+
+    rows.sort((a,b) => {
+      const a_found = a.found_in_search;
+      const b_found = b.found_in_search;
+      return b_found - a_found
+    });
+  }
+
   return {add_data, select_codes, selection_callback};
 }
 
