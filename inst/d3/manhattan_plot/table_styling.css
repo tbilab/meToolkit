@@ -1,7 +1,7 @@
 table {
-	width: 100%;
 	border-collapse: collapse;
 }
+
 /* Zebra striping */
 tr:nth-of-type(odd) {
 	background: #eee;
@@ -17,7 +17,7 @@ th {
 	font-weight: bold;
 	cursor: s-resize;
 	background-repeat: no-repeat;
-      background-position: 3% center;
+  background-position: 3% center;
 }
 
 td, th {
@@ -27,13 +27,12 @@ td, th {
 }
 
 .fixed_header{
-  width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
 }
 
 .fixed_header tbody{
-  display:block;
+  display: block;
   width: 100%;
   overflow: auto;
   height: 100px;

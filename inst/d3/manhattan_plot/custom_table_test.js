@@ -17,8 +17,16 @@ function setup_table(dom_target, sizes){
 
   const body_height = sizes.height - sizes.header - sizes.padding;
 
+  const control_panel = div.append('div')
+    .style('height', `${sizes.control_panel}px`)
+    .style('background-color', 'steelblue');
+
+  control_panel.append('button')
+    .text('Bring selected codes to top')
+    .on('click', raise_selected_codes);
+
   const table = div.append('div')
-    .style('height', sizes.height)
+    .style('height', `${sizes.height}px`)
     .style('overflow', 'scroll')
     .append('table')
     .attr('class', 'fixed_header');
@@ -44,7 +52,6 @@ function setup_table(dom_target, sizes){
       .attr('title', "Click to sort in decreasing order")
       .attr('class', 'tool table_header')
       .on('click', column_sort);
-
 
     // Initialize rows for every datapoint
   rows = table.append('tbody')
@@ -77,6 +84,7 @@ function setup_table(dom_target, sizes){
   };
 
   const select_codes = function(codes_to_select){
+    selected_codes = codes_to_select;
     rows.classed('selected', d => codes_to_select.includes(d.code));
     return this;
   };
@@ -123,6 +131,16 @@ function setup_table(dom_target, sizes){
     selected_column.sort_inc = !selected_column.sort_inc;
   }
 
+  function raise_selected_codes(){
+    debugger;
+    rows.sort((a,b) => {
+      const a_selected = selected_codes.includes(a.code);
+      const b_selected = selected_codes.includes(b.code);
+
+      return b_selected - a_selected
+    })
+    //rows.selectAll('.selected').raise();
+  }
   return {add_data, select_codes, selection_callback};
 }
 
@@ -137,7 +155,7 @@ const columns_to_show = [
   {name: 'P-Value', id: 'p_val', is_num: true},
 ];
 
-const my_table = setup_table(div.append('div'), {height: 400, header: 35, padding: 5})
+const my_table = setup_table(div.append('div'), {height: 400, header: 35, padding: 5, control_panel: 50})
   .add_data(data, columns_to_show)
   .select_codes(['415.10', '414.20']);
 
