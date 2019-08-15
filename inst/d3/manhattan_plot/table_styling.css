@@ -12,10 +12,10 @@ table {
 
 /*Individual cells for header and body */
 td, th {
-  width: 200px;
-	padding: 6px;
+	padding: 3px;
 	border: 1px solid #ccc;
-	text-align: left;
+	text-align: center;
+	vertical-align: middle;
 }
 
 /* ================================================== */
@@ -24,7 +24,7 @@ tbody{
   display: block;
   width: 100%;
   overflow: auto;
-  height: 100px;
+  margin-top: -6px; /*Fixes gap between header and table */
 }
 
 /* ================================================== */
@@ -44,11 +44,16 @@ thead tr {
 /*Individual header cells */
 th {
   background-color: #d9d9d9;
-	cursor: s-resize;
 }
 
 /* ================================================== */
 /* Row styling */
+
+tr {
+  --row-height: 30px;
+  height: var(--row-height);
+}
+
 /* Zebra striping */
 tr:nth-of-type(even) {
 	background: #f0f0f0;
@@ -57,6 +62,14 @@ tr:nth-of-type(even) {
 /* Rows that have been selected */
 tr.selected{
   background: orangered;
+}
+
+tr div {
+  height: var(--row-height);
+  text-align: left;
+  overflow-x: auto;
+  width: 100%;
+  font-size: 0.8em;
 }
 
 

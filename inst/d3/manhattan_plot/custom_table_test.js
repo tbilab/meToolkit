@@ -10,6 +10,10 @@ function setup_table(dom_target, sizes){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
 
+  const small_col_width = "60px";
+  const normal_col_width = "200px";
+
+
   // Scope variables that get modified by methods
   let selected_codes = [];
   let on_selection = selected_codes => console.log(selected_codes);
@@ -66,19 +70,15 @@ function setup_table(dom_target, sizes){
       .data(columns_to_show).enter()
       .append('th')
       .text(d => d.name)
-      .style('cursor', down_cursor)
+      .style('cursor', d => d.sortable ? down_cursor: null)
+      .style('width', d => d.small_col ? small_col_width: normal_col_width)
       .attr('title', "Click to sort in decreasing order")
       .attr('class', 'tool table_header')
       .on('click', column_sort);
 
     // Initialize rows for every datapoint
   rows = table.append('tbody')
-    .st({
-      display:'block',
-      overflow:'auto',
-      height: `${sizes.height}px`,
-      width:'100%',
-    })
+    .style('height', `${sizes.height}px`)
     .selectAll('tr')
     .data(table_data)
     .enter()
@@ -89,14 +89,17 @@ function setup_table(dom_target, sizes){
   // Fill in rows with each columns data
   rows.selectAll('td')
     .data(d => columns_to_show
-      .map(({name, id, is_num}) => ({
+      .map(({name, id, is_num, small_col, scroll}) => ({
         column: name,
+        small_col: small_col,
         value: is_num ? format_val(d[id]): d[id],
+        scroll: scroll,
       })))
     .enter()
     .append('td')
+    .style('width', d => d.small_col ? small_col_width: normal_col_width)
     .attr('data-th', d => d.column)
-    .text(d => d.value);
+    .html(d => `${d.scroll ? `<div style="width:${normal_col_width}">`: ''} ${d.value} ${d.scroll ? '</div>': ''}`);
 
     return this;
   };
@@ -130,6 +133,8 @@ function setup_table(dom_target, sizes){
   }
 
   function column_sort(selected_column){
+    // Only do sorting if the column allows it.
+    if(!selected_column.sortable) return;
 
     const id_to_sort = selected_column.id;
     const sort_increasing = selected_column.sort_inc;
@@ -213,11 +218,12 @@ function setup_table(dom_target, sizes){
 // ================================================================
 // Global variables that get accessed in state functions
 // ================================================================
+
 const columns_to_show = [
-  {name: 'Code', id: 'code', is_num: false},
-  //{name: 'Description', id: 'description', is_num: false},
-  {name: 'OR', id: 'OR', is_num: true},
-  {name: 'P-Value', id: 'p_val', is_num: true},
+  {name: 'Code',        id: 'code',        is_num: false, scroll: false, sortable: true, small_col: true},
+  {name: 'OR',          id: 'OR',          is_num: true,  scroll: false, sortable: true, small_col: true},
+  {name: 'P-Value',     id: 'p_val',       is_num: true,  scroll: false, sortable: true, small_col: true},
+  {name: 'Description', id: 'description', is_num: false, scroll: true,  sortable: false, small_col: false},
 ];
 
 const my_table = setup_table(div.append('div'), {height: 400, header: 35, padding: 5, control_panel: 50})
