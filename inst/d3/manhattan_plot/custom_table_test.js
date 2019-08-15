@@ -153,8 +153,8 @@ function setup_table(dom_target, sizes){
     rows.sort((a,b) => {
       const a_selected = selected_codes.includes(a.code);
       const b_selected = selected_codes.includes(b.code);
-      return b_selected - a_selected
-    })
+      return b_selected - a_selected;
+    });
   }
 
   function on_code_search(){

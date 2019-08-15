@@ -1,60 +1,68 @@
+
+/* ================================================== */
+/* Table */
+/* ================================================== */
+
+/* ================================================== */
+/* Table-wide style */
 table {
 	border-collapse: collapse;
+	table-layout: fixed;
 }
 
-/* Zebra striping */
-tr:nth-of-type(odd) {
-	background: #eee;
-}
-
-tr.selected{
-  background: orangered;
-}
-
-th {
-	background: #333;
-	color: white;
-	font-weight: bold;
-	cursor: s-resize;
-	background-repeat: no-repeat;
-  background-position: 3% center;
-}
-
+/*Individual cells for header and body */
 td, th {
+  width: 200px;
 	padding: 6px;
 	border: 1px solid #ccc;
 	text-align: left;
 }
 
-.fixed_header{
-  table-layout: fixed;
-  border-collapse: collapse;
-}
-
-.fixed_header tbody{
+/* ================================================== */
+/* Table-body style */
+tbody{
   display: block;
   width: 100%;
   overflow: auto;
   height: 100px;
 }
 
-.fixed_header thead tr {
+/* ================================================== */
+/* Header styling */
+
+/* Everything that composes the header */
+thead {
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+/* Entire row of the header */
+thead tr {
    display: block;
 }
 
-.fixed_header thead {
-  background: black;
-  color:#fff;
+/*Individual header cells */
+th {
+  background-color: #d9d9d9;
+	cursor: s-resize;
 }
 
-.fixed_header th, .fixed_header td {
-  padding: 5px;
-  text-align: left;
-  width: 200px;
+/* ================================================== */
+/* Row styling */
+/* Zebra striping */
+tr:nth-of-type(even) {
+	background: #f0f0f0;
+}
+
+/* Rows that have been selected */
+tr.selected{
+  background: orangered;
 }
 
 
-
+/* ================================================== */
+/* Buttons */
+/* ================================================== */
 button {
   white-space: normal;
 	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
@@ -75,7 +83,6 @@ button {
 	display:inline-block;
 	cursor:pointer;
 	color:#666666;
-	font-family:Arial;
 	font-weight:bold;
 	text-decoration:none;
 	text-shadow:0px 1px 0px #ffffff;
