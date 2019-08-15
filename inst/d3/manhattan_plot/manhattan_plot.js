@@ -244,6 +244,7 @@ function new_state(state){
   }
 
   if(state.has_changed('selected_codes') || state.has_changed('or_bounds')){
+    debugger;
     const default_bounds = tuples_equal(state.get('or_bounds'), [-Infinity, Infinity]);
     const no_codes_selected = state.get('selected_codes').length === 0;
 

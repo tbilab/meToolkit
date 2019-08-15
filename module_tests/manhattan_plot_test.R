@@ -5,8 +5,7 @@ library(tidyverse)
 library(meToolkit)
 library(glue)
 
-library(crosstalk)
-
+# library(crosstalk)
 
 data("fake_phewas_results")
 
@@ -32,7 +31,7 @@ first_selected <- phewas_results %>%
 ui <- shinyUI(
   tagList(
     h1('Manhattan module test'),
-    manhattan_plot_UI('manhattan_plot')
+    manhattan_plot_and_table_UI('manhattan_plot')
   )
 )
 
@@ -43,18 +42,18 @@ server <- function(input, output, session) {
   action_object <- reactiveVal()
 
   callModule(
-    manhattan_plot, 'manhattan_plot',
+    manhattan_plot_and_table, 'manhattan_plot',
     phewas_results,
     selected_codes,
     action_object
   )
 
-  observeEvent(action_object(),{
-    print("we have received a message from within the plot!")
-    print(action_object())
-    # Update codes
-    selected_codes(action_object()$payload)
-  })
+  # observeEvent(action_object(),{
+  #   print("we have received a message from within the plot!")
+  #   print(action_object())
+  #   # Update codes
+  #   selected_codes(action_object()$payload)
+  # })
 
 }
 
