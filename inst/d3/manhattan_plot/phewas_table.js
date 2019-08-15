@@ -3,7 +3,7 @@ function setup_table(dom_target, sizes){
   const down_cursor = 's-resize';
 
   const small_col_width = "70px";
-  const normal_col_width = "200px";
+  const normal_col_width = "220px";
 
 
   // Scope variables that get modified by methods
@@ -13,7 +13,11 @@ function setup_table(dom_target, sizes){
 
   const body_height = sizes.height - sizes.header - sizes.padding;
 
-  const control_panel = div.append('div.control_panel');
+  // Let CSS know this is the main container div.
+  dom_target.classed('table_holder', true);
+  const main_div = dom_target.append('div');
+
+  const control_panel = main_div.append('div.control_panel');
 
   // ==============================================================
   // Search bar setup
@@ -39,7 +43,7 @@ function setup_table(dom_target, sizes){
     .text('Bring selected codes to top')
     .on('click', raise_selected_codes);
 
-  const table = div.append('div')
+  const table = main_div.append('div')
     .style('height', `${sizes.height}px`)
     .style('overflow', 'scroll')
     .append('table')
@@ -91,7 +95,7 @@ function setup_table(dom_target, sizes){
     .append('td')
     .style('width', d => d.small_col ? small_col_width: normal_col_width)
     .attr('data-th', d => d.column)
-    .html(d => `${d.scroll ? `<div style="width:${normal_col_width}">`: ''} ${d.value} ${d.scroll ? '</div>': ''}`);
+    .html(d => `${d.scroll ? `<div style="width:${normal_col_width}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
 
     return this;
   };

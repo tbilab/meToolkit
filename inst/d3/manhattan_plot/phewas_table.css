@@ -1,3 +1,7 @@
+.table_holder {
+  display: flex;
+  justify-content: center;
+}
 
 /* ================================================== */
 /* Table */
@@ -70,6 +74,11 @@ tr div {
   overflow-x: auto;
   width: 100%;
   font-size: 0.8em;
+}
+
+/* Give text a bit of breathing room */
+tr div span {
+  padding-left: 0.2rem;
 }
 
 
