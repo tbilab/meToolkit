@@ -17,17 +17,31 @@ function setup_table(dom_target, sizes){
 
   const body_height = sizes.height - sizes.header - sizes.padding;
 
-  const control_panel = div.append('div')
-    .style('height', `${sizes.control_panel}px`)
-    .style('background-color', 'steelblue');
+  const control_panel = div.append('div.control_panel');
 
-  control_panel.append('button')
+  // ==============================================================
+  // Search bar setup
+  const search_bar = control_panel
+    .append('div.search_box');
+
+  search_bar.append('label')
+    .text('Search for code(s):')
+    .attr('for', 'search_bar');
+
+  const search_text = search_bar.append('input')
+    .attr('type', 'text')
+    .attr('name', 'search_bar')
+    .on('input', on_code_search);
+
+  const search_clear_btn = search_bar.append('button.clear_search.hidden')
+    .text('Clear')
+    .on('click', clear_search);
+
+  // ==============================================================
+  // Bring selected codes to top button
+  control_panel.append('button.raise_selected')
     .text('Bring selected codes to top')
     .on('click', raise_selected_codes);
-
-  control_panel.append('input')
-    .attr('type', 'text')
-    .on('input', on_code_search)
 
   const table = div.append('div')
     .style('height', `${sizes.height}px`)
@@ -146,6 +160,13 @@ function setup_table(dom_target, sizes){
   function on_code_search(){
     const current_search = this.value;
 
+    // Make sure to hide clear button if the user has deleted all their search
+    if(current_search.length === 0){
+      hide_clear_btn();
+    } else {
+      show_clear_btn();
+    }
+
     // Only start searching if the query is over two letters long for efficiency.
     if(current_search.length < 2) {
       rows.classed('found_in_search', false);
@@ -162,6 +183,22 @@ function setup_table(dom_target, sizes){
       const b_found = b.found_in_search;
       return b_found - a_found
     });
+  }
+
+  function clear_search(){
+    rows.classed('found_in_search', false);
+    search_text.node().value = '';
+    hide_clear_btn();
+  }
+
+  function hide_clear_btn(){
+    search_clear_btn.classed('hidden', true);
+    search_clear_btn.classed('visible', false);
+  }
+
+  function show_clear_btn(){
+    search_clear_btn.classed('hidden', false);
+    search_clear_btn.classed('visible', true);
   }
 
   return {add_data, select_codes, selection_callback};
