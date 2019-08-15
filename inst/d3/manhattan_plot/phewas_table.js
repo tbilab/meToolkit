@@ -1,16 +1,8 @@
-// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack'), css = here::here('inst/d3/manhattan_plot/table_styling.css')
-// ===============================================================
-// Initialization
-// This code is run a single time
-// ===============================================================
-const margin = {left: 65, right: 10, top: 10, bottom: 20};
-
-
 function setup_table(dom_target, sizes){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
 
-  const small_col_width = "60px";
+  const small_col_width = "70px";
   const normal_col_width = "200px";
 
 
@@ -110,10 +102,10 @@ function setup_table(dom_target, sizes){
     return this;
   };
 
-  const selection_callback = callback => {
+  function set_selection_callback(callback){
     on_selection = callback;
     return this;
-  };
+  }
 
   function on_row_click(d){
     const row = d3.select(this);
@@ -211,7 +203,7 @@ function setup_table(dom_target, sizes){
     search_clear_btn.classed('visible', true);
   }
 
-  return {add_data, select_codes, selection_callback};
+  return {add_data, select_codes, set_selection_callback};
 }
 
 
@@ -219,16 +211,6 @@ function setup_table(dom_target, sizes){
 // Global variables that get accessed in state functions
 // ================================================================
 
-const columns_to_show = [
-  {name: 'Code',        id: 'code',        is_num: false, scroll: false, sortable: true, small_col: true},
-  {name: 'OR',          id: 'OR',          is_num: true,  scroll: false, sortable: true, small_col: true},
-  {name: 'P-Value',     id: 'p_val',       is_num: true,  scroll: false, sortable: true, small_col: true},
-  {name: 'Description', id: 'description', is_num: false, scroll: true,  sortable: false, small_col: false},
-];
-
-const my_table = setup_table(div.append('div'), {height: 400, header: 35, padding: 5, control_panel: 50})
-  .add_data(data, columns_to_show)
-  .select_codes(['415.10', '414.20']);
 
 
 function format_val(d){

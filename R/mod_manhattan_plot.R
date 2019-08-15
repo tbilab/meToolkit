@@ -41,7 +41,8 @@ manhattan_plot <- function(
           tooltip,
           paste0('</br>', tooltip)
         )
-      )
+      ) %>% highlight_key()
+
 
     plot_data %>%
       plotly::plot_ly(
