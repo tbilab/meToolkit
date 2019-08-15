@@ -173,16 +173,21 @@ function setup_table(dom_target, sizes){
       return;
     }
 
+    let num_results = 0;
     rows.each(function(d){
       d.found_in_search = d.code.includes(current_search);
+      if(d.found_in_search) num_results++;
       d3.select(this).classed('found_in_search', d.found_in_search);
     })
 
-    rows.sort((a,b) => {
-      const a_found = a.found_in_search;
-      const b_found = b.found_in_search;
-      return b_found - a_found
-    });
+    // Only do sorting if the search has any results.
+    if(num_results > 0){
+      rows.sort((a,b) => {
+        const a_found = a.found_in_search;
+        const b_found = b.found_in_search;
+        return b_found - a_found
+      });
+    }
   }
 
   function clear_search(){
