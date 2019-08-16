@@ -165,7 +165,6 @@ class App_State{
   // Individual app components pass info to this
   // which then modifies the internal state accordingly
   pass_action(type, payload){
-    //debugger;
     switch(type){
       case 'initialize':
         break;
@@ -244,7 +243,6 @@ function new_state(state){
   }
 
   if(state.has_changed('selected_codes') || state.has_changed('or_bounds')){
-    debugger;
     const default_bounds = tuples_equal(state.get('or_bounds'), [-Infinity, Infinity]);
     const no_codes_selected = state.get('selected_codes').length === 0;
 
@@ -371,7 +369,6 @@ function draw_manhattan(data){
 
   const disable_codes = or_bounds => {
 
-    //debugger;
     const is_disable = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
 
     manhattan_points
@@ -479,6 +476,8 @@ function send_selection_to_shiny(){
 function send_table_selection(selected_codes){
     app_state.pass_action('table_selection', selected_codes);
 }
+
+
 // ================================================================
 // On load functions for resizing and processing raw data
 // ================================================================

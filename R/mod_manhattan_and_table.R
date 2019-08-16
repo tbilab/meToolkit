@@ -1,15 +1,17 @@
 #' Interactive manhattan plot and table for selecting codes for further visualization in app.
 #'
 #' @param id String with unique id of module in app
+#'@param height How tall we want this module to be in css units (defaults to '500px')
 #' @return UI component of interactive manhattan plot
 #' @export
 #'
 #' @examples
 #' manhattan_plot_and_table_UI('my_mod')
-manhattan_plot_and_table_UI <- function(id) {
+manhattan_plot_and_table_UI <- function(id, height = '500px') {
   ns <- NS(id)
   tagList(
     div(
+      style = glue::glue("height: {height};"),
       r2d3::d3Output(ns('plot'), height = '100%')
     )
   )
