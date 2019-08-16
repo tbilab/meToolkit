@@ -1,18 +1,27 @@
 #' Interactive manhattan plot and table for selecting codes for further visualization in app.
 #'
 #' @param id String with unique id of module in app
-#'@param height How tall we want this module to be in css units (defaults to '500px')
+#' @param height How tall we want this module to be in pixels (defaults to `NULL`). If not provided the div must be styled to have a height using css. (See `div_class` argument for targeting.)
+#' @param div_class A character string containing a class name for the entire plot to be wrapped in. This can then be used to style with external css. Defaults to 'manhattan_plot'.
 #' @return UI component of interactive manhattan plot
 #' @export
 #'
 #' @examples
 #' manhattan_plot_and_table_UI('my_mod')
-manhattan_plot_and_table_UI <- function(id, height = '500px') {
+manhattan_plot_and_table_UI <- function(id, height = NULL, div_class = 'manhattan_plot') {
   ns <- NS(id)
+
+  wrapper_height <- ''
+  if(!is.null(height)){
+    wrapper_height <- glue::glue('height: {height}px')
+  }
   tagList(
     div(
-      style = glue::glue("height: {height};"),
-      r2d3::d3Output(ns('plot'), height = '100%')
+      div(
+        class = div_class,
+        style = wrapper_height,
+        r2d3::d3Output(ns('plot'), height = '100%')
+      )
     )
   )
 }

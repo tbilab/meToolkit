@@ -1,7 +1,7 @@
 
-/* 
-  Box headers are roughly 40 pixels tall 
-  Top of page + padding is 50 + 30 pixels = 80 pixels tall.   
+/*
+  Box headers are roughly 40 pixels tall
+  Top of page + padding is 50 + 30 pixels = 80 pixels tall.
 */
 
 /*
@@ -9,23 +9,23 @@
   top + 3 headers + 2 paddings + 4 inner paddings = 80 + 120 + 20 + 40 = 260
 */
 
-#manhattanPlot {
-  height: calc(40vh - 124px) !important;
-} 
+.manhattan_plot {
+  height: calc(60vh - 124px) !important;
+}
 
 .upset_plot {
-  height: calc(60vh - 124px) !important;
+  height: calc(45vh - 124px) !important;
 }
 
 /*
   Right Column
   Top of page + 2 normal headers + tabbed header + legend + info box + 2 inner paddings
   80          + 2*40             + 43 +            55     + 165 + 20
-  3 headers 
+  3 headers
 */
 .network_plot {
   height: calc(100vh - 326px) !important;
-} 
+}
 
 
 .skin-black .main-header>.logo {
@@ -59,7 +59,7 @@ svg text {
 }
 
 svg text.genome_browser_link{
-  pointer-events: all; 
+  pointer-events: all;
   -webkit-user-select: all;
   -moz-user-select:    all;
   -ms-user-select:     all;
@@ -71,8 +71,8 @@ svg text.genome_browser_link{
 
 .network_controls {
   display: inline-block;
-  vertical-align: top; 
-  width: 210px;  
+  vertical-align: top;
+  width: 210px;
   white-space: nowrap;
 }
 

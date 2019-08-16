@@ -64,8 +64,10 @@ const columns_to_show = [
   {name: 'Description', id: 'description', is_num: false, scroll: true,  sortable: false, small_col: false},
 ];
 
+const table_div = div.append('div');
+
 const my_table = setup_table(
-    div.append('div'),
+    table_div,
     {height: 400, header: 35, padding: 5, control_panel: 50}
   )
   .set_selection_callback(send_table_selection);
@@ -509,6 +511,8 @@ function size_viz([width, height]){
   or_svg
     .attr('height', height*size_props.histogram)
     .attr('width', width);
+
+  table_div.style('height', `${height*size_props.table}px`);
 }
 
 
@@ -757,7 +761,3 @@ function tuples_equal(a,b){
   return (a[0] === b[0]) && (a[1] === b[1]);
 }
 
-
-// Function to send a message back to shiny
-function send_to_shiny(type, codes){
- }

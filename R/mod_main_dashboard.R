@@ -6,28 +6,16 @@ TWO_SNP_COPIES_COLOR <- '#a50f15'
 main_dashboard_UI <- function(id) {
   ns <- NS(id)
   tagList(
-    tags$head( tags$link(rel = "stylesheet", type = "text/css", href = "custom.css") ),
     fluidRow(
       column(
         width = 5,
         box(title = "Manhattan Plot (Phecode 1.2)",
             width = NULL,
             solidHeader=TRUE,
-            collapsible = TRUE,
-            div(id = 'manhattanPlot',
-                manhattan_plot_UI(ns('manhattan_plot'))
-            )
-        ),
-        div(id = 'selected_code_box',
-            box(
-              title = "Phewas Results (Selected Codes)",
-              id = 'codeTable',
-              solidHeader=TRUE,
-              width = NULL,
-              collapsible = TRUE,
-              collapsed = TRUE,
-              phewas_table_UI(ns('phewas_table'))
-            )
+            manhattan_plot_and_table_UI(ns('manhattan_plot'), div_class = 'manhattan_plot')
+            # div(id = 'manhattanPlot',
+            #   manhattan_plot_and_table_UI(ns('manhattan_plot'))
+            # )
         ),
         box(
           title = "Upset Plot",
@@ -189,7 +177,7 @@ main_dashboard <- function(input, output, session, individual_data, results_data
 
   ## Manhattan plot
   manhattan_plot <- callModule(
-    manhattan_plot, 'manhattan_plot',
+    manhattan_plot_and_table, 'manhattan_plot',
     results_data = results_data,
     selected_codes = state$selected_codes,
     action_object = app_interaction

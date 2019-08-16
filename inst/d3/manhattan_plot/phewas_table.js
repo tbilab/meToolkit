@@ -44,7 +44,7 @@ function setup_table(dom_target, sizes){
     .on('click', raise_selected_codes);
 
   const table = main_div.append('div')
-    .style('height', `${sizes.height}px`)
+    //.style('height', `${sizes.height}px`)
     .style('overflow', 'scroll')
     .append('table')
     .attr('class', 'fixed_header');

@@ -12,6 +12,7 @@ individual_data <- read_rds(here::here('../simulated_ind_data.rds'))
 phewas_data     <- read_rds(here::here('../simulated_phewas_results.rds'))
 snp_name        <- 'rs1234'
 
+
 ui <- shinyUI(
   dashboardPage(
     dashboardHeader(

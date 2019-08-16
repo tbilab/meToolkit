@@ -29,7 +29,7 @@ first_selected <- phewas_results %>%
 ui <- shinyUI(
   tagList(
     h1('Manhattan module test'),
-    manhattan_plot_and_table_UI('manhattan_plot')
+    manhattan_plot_and_table_UI('manhattan_plot', height = 297)
   )
 )
 
