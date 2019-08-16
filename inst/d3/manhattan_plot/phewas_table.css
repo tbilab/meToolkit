@@ -65,7 +65,7 @@ tr:nth-of-type(even) {
 
 /* Rows that have been selected */
 tr.selected{
-  background: orangered;
+  background: #ff7f00;
 }
 
 tr div {

@@ -1,14 +1,13 @@
 // !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'))
 // ===============================================================
 // Initialization
-// This code is run a single time
 // ===============================================================
 const margin = {left: 65, right: 10, top: 10, bottom: 20};
 
 const manhattan_unit = 3;
 const hist_unit = 1;
 const table_unit = 2;
-const total_units = manhattan_unit + hist_unit + table_unit + 1;
+const total_units = manhattan_unit + hist_unit + table_unit + 0.1;
 
 const size_props = {
   manhattan: manhattan_unit/total_units,
@@ -30,13 +29,13 @@ div.style('overflow', 'scroll');
 const buttons = div.append('div.buttons')
   .st({
      textAlign: 'center',
-     position: 'fixed',
+     position: 'absolute',
      right: 10,
      top: 2,
   });
 
 const send_button = buttons.append('button')
-  .text('Send selection')
+  .text('Update Network')
   .style('display', 'inline-block')
   .on('click', send_selection_to_shiny);
 
@@ -55,13 +54,14 @@ const main_svg = div.append('svg')
 const or_svg = div.append('svg')
   .attr('id', 'or_hist');
 
-div.append('hr');
+//div.append('hr');
 
 const columns_to_show = [
   {name: 'Code',        id: 'code',        is_num: false, scroll: false, sortable: true, small_col: true},
   {name: 'OR',          id: 'OR',          is_num: true,  scroll: false, sortable: true, small_col: true},
   {name: 'P-Value',     id: 'p_val',       is_num: true,  scroll: false, sortable: true, small_col: true},
   {name: 'Description', id: 'description', is_num: false, scroll: true,  sortable: false, small_col: false},
+  {name: 'Category',    id: 'category',    is_num: false, scroll: true,  sortable: true,  small_col: false},
 ];
 
 const table_div = div.append('div');
@@ -112,6 +112,7 @@ const histogram_scales = {
   x: d3.scaleLinear(),
   y: d3.scaleLinear(),
 };
+
 
 // Quadtree
 // ================================================================
