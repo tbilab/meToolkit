@@ -470,6 +470,24 @@ function hide_tooltip(){
 function send_selection_to_shiny(){
   const currently_selected = app_state.get('selected_codes');
   // Hook up the to app code here.
+
+  // Only try and send a message if we have codes to do so.
+  if(currently_selected.length === 0) return;
+
+  // Build message
+  const message_body = {
+    type: 'code_selection',
+    // append the date to the begining so sent value always changes.
+    payload: [Date.now().toString(), ...currently_selected]
+  };
+
+  // Send message off to server
+  if(typeof Shiny !== 'undefined'){
+    // Only attempt to send to shiny if we're in a shiny context
+    Shiny.onInputChange(options.msg_loc, message_body);
+  } else {
+    console.log('sending message to shiny');
+  }
 }
 
 
@@ -738,3 +756,8 @@ function format_val(d){
 function tuples_equal(a,b){
   return (a[0] === b[0]) && (a[1] === b[1]);
 }
+
+
+// Function to send a message back to shiny
+function send_to_shiny(type, codes){
+ }

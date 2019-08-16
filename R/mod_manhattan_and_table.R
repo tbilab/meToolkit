@@ -16,6 +16,7 @@ manhattan_plot_and_table_UI <- function(id, height = '500px') {
     )
   )
 }
+
 #' Server function of manhattan plot module. Returns a reactive variable that dispenses interaction events in the common type, payload format of \code{meToolkit} modules.
 #'
 #' @param input,output,session Auto-filled by callModule | ignore
@@ -54,30 +55,10 @@ manhattan_plot_and_table <- function(
     )
   })
 
-  # # Make sure checkbox is displaying right value
-  # observeEvent(snp_filter(), {
-  #   updateCheckboxInput(session, "snp_filter", value = snp_filter())
-  # })
+  # If we've received a message, package it into the returned reactive value
+  observeEvent(input$message, {
+    validate(need(input$message, message = FALSE))
+    action_object(input$message)
+  })
 
-
-  # # If we've received a message from the network viz package
-  # # it into the returned reactive value
-  # observeEvent(input$message, {
-  #   validate(need(input$message, message = FALSE))
-  #   action_object(input$message)
-  # })
-  #
-  # # If the snp filter toggle has been changed, send the message
-  # # to the reactive value
-  # observeEvent(input$snp_filter, {
-  #
-  #   # Check to see if the snp filter is different than current state
-  #   validate(need(input$snp_filter != snp_filter(), message = FALSE))
-  #
-  #   to_return <- list(
-  #     type = 'snp_filter_change',
-  #     payload = input$snp_filter
-  #   )
-  #   action_object(to_return)
-  # })
 }

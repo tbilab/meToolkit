@@ -48,12 +48,12 @@ server <- function(input, output, session) {
     action_object
   )
 
-  # observeEvent(action_object(),{
-  #   print("we have received a message from within the plot!")
-  #   print(action_object())
-  #   # Update codes
-  #   selected_codes(action_object()$payload)
-  # })
+  observeEvent(action_object(),{
+    print("we have received a message from within the plot!")
+    print(action_object())
+    # Update codes
+    selected_codes(action_object()$payload)
+  })
 
 }
 
