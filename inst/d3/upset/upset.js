@@ -1,7 +1,7 @@
 // !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
 
 // Constants
-const margin = {right: 25, left: 25, top: 20, bottom: 70}; // margins on side of chart
+const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
 
 const colors = {
   marginal_count_bars: 'orangered',
@@ -86,7 +86,7 @@ function setup_scales(patterns, marginal, sizes, set_size_x){
 function setup_chart_sizes(width, height, margin, only_snps){
   const set_size_bars_units = 1;
   const rr_plot_units = only_snps ? 0 : 1;
-  const matrix_plot_units = 1;
+  const matrix_plot_units = 0.7;
   const marginal_count_prop = 0.3;
   const total_width_units = set_size_bars_units + rr_plot_units + matrix_plot_units;
 
