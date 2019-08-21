@@ -16,13 +16,13 @@ manhattan_plot_and_table_UI <- function(id, height = NULL, div_class = 'manhatta
     wrapper_height <- glue::glue('height: {height}px')
   }
   tagList(
-    div(
-      div(
-        class = div_class,
-        style = wrapper_height,
+    # div(
+    #   div(
+    #     class = div_class,
+    #     style = wrapper_height,
         r2d3::d3Output(ns('plot'), height = '100%')
-      )
-    )
+      # )
+  #   )
   )
 }
 

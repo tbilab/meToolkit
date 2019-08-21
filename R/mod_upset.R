@@ -10,11 +10,7 @@
 upset_UI <- function(id, div_class = 'upset_plot') {
   ns <- NS(id)
   tagList(
-    div(
-      div(class = div_class,
-        r2d3::d3Output(ns('chart'), height = '100%')
-      )
-    )
+    r2d3::d3Output(ns('chart'), height = '100%')
   )
 }
 #' Server function of upset module

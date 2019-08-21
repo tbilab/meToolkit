@@ -7,67 +7,28 @@ library(magrittr)
 library(here)
 library(glue)
 
-
 individual_data <- read_rds(here::here('../simulated_ind_data.rds'))
 results_data     <- read_rds(here::here('../simulated_phewas_results.rds'))
 snp_name        <- 'rs1234'
 
-ns <- I
-
-ui <- shinyUI(
-
-  dashboardPage(
-    dashboardHeader(
-      title = "Multimorbidity Explorer",
-      titleWidth = 300
-    ),
-    dashboardSidebar(disable = TRUE),
-    dashboardBody(
-      includeCSS(here("inst/css/main_dashboard.css")),
-      tagList(
-        fluidRow(
-          column(
-            width = 5,
-            box(title = "Manhattan Plot (Phecode 1.2)",
-                width = NULL,
-                solidHeader=TRUE,
-                manhattan_plot_and_table_UI(ns('manhattan_plot'), div_class = 'manhattan_plot')
-            ),
-            box(
-              title = "Upset Plot",
-              solidHeader = TRUE,
-              width = NULL,
-              upset_UI(ns('upsetPlot'), div_class = 'upset_plot')
-            )
-          ),
-          column(
-            width = 7,
-            div(style = "margin-top: 10px;",
-                box(
-                  solidHeader = TRUE,
-                  width = NULL,
-                  info_panel_UI(ns('info_panel'))
-                )
-            ),
-            box(
-              title = "Phenotype-Subject Bipartite Network",
-              solidHeader = TRUE,
-              width = NULL,
-              network_plot_UI(ns('network_plot'),
-                              height = '80%',
-                              div_class = 'network_plot',
-                              snp_colors = c(NO_SNP_COLOR, ONE_SNP_COPY_COLOR, TWO_SNP_COPIES_COLOR) )
-            )
-          )
-        )
-      )
-    ),
-    skin = 'black'
-  )
+ui <- htmlTemplate(
+  "template.html",
+  manhattan_plot = manhattan_plot_and_table_UI(
+    'manhattan_plot',
+    div_class = 'manhattan_plot'
+  ),
+  upset = upset_UI(
+    'upsetPlot',
+    div_class = 'upset_plot'
+  ),
+  network =  network_plot_UI('network_plot',
+    height = '100%',
+    div_class = 'network_plot',
+    snp_colors = c(NO_SNP_COLOR, ONE_SNP_COPY_COLOR, TWO_SNP_COPIES_COLOR) )
 )
 
-server <- function(input, output, session) {
 
+server <- function(input, output, session) {
 
   # Add colors to codes in results data.
   results_data <- buildColorPalette(results_data, category)
@@ -224,12 +185,12 @@ server <- function(input, output, session) {
   })
 
   ## SNP info panel
-  callModule(
-    info_panel, 'info_panel',
-    snp_name,
-    individual_data,
-    curr_ind_data
-  )
+  # callModule(
+  #   info_panel, 'info_panel',
+  #   snp_name,
+  #   individual_data,
+  #   curr_ind_data
+  # )
 
 }
 

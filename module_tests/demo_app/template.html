@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- template.html -->
+<html>
+  <head>
+    {{ headContent() }}
+    <style>
+      .parent {
+        height: 95vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+        grid-column-gap: 4px;
+        grid-row-gap: 4px;
+      }
+      .div1 {
+        grid-area: 1 / 1 / 6 / 3;
+        border-right: 3px solid grey;
+      }
+      .div2 {
+        grid-area: 1 / 3 / 3 / 6;
+      }
+      .div3 {
+        grid-area: 3 / 3 / 6 / 6;
+        border-top: 3px solid grey;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class = 'parent'>
+      <div class = 'div1'>
+        {{ manhattan_plot }}
+      </div>
+      <div class = 'div2'>
+         {{ upset }}
+      </div>
+      <div class = 'div3'>
+        {{ network }}
+      </div>
+    </div>
+  </body>
+</html>
