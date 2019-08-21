@@ -495,7 +495,7 @@ const download_button = settings_menu.selectAppend('div.download_button')
           strokeWidth: 3,
         });
     })
-    .on('mouseout', function(){
+  .on('mouseout', function(){
        d3.select(this)
         .select('svg')
         .st({

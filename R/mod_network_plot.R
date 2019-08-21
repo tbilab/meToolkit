@@ -27,7 +27,7 @@ network_plot_UI <- function(
       background: {color};")
   }
   header_style <- glue::glue("
-    height: 10%;
+    height: 1.5rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 8px 10px;
