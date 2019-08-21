@@ -8,7 +8,7 @@ library(here)
 library(glue)
 
 individual_data <- read_rds(here::here('../simulated_ind_data.rds'))
-results_data     <- read_rds(here::here('../simulated_phewas_results.rds'))
+results_data    <- read_rds(here::here('../simulated_phewas_results.rds'))
 snp_name        <- 'rs1234'
 
 ui <- htmlTemplate(
@@ -24,7 +24,8 @@ ui <- htmlTemplate(
   network =  network_plot_UI('network_plot',
     height = '100%',
     div_class = 'network_plot',
-    snp_colors = c(NO_SNP_COLOR, ONE_SNP_COPY_COLOR, TWO_SNP_COPIES_COLOR) )
+    snp_colors = c(NO_SNP_COLOR, ONE_SNP_COPY_COLOR, TWO_SNP_COPIES_COLOR) ),
+  info = 'Multimorbidity Explorer'
 )
 
 
