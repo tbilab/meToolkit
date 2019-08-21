@@ -24,7 +24,12 @@ let or_bins;
 // ================================================================
 // Setup DOM elements
 // ================================================================
-div.style('overflow', 'scroll');
+// positioning for tooltips and buttons so they can be placed relative
+// to the main div
+div.st({
+  overflow: 'scroll',
+  position: 'relative',
+});
 
 const buttons = div.append('div.buttons')
   .st({
