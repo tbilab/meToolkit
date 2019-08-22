@@ -483,7 +483,7 @@ function send_selection_to_shiny(){
 
   // Build message
   const message_body = {
-    type: 'code_selection',
+    type: 'selection',
     // append the date to the begining so sent value always changes.
     payload: [Date.now().toString(), ...currently_selected]
   };

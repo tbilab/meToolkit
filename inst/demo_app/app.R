@@ -7,8 +7,8 @@ library(magrittr)
 library(here)
 library(glue)
 
-individual_data <- read_rds(here::here('../simulated_ind_data.rds'))
-results_data    <- read_rds(here::here('../simulated_phewas_results.rds'))
+individual_data <- read_rds('data/simulated_ind_data.rds')
+results_data    <- read_rds('data/simulated_phewas_results.rds')
 snp_name        <- 'rs1234'
 
 ui <- htmlTemplate(
@@ -95,6 +95,7 @@ server <- function(input, output, session) {
     }
 
     print(glue("Action of type {action_type} received"))
+
     action_type %>%
       switch(
         delete = {
@@ -107,10 +108,12 @@ server <- function(input, output, session) {
         },
         selection = {
           print('selecting codes!')
-          if(length(action_payload) < 2){
+          codes_to_select <- action_payload %>%
+            extract_codes()
+          if(length(codes_to_select) < 2){
             warnAboutSelection()
           } else {
-            state$selected_codes(action_payload)
+            state$selected_codes(codes_to_select)
           }
         },
         isolate = {

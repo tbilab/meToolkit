@@ -5,7 +5,7 @@
 \title{Server function of upset module}
 \usage{
 upset(input, output, session, individual_data, all_patient_snps,
-  action_object = NULL)
+  results_data, action_object = NULL)
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
@@ -13,6 +13,8 @@ upset(input, output, session, individual_data, all_patient_snps,
 \item{individual_data}{Reactive object with dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.}
 
 \item{all_patient_snps}{dataframe containing two columns \code{IID}, \code{snp} for every case in the population. Used in calculating a overall snp abundence.}
+
+\item{results_data}{Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}. (Used to color codes.)}
 
 \item{action_object}{A \code{reactiveVal} that will be updated by the module upon isolation, deletion, or snp_filtering.}
 }
