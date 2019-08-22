@@ -128,9 +128,9 @@ server <- function(input, output, session) {
           print(glue('New snp filter status is {state$snp_filter()}'))
         },
         pattern_highlight = {
-          # print('Upset sent a pattern higlight request')
-          # print(extract_codes(action_payload))
-          # state$highlighted_pattern(extract_codes(action_payload))
+          print('Upset sent a pattern higlight request')
+          print(extract_codes(action_payload))
+          state$highlighted_pattern(extract_codes(action_payload))
         },
         stop("Unknown input")
       )
