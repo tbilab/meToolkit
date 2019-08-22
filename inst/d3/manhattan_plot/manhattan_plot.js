@@ -59,8 +59,6 @@ const main_svg = div.append('svg')
 const or_svg = div.append('svg')
   .attr('id', 'or_hist');
 
-//div.append('hr');
-
 const columns_to_show = [
   {name: 'Code',        id: 'code',        is_num: false, scroll: false, sortable: true,  size: 'small', small_col: true},
   {name: 'OR',          id: 'OR',          is_num: true,  scroll: false, sortable: true,  size: 'small', small_col: true},
@@ -269,6 +267,7 @@ function new_state(state){
 
   if(state.has_changed('or_bounds')){
     manhattan_plot.disable(this.get('or_bounds'));
+    my_table.disable_codes(this.get('or_bounds'));
 
     // Check if the vis was just reset.
     if(tuples_equal(state.get('or_bounds'), [-Infinity, Infinity])){

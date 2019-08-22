@@ -68,6 +68,10 @@ tr.selected{
   background: #ff7f00;
 }
 
+tr.disabled{
+  opacity: 0.5;
+}
+
 tr div {
   height: var(--row-height);
   text-align: left;

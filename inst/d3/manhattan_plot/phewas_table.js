@@ -108,6 +108,17 @@ function setup_table(dom_target, sizes){
     return this;
   };
 
+  const disable_codes = function(or_bounds){
+    if(or_bounds == null) return
+
+    const is_disabled = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
+
+    rows.classed('disabled', is_disabled);
+
+
+    return this;
+  }
+
   function set_selection_callback(callback){
     on_selection = callback;
     return this;
@@ -115,6 +126,11 @@ function setup_table(dom_target, sizes){
 
   function on_row_click(d){
     const row = d3.select(this);
+
+    // Dont let user interact with disabled codes.
+    const is_disabled = row.classed('disabled');
+    if(is_disabled) return;
+
     const new_selection = !row.classed('selected');
 
     // toggle selection class
@@ -209,7 +225,7 @@ function setup_table(dom_target, sizes){
     search_clear_btn.classed('visible', true);
   }
 
-  return {add_data, select_codes, set_selection_callback};
+  return {add_data, select_codes, disable_codes, set_selection_callback};
 }
 
 
