@@ -2,7 +2,7 @@
 // ===============================================================
 // Initialization
 // ===============================================================
-const margin = {left: 65, right: 10, top: 10, bottom: 20};
+const margin = {left: 70, right: 25, top: 30, bottom: 20};
 
 const manhattan_unit = 3;
 const hist_unit = 1;
