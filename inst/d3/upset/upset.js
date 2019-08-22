@@ -1,8 +1,13 @@
-// !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack",here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
+// !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
+
+let viz_data = data,
+    viz_svg = svg,
+    viz_options = options,
+    viz_width = width,
+    viz_height = height;
 
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
-
 
 const colors = {
   marginal_count_bars: 'orangered',
@@ -81,7 +86,7 @@ function setup_scales(patterns, marginal, sizes, set_size_x){
     matrix_dot_size,
     matrix_row_height,
     matrix_column_width,
-    code_to_color: options.code_to_color, // attach color information to scales for each code
+    code_to_color: viz_options.code_to_color, // attach color information to scales for each code
   };
 }
 
@@ -101,7 +106,7 @@ function setup_chart_sizes(width, height, margin, only_snps){
     matrix_plot_w: w*(matrix_plot_units/total_width_units),
     margin_count_h: h*marginal_count_prop,
     matrix_plot_h: h*(1 - marginal_count_prop),
-    matrix_padding: 5,
+    matrix_padding: 10,
     padding: 10,
     w,
     h,
@@ -110,8 +115,7 @@ function setup_chart_sizes(width, height, margin, only_snps){
 }
 
 function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
-
-  const {patterns, marginals} = filter_set_size(data, options.marginalData, min_set_size);
+  const {patterns, marginals} = filter_set_size(viz_data, viz_options.marginalData, min_set_size);
 
   // Setup the scales
   const scales = setup_scales(patterns, marginals, sizes, set_size_x);
@@ -229,6 +233,7 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
 }
 
 function draw_upset(){
+
   // ----------------------------------------------------------------------
   // Start main visualization drawing
   // ---------------------------------------------------------------------
@@ -239,7 +244,7 @@ function draw_upset(){
   const sizes = setup_chart_sizes(viz_width, viz_height, margin, filtered_on_snp);
 
   // Get a set_size scale for use with slider
-  const set_size_x = setup_set_size_x_scale(data, sizes);
+  const set_size_x = setup_set_size_x_scale(viz_data, sizes);
 
   // Add a g to pad chart
   const g = svg.selectAppend('g.padding')
@@ -247,8 +252,8 @@ function draw_upset(){
 
 
   // Check if we have enough data to make a meaningful upset chart
-  if(data.length < 2){
-    const lead_message = data.length === 1 ? "Only one group meets" : "No groups meet";
+  if(viz_data.length < 2){
+    const lead_message = viz_data.length === 1 ? "Only one group meets" : "No groups meet";
     svg.append('text')
       .attr('text-anchor', 'middle')
       .tspans([`${lead_message} filter size threshold`, 'Adjust threshold down to see groups.'])
@@ -256,7 +261,7 @@ function draw_upset(){
       .attr('y', viz_height/2);
 
   } else {
-    const [min_count, max_count] = d3.extent(data, d => d.count);
+    const [min_count, max_count] = d3.extent(viz_data, d => d.count);
     // Make sure desired min set size is within reason
     const starting_min_size = viz_options.min_set_size < min_count ? min_count + 1 :
                               viz_options.min_set_size > max_count ? max_count -1  :
@@ -275,11 +280,6 @@ function draw_upset(){
   }
 };
 
-let viz_data = data,
-    viz_svg = svg,
-    viz_options = options,
-    viz_width = width,
-    viz_height = height;
 
 
 r2d3.onRender((data, svg, width, height, options) => {
@@ -297,18 +297,4 @@ r2d3.onResize((width,height) => {
 });
 
 
-// Function to send a message back to shiny
-function send_to_shiny(type, payload, destination){
-  // Build message
-  const message_body = {
-    type: type,
-    // append the date to the begining so sent value always changes.
-    payload: [Date.now().toString(), ...payload]
-  };
 
-  // Make sure shiny is available before sending message
-  if(typeof Shiny !== 'undefined'){
-    // Send message off to server
-    Shiny.onInputChange(destination, message_body);
-  }
-}
