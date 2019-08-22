@@ -18,13 +18,19 @@ upset_UI <- function(id, div_class = 'upset_plot') {
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param individual_data Reactive object with dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.
 #' @param all_patient_snps dataframe containing two columns \code{IID}, \code{snp} for every case in the population. Used in calculating a overall snp abundence.
+#' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}. (Used to color codes.)
 #' @param action_object A \code{reactiveVal} that will be updated by the module upon isolation, deletion, or snp_filtering.
 #' @return Shiny module
 #' @export
 #'
 #' @examples
 #' callModule(upset, 'my_mod')
-upset <- function(input, output, session, individual_data, all_patient_snps, action_object = NULL) {
+upset <- function(
+  input, output, session,
+  individual_data,
+  all_patient_snps,
+  results_data,
+  action_object = NULL) {
 
   # What's the MA freq for all the data?
   overall_ma_freq <- mean(all_patient_snps$snp != 0)
@@ -35,6 +41,18 @@ upset <- function(input, output, session, individual_data, all_patient_snps, act
     tidy_phenotypes <- individual_data() %>%
       tidyr::gather(code, value, -IID, -snp) %>%
       dplyr::filter(value != 0)
+
+
+    # Get the code to color mappings for each pair
+    present_codes <- colnames(individual_data()) %>%
+      {.[!(. %in% c('IID', 'snp'))]}
+    code_to_color <- results_data %>%
+      dplyr::filter(code %in% present_codes) %>% {
+        this <- .
+        color_map <- as.list(this$color)
+        names(color_map) <- this$code
+        color_map
+      }
 
     # Turn the tidy phenotypes into a dataframe of patient id for each row along with their pattern of phenotypes
     patient_to_pattern <- tidy_phenotypes %>%
@@ -112,6 +130,7 @@ upset <- function(input, output, session, individual_data, all_patient_snps, act
       options = list(
         marginalData = code_marginal_data,
         overallMaRate = overall_ma_freq,
+        code_to_color = code_to_color,
         min_set_size = 20,
         msg_loc = session$ns('message')
       ),

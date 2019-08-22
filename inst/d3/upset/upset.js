@@ -3,6 +3,7 @@
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
 
+
 const colors = {
   marginal_count_bars: 'orangered',
   pattern_count_bars: 'steelblue',
@@ -80,6 +81,7 @@ function setup_scales(patterns, marginal, sizes, set_size_x){
     matrix_dot_size,
     matrix_row_height,
     matrix_column_width,
+    code_to_color: options.code_to_color, // attach color information to scales for each code
   };
 }
 
@@ -170,9 +172,9 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       // Update right panel with rr info
       right_info_panel.update(rr_message).show();
       left_info_panel.update(size_message).show();
+
       // highlight pattern
       d3.select(this).attr('opacity', 0.7);
-
 
       // Send message to shiny about the highlighted pattern
       send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
@@ -183,6 +185,11 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       d3.select(this).attr('opacity', 0);
 
       send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
+    },
+    click: function(d){
+      // Send message to shiny about the highlighted pattern
+      send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
+      debugger;
     }
   };
 

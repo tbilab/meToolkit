@@ -155,6 +155,7 @@ server <- function(input, output, session) {
     upset, 'upsetPlot',
     curr_ind_data,
     select(individual_data, IID, snp),
+    results_data = results_data,
     app_interaction
   )
 

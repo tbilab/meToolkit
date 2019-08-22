@@ -52,16 +52,22 @@ function setup_set_size_x_scale(patterns, sizes){
 function get_pattern_info(d, scales) {
   const positions_of_codes = d.pattern
     .split('-')
-    .map(p => scales.matrix_width_scale(p) + scales.matrix_width_scale.bandwidth()/2);
+    .map(p => ({
+      code: p,
+      pos: scales.matrix_width_scale(p) + scales.matrix_width_scale.bandwidth()/2,
+    }));
 
-  const range_of_pattern = d3.extent(positions_of_codes);
+  //const positions_of_codes = d.pattern
+  //  .split('-')
+  //  .map(p => scales.matrix_width_scale(p) + scales.matrix_width_scale.bandwidth()/2);
+
+  const range_of_pattern = d3.extent(positions_of_codes, d => d.pos);
 
   return {
     positions: positions_of_codes,
     range: range_of_pattern,
   };
 }
-
 
 
 //-------------------------------------------------------
@@ -104,9 +110,9 @@ function draw_pattern_matrix(g, patterns, marginals, scales, sizes){
     .enter().append('circle')
     .at({
       class: 'presentCodes',
-      cx: d => d,
+      cx: d => d.pos,
       r: scales.matrix_dot_size,
-      fill: colors.code_present,
+      fill: d => scales.code_to_color[d.code],
     });
 
 
@@ -302,7 +308,7 @@ function draw_code_marginal_bars(g, marginals, scales, sizes){
     .at({
        y: sizes.margin_count_h,
        x: d => scales.matrix_width_scale(d.code),
-       fill: colors.marginal_count_bars,
+       fill: d => scales.code_to_color[d.code],
     })
     .merge(code_marginal_bars)
     .transition(t)
