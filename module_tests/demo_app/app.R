@@ -13,6 +13,7 @@ snp_name        <- 'rs1234'
 
 ui <- htmlTemplate(
   "template.html",
+  app_title = 'Multimorbidity Explorer',
   manhattan_plot = manhattan_plot_and_table_UI(
     'manhattan_plot',
     div_class = 'manhattan_plot'
@@ -24,8 +25,7 @@ ui <- htmlTemplate(
   network =  network_plot_UI('network_plot',
     height = '100%',
     div_class = 'network_plot',
-    snp_colors = c(NO_SNP_COLOR, ONE_SNP_COPY_COLOR, TWO_SNP_COPIES_COLOR) ),
-  info = 'Multimorbidity Explorer'
+    snp_colors = c(NO_SNP_COLOR, ONE_SNP_COPY_COLOR, TWO_SNP_COPIES_COLOR) )
 )
 
 

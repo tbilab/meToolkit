@@ -7,11 +7,17 @@
       body {
         box-sizing: border-box;
         margin: 2px;
+        background-color: #bdbdbd;
       }
 
       .info_header {
         height: 3rem;
-        background-color: red;
+      }
+
+      .app-title {
+        margin: 0;
+        padding-top: 0.5rem;
+        padding-left: 0.5rem;
       }
 
       .parent {
@@ -21,7 +27,6 @@
         grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
         grid-column-gap: 15px;
         grid-row-gap: 15px;
-        background-color: #bdbdbd;
       }
 
       .section {
@@ -42,7 +47,7 @@
   <body>
 
     <div class = 'info_header'>
-      {{ info }}
+      <h2 class = 'app-title'> {{ app_title }} </h2>
     </div>
     <div class = 'parent'>
       <div class = 'div1 section'>
