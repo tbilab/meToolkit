@@ -2,9 +2,11 @@ function setup_table(dom_target, sizes){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
 
-  const small_col_width = "70px";
-  const normal_col_width = "220px";
-
+  const col_sizes = {
+    small: '70px',
+    med: '120px',
+    large: '220px',
+  };
 
   // Scope variables that get modified by methods
   let selected_codes = [];
@@ -67,7 +69,7 @@ function setup_table(dom_target, sizes){
       .append('th')
       .text(d => d.name)
       .style('cursor', d => d.sortable ? down_cursor: null)
-      .style('width', d => d.small_col ? small_col_width: normal_col_width)
+      .style('width', d => col_sizes[d.size])
       .attr('title', "Click to sort in decreasing order")
       .attr('class', 'tool table_header')
       .on('click', column_sort);
@@ -85,17 +87,17 @@ function setup_table(dom_target, sizes){
   // Fill in rows with each columns data
   rows.selectAll('td')
     .data(d => columns_to_show
-      .map(({name, id, is_num, small_col, scroll}) => ({
+      .map(({name, id, is_num, size, scroll}) => ({
         column: name,
-        small_col: small_col,
+        size: size,
         value: is_num ? format_val(d[id]): d[id],
         scroll: scroll,
       })))
     .enter()
     .append('td')
-    .style('width', d => d.small_col ? small_col_width: normal_col_width)
+    .style('width', d => col_sizes[d.size])
     .attr('data-th', d => d.column)
-    .html(d => `${d.scroll ? `<div style="width:${normal_col_width}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
+    .html(d => `${d.scroll ? `<div style="width:${col_sizes[d.size]}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
 
     return this;
   };

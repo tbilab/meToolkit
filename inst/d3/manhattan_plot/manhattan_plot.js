@@ -62,11 +62,11 @@ const or_svg = div.append('svg')
 //div.append('hr');
 
 const columns_to_show = [
-  {name: 'Code',        id: 'code',        is_num: false, scroll: false, sortable: true, small_col: true},
-  {name: 'OR',          id: 'OR',          is_num: true,  scroll: false, sortable: true, small_col: true},
-  {name: 'P-Value',     id: 'p_val',       is_num: true,  scroll: false, sortable: true, small_col: true},
-  {name: 'Description', id: 'description', is_num: false, scroll: true,  sortable: false, small_col: false},
-  {name: 'Category',    id: 'category',    is_num: false, scroll: true,  sortable: true,  small_col: false},
+  {name: 'Code',        id: 'code',        is_num: false, scroll: false, sortable: true,  size: 'small', small_col: true},
+  {name: 'OR',          id: 'OR',          is_num: true,  scroll: false, sortable: true,  size: 'small', small_col: true},
+  {name: 'P-Value',     id: 'p_val',       is_num: true,  scroll: false, sortable: true,  size: 'small', small_col: true},
+  {name: 'Description', id: 'description', is_num: false, scroll: true,  sortable: false, size: 'large', small_col: false},
+  {name: 'Category',    id: 'category',    is_num: false, scroll: true,  sortable: true,  size: 'med', small_col: false},
 ];
 
 const table_div = div.append('div');
