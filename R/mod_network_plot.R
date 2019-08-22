@@ -31,9 +31,9 @@ network_plot_UI <- function(
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 8px 10px;
-    border-style: solid;
-    border-width: 1px 0px;
-    border-color: grey; ")
+    border-bottom: 1px solid #e4e0e0;
+    align-items: center;
+  ")
 
   tagList(
     div(
