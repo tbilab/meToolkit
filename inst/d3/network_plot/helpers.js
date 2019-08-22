@@ -1,8 +1,5 @@
 // Helper functions for network plot
 
-function unique(data, key){
-  return d3.set(data).values();
-};
 
 function decide_link_opacity(links){
   return Math.max(
@@ -10,6 +7,8 @@ function decide_link_opacity(links){
     0.06
   );
 }
+
+
 // Sets up size object given a width and height and the constants object for sizing viz
 function setup_sizes(width, height, C){
   return {
@@ -339,6 +338,7 @@ function sim_webworker(update_freq){
   };
 }
 
+
 // Function to draw canvas parts of network
 function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highlighted_nodes = []){
   // Clear canvas
@@ -447,6 +447,7 @@ function find_patients_by_pattern({nodes, links}, pattern){
 
 }
 
+
 // Builds array of patient to phecode pattern for use in filtering
 function build_patient_patterns(data){
   const nodes = data.nodes || data.vertices;
@@ -492,27 +493,7 @@ function is_new_data(old_data, new_data) {
   return combined_names.length !== old_nodes.length;
 }
 
-function arrays_equal(arr_1, arr_2){
-  // If vecs are different lengths data must different
-  if(arr_1.length !== arr_1.length)
-    return false;
 
-  // If the union of the two arrays is the same size as both they're the same.
-  const size_of_union = unique([...arr_1, ...arr_2]).length
-  return (size_of_union === arr_1.length) && (size_of_union === arr_2.length);
-}
-
-function downloadPlot(svg){
-  const svgData = svg.node().outerHTML;
-  const svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
-  const svgUrl = URL.createObjectURL(svgBlob);
-  const downloadLink = document.createElement("a");
-  downloadLink.href = svgUrl;
-  downloadLink.download = "phecode_network.svg";
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-  document.body.removeChild(downloadLink);
-}
 
 
 const button_icon = `

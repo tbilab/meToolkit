@@ -94,6 +94,7 @@ network_plot <- function(
       container = 'div',
       dependencies = c(
         "d3-jetpack",
+        system.file("d3/helpers.js", package = "meToolkit"),
         system.file("d3/network_plot/helpers.js", package = "meToolkit")
       ),
       css = system.file("d3/network_plot/network.css", package = "meToolkit"),

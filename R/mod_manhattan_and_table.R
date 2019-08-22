@@ -16,13 +16,7 @@ manhattan_plot_and_table_UI <- function(id, height = NULL, div_class = 'manhatta
     wrapper_height <- glue::glue('height: {height}px')
   }
   tagList(
-    # div(
-    #   div(
-    #     class = div_class,
-    #     style = wrapper_height,
-        r2d3::d3Output(ns('plot'), height = '100%')
-      # )
-  #   )
+    r2d3::d3Output(ns('plot'), height = '100%')
   )
 }
 
@@ -54,6 +48,7 @@ manhattan_plot_and_table <- function(
       container = 'div',
       dependencies = c(
         "d3-jetpack",
+        system.file("d3/helpers.js", package = "meToolkit"),
         system.file("d3/manhattan_plot/phewas_table.js", package = "meToolkit")
       ),
       css = system.file("d3/manhattan_plot/phewas_table.css", package = "meToolkit"),

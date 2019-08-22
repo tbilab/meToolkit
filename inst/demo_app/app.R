@@ -1,4 +1,5 @@
 # testing main app module in own shiny app.
+library(meToolkit)
 library(shiny)
 library(shinydashboard)
 library(shinydashboardPlus)
@@ -6,6 +7,10 @@ library(tidyverse)
 library(magrittr)
 library(here)
 library(glue)
+
+NO_SNP_COLOR <- "#bdbdbd"
+ONE_SNP_COPY_COLOR <- "#fc9272"
+TWO_SNP_COPIES_COLOR <- "#de2d26"
 
 individual_data <- read_rds('data/simulated_ind_data.rds')
 results_data    <- read_rds('data/simulated_phewas_results.rds')

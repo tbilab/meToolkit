@@ -1,4 +1,4 @@
-// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'))
+// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'))
 // ===============================================================
 // Initialization
 // ===============================================================
@@ -481,20 +481,11 @@ function send_selection_to_shiny(){
   // Only try and send a message if we have codes to do so.
   if(currently_selected.length === 0) return;
 
-  // Build message
-  const message_body = {
-    type: 'selection',
-    // append the date to the begining so sent value always changes.
-    payload: [Date.now().toString(), ...currently_selected]
-  };
-
-  // Send message off to server
-  if(typeof Shiny !== 'undefined'){
-    // Only attempt to send to shiny if we're in a shiny context
-    Shiny.onInputChange(options.msg_loc, message_body);
-  } else {
-    console.log('sending message to shiny');
-  }
+  send_to_shiny(
+    'selection',
+    currently_selected,
+    options.msg_loc
+  );
 }
 
 
@@ -720,7 +711,6 @@ function reset_scales(data, sizes){
 // ===============================================================
 // Helper functions
 // ===============================================================
-
 function add_axis_label(label, y_axis = true){
 
   const bump_axis = y_axis ? 'x': 'y';
@@ -754,15 +744,5 @@ function selection_contains(selection, bx_min, by_min, bx_max = bx_min, by_max =
   const ys_intersect = (sy_min < by_max) && (sy_max > by_min);
 
   return xs_intersect && ys_intersect;
-}
-
-
-function format_val(d){
-  return d3.format(".3")(d);
-}
-
-
-function tuples_equal(a,b){
-  return (a[0] === b[0]) && (a[1] === b[1]);
 }
 
