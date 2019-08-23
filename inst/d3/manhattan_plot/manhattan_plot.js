@@ -55,8 +55,6 @@ const send_button = buttons.append('button')
 const reset_button = buttons.append('button')
   .text('Reset')
   .style('display', 'inline-block')
-
-  //.style('display', 'none')
   .on('click', () => app_state.pass_action('reset_button', null));
 
 const main_svg = div.append('svg')
@@ -210,7 +208,7 @@ class App_State{
         break;
       case 'reset_button':
         // Clear the filters to default values
-        this.modify_property('selected_codes', []);
+        this.modify_property('selected_codes', default_selection);
         this.modify_property('or_bounds', [-Infinity, Infinity]);
         break;
       default:
@@ -231,32 +229,27 @@ function new_state(state){
   // From here on out we need data and sizes so let's check if we have data before proceeding
   const sizes = state.get('sizes');
   if(!sizes) return;
-  const data = state.get('data');
-  if(!data) return;
-
-  // Set the sizes of the various dom elements
-  if(state.has_changed('sizes')) size_viz(state.get('sizes'));
-
-  //// add log odds ratios to data
-  //if(state.has_changed('data')){
-  //  process_new_data(data);
-  //  my_table.add_data(data, columns_to_show);
-  //}
 
   // Update scales and the quadtree for selecting points
-  if(state.has_changed('sizes') || state.has_changed('data')){
-    reset_scales(data, state.get('sizes'));
-    setup_quadtree(data, manhattan_scales);
+  if(state.has_changed('sizes')){
+    // Set the sizes of the various dom elements
+    size_viz(state.get('sizes'));
 
-    manhattan_plot = draw_manhattan(data);
-    initialize_manhattan_brush(data);
+    reset_scales(viz_data, state.get('sizes'));
+    setup_quadtree(viz_data, manhattan_scales);
 
-    draw_histogram(data);
+    manhattan_plot = draw_manhattan(viz_data);
+    initialize_manhattan_brush(viz_data);
+
+    draw_histogram(viz_data);
     hist_brush = initialize_histogram_brush(data);
   }
 
   if(state.has_changed('selected_codes') || state.has_changed('or_bounds')){
-    const default_bounds = tuples_equal(state.get('or_bounds'), [-Infinity, Infinity]);
+    const default_bounds = tuples_equal(
+      state.get('or_bounds'),
+      [-Infinity, Infinity] );
+
     const no_codes_selected = state.get('selected_codes').length === 0;
 
     if(default_bounds && no_codes_selected){
@@ -294,7 +287,7 @@ function new_state(state){
 const initial_state = {
   data: viz_data,
   or_bounds: [-Infinity, Infinity],
-  selected_codes: [],
+  selected_codes: default_selection,
   sizes: null,
 };
 
@@ -305,9 +298,6 @@ const app_state = new App_State(initial_state, new_state);
 // This code runs whenever data changes
 // ===============================================================
 r2d3.onRender(function(data, svg, width, height, options) {
-
-  console.log('Render function executed')
-  //viz_data = data;
   default_selection = options.selected;
 
   //app_state.pass_action('new_data', viz_data);
@@ -320,10 +310,8 @@ r2d3.onRender(function(data, svg, width, height, options) {
 // This is called by r2d3 runs whenever the plot is resized
 // ===============================================================
 r2d3.onResize(function(width, height){
-  console.log('Resize function executed')
   viz_width = width;
   viz_height = height;
-
   app_state.pass_action('new_sizes', [viz_width, height]);
 });
 
