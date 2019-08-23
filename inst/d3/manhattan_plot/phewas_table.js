@@ -103,12 +103,14 @@ function setup_table(dom_target, sizes){
   };
 
   const select_codes = function(codes_to_select){
+    debugger;
     selected_codes = codes_to_select;
     rows.classed('selected', d => codes_to_select.includes(d.code));
     return this;
   };
 
   const disable_codes = function(or_bounds){
+    debugger;
     if(or_bounds == null) return
 
     const is_disabled = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
@@ -169,6 +171,7 @@ function setup_table(dom_target, sizes){
   }
 
   function raise_selected_codes(){
+    debugger;
     rows.sort((a,b) => {
       const a_selected = selected_codes.includes(a.code);
       const b_selected = selected_codes.includes(b.code);
@@ -229,12 +232,3 @@ function setup_table(dom_target, sizes){
 }
 
 
-// ================================================================
-// Global variables that get accessed in state functions
-// ================================================================
-
-
-
-function format_val(d){
-  return d3.format(".3")(d);
-}

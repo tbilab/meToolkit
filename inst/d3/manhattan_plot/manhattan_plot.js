@@ -4,7 +4,8 @@
 // ===============================================================
 let viz_width = width,
     viz_height = height,
-    viz_data;
+    viz_data = data,
+    default_selection = [];
 
 const margin = {left: 70, right: 25, top: 30, bottom: 20};
 
@@ -14,7 +15,6 @@ const table_unit = 2;
 const total_units = manhattan_unit + hist_unit + table_unit + 0.1;
 
 
-console.log('Main script executed')
 const size_props = {
   manhattan: manhattan_unit/total_units,
   histogram: hist_unit/total_units,
@@ -75,12 +75,13 @@ const columns_to_show = [
 
 const table_div = div.append('div');
 
+process_new_data(data);
 const my_table = setup_table(
     table_div,
     {height: 400, header: 35, padding: 5, control_panel: 50}
   )
+  .add_data(viz_data, columns_to_show)
   .set_selection_callback(send_table_selection);
-
 
 const tooltip = div.selectAppend('div.tooltip')
   .st({
@@ -236,12 +237,11 @@ function new_state(state){
   // Set the sizes of the various dom elements
   if(state.has_changed('sizes')) size_viz(state.get('sizes'));
 
-  // add log odds ratios to data
-  if(state.has_changed('data')){
-    process_new_data(data);
-    my_table.add_data(data, columns_to_show);
-  }
-
+  //// add log odds ratios to data
+  //if(state.has_changed('data')){
+  //  process_new_data(data);
+  //  my_table.add_data(data, columns_to_show);
+  //}
 
   // Update scales and the quadtree for selecting points
   if(state.has_changed('sizes') || state.has_changed('data')){
@@ -292,7 +292,7 @@ function new_state(state){
 }
 
 const initial_state = {
-  data: null,
+  data: viz_data,
   or_bounds: [-Infinity, Infinity],
   selected_codes: [],
   sizes: null,
@@ -305,12 +305,14 @@ const app_state = new App_State(initial_state, new_state);
 // This code runs whenever data changes
 // ===============================================================
 r2d3.onRender(function(data, svg, width, height, options) {
-  console.log('Render function executed')
-  viz_data = data;
 
-  app_state.pass_action('new_data', viz_data);
+  console.log('Render function executed')
+  //viz_data = data;
+  default_selection = options.selected;
+
+  //app_state.pass_action('new_data', viz_data);
   app_state.pass_action('new_sizes', [viz_width, height]);
-  app_state.pass_action('table_selection', options.selected);
+  app_state.pass_action('table_selection', default_selection);
 });
 
 // ===============================================================
