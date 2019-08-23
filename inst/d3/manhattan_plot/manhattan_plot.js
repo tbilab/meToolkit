@@ -176,7 +176,6 @@ class App_State{
   // Individual app components pass info to this
   // which then modifies the internal state accordingly
   pass_action(type, payload){
-    console.log(`Action: ${type}`);
     switch(type){
       case 'initialize':
         break;
@@ -245,7 +244,9 @@ function new_state(state){
     hist_brush = initialize_histogram_brush(data);
   }
 
+
   if(state.has_changed('selected_codes') || state.has_changed('or_bounds')){
+
     const default_bounds = tuples_equal(
       state.get('or_bounds'),
       [-Infinity, Infinity] );
@@ -259,11 +260,13 @@ function new_state(state){
     }
   }
 
+
   // Make sure manhattan and table have selected codes.
   if(state.has_changed('selected_codes') || state.has_changed('sizes')){
     manhattan_plot.highlight(state.get('selected_codes'));
     my_table.select_codes(state.get('selected_codes'));
   }
+
 
   if(state.has_changed('or_bounds')){
     manhattan_plot.disable(this.get('or_bounds'));
@@ -275,10 +278,6 @@ function new_state(state){
     }
   }
 
-  // Check if viz has been reset
-  if(state.has_changed('or_bounds')){
-    manhattan_plot.disable(this.get('or_bounds'));
-  }
 
   // Make all the props completed.
   changed_props.forEach(p => state.mark_completed(p));
@@ -300,8 +299,8 @@ const app_state = new App_State(initial_state, new_state);
 r2d3.onRender(function(data, svg, width, height, options) {
   default_selection = options.selected;
 
-  //app_state.pass_action('new_data', viz_data);
   app_state.pass_action('new_sizes', [viz_width, height]);
+  app_state.pass_action('reset_button', null);
   app_state.pass_action('table_selection', default_selection);
 });
 
