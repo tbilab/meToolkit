@@ -2,6 +2,10 @@
 // ===============================================================
 // Initialization
 // ===============================================================
+let viz_width = width,
+    viz_height = height,
+    viz_data;
+
 const margin = {left: 70, right: 25, top: 30, bottom: 20};
 
 const manhattan_unit = 3;
@@ -9,6 +13,8 @@ const hist_unit = 1;
 const table_unit = 2;
 const total_units = manhattan_unit + hist_unit + table_unit + 0.1;
 
+
+console.log('Main script executed')
 const size_props = {
   manhattan: manhattan_unit/total_units,
   histogram: hist_unit/total_units,
@@ -171,6 +177,7 @@ class App_State{
   // Individual app components pass info to this
   // which then modifies the internal state accordingly
   pass_action(type, payload){
+    console.log(`Action: ${type}`);
     switch(type){
       case 'initialize':
         break;
@@ -298,8 +305,11 @@ const app_state = new App_State(initial_state, new_state);
 // This code runs whenever data changes
 // ===============================================================
 r2d3.onRender(function(data, svg, width, height, options) {
-  app_state.pass_action('new_data', data);
-  app_state.pass_action('new_sizes', [width, height]);
+  console.log('Render function executed')
+  viz_data = data;
+
+  app_state.pass_action('new_data', viz_data);
+  app_state.pass_action('new_sizes', [viz_width, height]);
   app_state.pass_action('table_selection', options.selected);
 });
 
@@ -308,7 +318,11 @@ r2d3.onRender(function(data, svg, width, height, options) {
 // This is called by r2d3 runs whenever the plot is resized
 // ===============================================================
 r2d3.onResize(function(width, height){
-  app_state.pass_action('new_sizes', [width, height]);
+  console.log('Resize function executed')
+  viz_width = width;
+  viz_height = height;
+
+  app_state.pass_action('new_sizes', [viz_width, height]);
 });
 
 // ================================================================
