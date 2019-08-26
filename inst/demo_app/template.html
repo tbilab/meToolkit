@@ -4,46 +4,42 @@
   <head>
     {{ headContent() }}
     <style>
-      body {
-        box-sizing: border-box;
-        margin: 2px;
-        background-color: #bdbdbd;
-      }
+    body {
+      box-sizing: border-box;
+      margin: 2px;
+      background-color: #bdbdbd;
+    }
 
-      .info_header {
-        height: 3rem;
-      }
+    .info_header {
+      height: 3rem;
+    }
 
-      .app-title {
-        margin: 0;
-        padding-top: 0.5rem;
-        padding-left: 0.5rem;
-      }
+    .app-title {
+      margin: 0;
+      padding-top: 0.5rem;
+      padding-left: 0.5rem;
+    }
 
-      .parent {
-        height: calc(100vh - 3rem);
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-        grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
-        grid-column-gap: 15px;
-        grid-row-gap: 15px;
-      }
+    .section {
+      background-color: white;
+      box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.49);
+      border-radius: 4px;
+      overflow: hidden;
+    }
 
-      .section {
-        background-color: white;
-        box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.49);
-        border-radius: 4px;
-        overflow: hidden;
-      }
-      .div1 {
-        grid-area: 1 / 1 / 6 / 3;
-      }
-      .div2 {
-        grid-area: 1 / 3 / 3 / 6;
-      }
-      .div3 {
-        grid-area: 3 / 3 / 6 / 6;
-      }
+    .parent {
+      height: calc(100vh - 3rem);
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      grid-column-gap: 15px;
+      grid-row-gap: 15px;
+    }
+    .div1 { grid-area: 1 / 1 / 8 / 4; }
+    .div2 { grid-area: 5 / 4 / 8 / 8; }
+    .div3 { grid-area: 1 / 4 / 5 / 7; }
+    .div4 { grid-area: 1 / 7 / 5 / 8; }
+
     </style>
   </head>
   <body>
@@ -55,11 +51,14 @@
       <div class = 'div1 section'>
         {{ manhattan_plot }}
       </div>
-      <div class = 'div2 section'>
+      <div class = 'div3 section'>
          {{ upset }}
       </div>
-      <div class = 'div3 section'>
+      <div class = 'div2 section'>
         {{ network }}
+      </div>
+      <div class = 'div4 section'>
+        SNP Info
       </div>
     </div>
   </body>
