@@ -25,6 +25,7 @@ manhattan_plot_and_table_UI <- function(id, height = NULL, div_class = 'manhatta
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
 #' @param selected_codes A reactive variable containing array of code \code{id}s that are currently selected in the app.
+#' @param colors A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.
 #' @param action_object A \code{reactiveVal} that will be updated by the module upon selection
 #' @return Server component of interactive manhattan plot. Returns type-payload list with the type \code{"selection"} to the passed \code{action_object} for updating app state.
 #' @export
@@ -35,6 +36,7 @@ manhattan_plot_and_table <- function(
   input, output, session,
   results_data,
   selected_codes,
+  colors,
   action_object ) {
 
   # send data and options to the 2d plot
@@ -57,7 +59,8 @@ manhattan_plot_and_table <- function(
       ),
       options = list(
         msg_loc = session$ns('message'),
-        selected = selected_codes()
+        selected = selected_codes(),
+        colors = colors
       )
     )
   })
