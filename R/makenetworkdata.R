@@ -48,18 +48,7 @@ makeNetworkData <- function(
     dplyr::filter(code %in% pheno_names) %>%
     # Add column for code inversion status
     dplyr::mutate( inverted = code %in% inverted_codes ) %>%
-    # Check for tooltip status. If it's not there already build a simple on from just the name
-    {
-      this <- .
-      has_tooltip <- 'tooltip' %in% colnames(this)
-      if(!has_tooltip){
-        this <- this %>%
-          dplyr::mutate(tooltip = glue::glue('<h2>{code}</h2>') %>% as.character())
-      }
-      this
-    } %>%
-    # Grab just the columns we need for plotting
-    dplyr::select(name = code, color, tooltip, inverted)
+    dplyr::rename(name = code)
 
   vertices <- data_frame(
     # Integer index for keeping track of edges source and destinations
