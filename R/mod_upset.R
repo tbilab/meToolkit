@@ -19,6 +19,7 @@ upset_UI <- function(id, div_class = 'upset_plot') {
 #' @param individual_data Reactive object with dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.
 #' @param all_patient_snps dataframe containing two columns \code{IID}, \code{snp} for every case in the population. Used in calculating a overall snp abundence.
 #' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}. (Used to color codes.)
+#' @param colors A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.
 #' @param action_object A \code{reactiveVal} that will be updated by the module upon isolation, deletion, or snp_filtering.
 #' @return Shiny module
 #' @export
@@ -30,12 +31,16 @@ upset <- function(
   individual_data,
   all_patient_snps,
   results_data,
+  colors,
   action_object = NULL) {
+
+
 
   # What's the MA freq for all the data?
   overall_ma_freq <- mean(all_patient_snps$snp != 0)
 
   output$chart <- r2d3::renderD3({
+
 
     # Turn wide individual data into a tidy list of phenotype presence
     tidy_phenotypes <- individual_data() %>%
@@ -132,7 +137,8 @@ upset <- function(
         overallMaRate = overall_ma_freq,
         code_to_color = code_to_color,
         min_set_size = 20,
-        msg_loc = session$ns('message')
+        msg_loc = session$ns('message'),
+        colors = colors
       ),
       script = system.file("d3/upset/upset.js", package = "meToolkit"),
       css = system.file("d3/upset/upset.css", package = "meToolkit"),

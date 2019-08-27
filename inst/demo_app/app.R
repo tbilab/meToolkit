@@ -8,6 +8,16 @@ library(magrittr)
 library(here)
 library(glue)
 
+COLORS <- list(
+  light_grey = "#f7f7f7",
+  med_grey   = "#d9d9d9",
+  dark_grey  = "#bdbdbd",
+  light_red  = "#fcbba1",
+  dark_red   = "#ef3b2c",
+  light_blue = "#4292c6",
+  green      = "#74c476"
+)
+
 NO_SNP_COLOR <- "#bdbdbd"
 ONE_SNP_COPY_COLOR <- "#fc9272"
 TWO_SNP_COPIES_COLOR <- "#de2d26"
@@ -166,6 +176,7 @@ server <- function(input, output, session) {
     curr_ind_data,
     select(individual_data, IID, snp),
     results_data = results_data,
+    colors = COLORS,
     app_interaction
   )
 
@@ -174,7 +185,8 @@ server <- function(input, output, session) {
     manhattan_plot_and_table, 'manhattan_plot',
     results_data = results_data,
     selected_codes = state$selected_codes,
-    action_object = app_interaction
+    action_object = app_interaction,
+    colors = COLORS
   )
 
   ## PheWAS table

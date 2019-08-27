@@ -1,4 +1,4 @@
-// !preview r2d3 data = data_for_upset$data, options = options, dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
+// !preview r2d3 data = readr::read_rds(here::here('data/fake_upset_main.rds')), options = readr::read_rds(here::here('data/fake_upset_options.rds')), dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here('inst/d3/upset/helpers.js')), css=here('inst/d3/upset/upset.css')
 
 let viz_data = data,
     viz_svg = svg,
@@ -9,16 +9,14 @@ let viz_data = data,
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
 
+
 const colors = {
-  marginal_count_bars: 'orangered',
-  pattern_count_bars: 'steelblue',
-  rr_interval: 'orangered',
-  null_rr_interval: 'grey',
-  highlight: '#fdcdac',
-  code_present: 'black',
-  code_missing: 'lightgrey',
-  interaction_box_border: 'grey',
-  silder_handle: 'green',
+  pattern_count_bars: viz_options.colors.light_blue,
+  rr_interval: viz_options.colors.dark_red,
+  null_rr_interval: 'black',
+  code_missing: viz_options.colors.dark_grey,
+  interaction_box_border: viz_options.colors.med_grey,
+  silder_handle: viz_options.colors.green,
 };
 
 const interaction_box_styles = {
@@ -279,7 +277,6 @@ function draw_upset(){
     draw_with_set_size(g, starting_min_size, sizes, set_size_x, filtered_on_snp);
   }
 };
-
 
 
 r2d3.onRender((data, svg, width, height, options) => {
