@@ -7,70 +7,12 @@
 /* Table */
 /* ================================================== */
 
-/* ================================================== */
-/* Table-wide style */
-table {
-	border-collapse: collapse;
-	table-layout: fixed;
-}
-
-/*Individual cells for header and body */
-td, th {
-	padding: 3px;
-	border: 1px solid #ccc;
-	text-align: center;
-	vertical-align: middle;
-}
-
-/* ================================================== */
 /* Table-body style */
-tbody{
-  display: block;
+tbody.phewas_table{
   width: 100%;
-  overflow: auto;
   margin-top: -6px; /*Fixes gap between header and table */
 }
 
-/* ================================================== */
-/* Header styling */
-
-/* Everything that composes the header */
-thead {
-  font-size: 0.95em;
-  font-weight: 600;
-}
-
-/* Entire row of the header */
-thead tr {
-   display: block;
-}
-
-/*Individual header cells */
-th {
-  background-color: #d9d9d9;
-}
-
-/* ================================================== */
-/* Row styling */
-
-tr {
-  --row-height: 30px;
-  height: var(--row-height);
-}
-
-/* Zebra striping */
-tr:nth-of-type(even) {
-	background: #f0f0f0;
-}
-
-/* Rows that have been selected */
-tr.selected{
-  background: #ff7f00;
-}
-
-tr.disabled{
-  opacity: 0.5;
-}
 
 tr div {
   height: var(--row-height);

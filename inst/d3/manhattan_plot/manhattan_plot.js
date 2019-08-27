@@ -1,4 +1,4 @@
-// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'))
+// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'), here::here('inst/d3/helpers.css'))
 // ===============================================================
 // Initialization
 // ===============================================================
@@ -355,7 +355,7 @@ function draw_manhattan(data){
       tooltip.show(d, [d3.event.clientX, d3.event.clientY]);
     })
     .on('mouseout', function(d){
-      tooltip.hide();
+      //tooltip.hide();
     });
 
 

@@ -68,21 +68,38 @@ function send_to_shiny(type, payload, destination){
 
 function setup_tooltip(dom_target){
 
+  const fields_to_ignore = ['color', 'disabled', 'selected', 'tooltip', 'unselected_color', 'index'];
+
   const tooltip = dom_target.selectAppend('div.tooltip')
     .st({
-      background:'rgba(255,255,255,0.7)',
+      background:'rgba(255,255,255,0.8)',
       position:'fixed',
+      padding: '0.25rem',
       fontSize: 18,
+      border: '1px solid grey',
+      borderRadius: '5px'
     });
 
+  const santatize_key = key => key.replace('_', ' ');
+
+  const santatize_value = val => typeof(val) === 'number' ? format_val(val): val;
+
+
   const show = function(d, loc){
+
+    const table_body = Object.keys(d)
+      .filter(key => !fields_to_ignore.includes(key))
+      .reduce((table, key) => table + `<tr><td style='text-align:right'>${santatize_key(key)}</td><td style='text-align:left; padding-left: 1rem'>${santatize_value(d[key])}</td></tr>`, '');
+
+    const tooltip_content = `<table> ${table_body} </table>`;
+
     tooltip
      .st({
        left: loc[0] + 10,
        top:  loc[1] + 10,
        display: 'block'
      })
-     .html(d.tooltip);
+     .html(tooltip_content);
   };
 
   const hide = function(){
