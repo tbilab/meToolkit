@@ -81,8 +81,8 @@ const my_table = setup_table(
   .add_data(viz_data, columns_to_show)
   .set_selection_callback(send_table_selection);
 
-
-const tooltip = setup_tooltip(div);
+// Setup tooltip to show same info as table.
+const tooltip = setup_tooltip(div, columns_to_show.map(d => d.id));
 
 
 // Then we append a g element that has padding added to it to those svgs
@@ -355,7 +355,7 @@ function draw_manhattan(data){
       tooltip.show(d, [d3.event.clientX, d3.event.clientY]);
     })
     .on('mouseout', function(d){
-      //tooltip.hide();
+      tooltip.hide();
     });
 
 

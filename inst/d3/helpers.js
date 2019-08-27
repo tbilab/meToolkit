@@ -66,9 +66,9 @@ function send_to_shiny(type, payload, destination){
   }
 }
 
-function setup_tooltip(dom_target){
+function setup_tooltip(dom_target, fields_to_show = ['code','OR']){
 
-  const fields_to_ignore = ['color', 'disabled', 'selected', 'tooltip', 'unselected_color', 'index'];
+  // Modify logic here.
 
   const tooltip = dom_target.selectAppend('div.tooltip')
     .st({
@@ -86,20 +86,24 @@ function setup_tooltip(dom_target){
 
 
   const show = function(d, loc){
-
+    // By filtering I avoid errors caused by not having data for something
     const table_body = Object.keys(d)
-      .filter(key => !fields_to_ignore.includes(key))
-      .reduce((table, key) => table + `<tr><td style='text-align:right'>${santatize_key(key)}</td><td style='text-align:left; padding-left: 1rem'>${santatize_value(d[key])}</td></tr>`, '');
+      .filter(key => fields_to_show.includes(key))
+      .reduce((table, key) =>
+        table + `<tr>
+                  <td style='text-align:right'>${santatize_key(key)}</td>
+                  <td style='text-align:left; padding-left: 1rem'>${santatize_value(d[key])}</td>
+                </tr>`, '');
 
-    const tooltip_content = `<table> ${table_body} </table>`;
+      const tooltip_content = `<table> ${table_body} </table>`;
 
-    tooltip
-     .st({
-       left: loc[0] + 10,
-       top:  loc[1] + 10,
-       display: 'block'
-     })
-     .html(tooltip_content);
+      tooltip
+       .st({
+         left: loc[0] + 10,
+         top:  loc[1] + 10,
+         display: 'block'
+       })
+       .html(tooltip_content);
   };
 
   const hide = function(){

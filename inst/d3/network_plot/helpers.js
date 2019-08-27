@@ -90,7 +90,7 @@ function setup_dom_elements(div, C, on_message){
   const canvas = div.selectAppend('canvas');
   const context = canvas.node().getContext('2d');
 
-  const tooltip = setup_tooltip(div, C);
+  const tooltip = setup_tooltip(div, C.fields_to_show);
 
   const message_buttons = setup_message_buttons(div, on_message);
 
@@ -107,51 +107,6 @@ function setup_dom_elements(div, C, on_message){
   };
 
   return {svg, canvas, context, tooltip, message_buttons, resize};
-}
-
-
-// Function to initialize a tooltip for showing mousover info
-// Appends a tooltip to a div and opens up methods to move it around, show, hide, and update contents
-function setup_tooltip(div, C){
-
-  const tip = div.selectAppend('div.tooltip')
-    .st({
-      background: 'white',
-      borderRadius: '10px',
-      padding: '0px 15px',
-      boxShadow: '1px 1px 3px black',
-      position: 'absolute',
-    });
-
-  const tip_body = tip.selectAppend('div.body');
-
-  const move = function(pos){
-    tip
-      .style('left', `${pos[0] + C.tooltip_offset}px`)
-      .style('top',  `${pos[1]}px`);
-
-    return this;
-  };
-
-  const show = function(){
-    tip.style('display', 'block');
-    return this;
-  };
-
-  const hide = function(){
-    tip.style('display', 'none');
-    return this;
-  };
-
-  const update = function(content){
-    tip_body.html(content);
-    return this;
-  };
-
-  // start with tooltip hidden
-  hide();
-
-  return {move, show, hide, update};
 }
 
 

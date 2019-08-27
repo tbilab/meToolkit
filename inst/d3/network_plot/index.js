@@ -1,4 +1,4 @@
-// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/network_plot/helpers.js'), css = here::here('inst/d3/network_plot/network.css'))
+// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/network_plot/helpers.js')), css = c(here::here('inst/d3/network_plot/network.css'),  here::here('inst/d3/helpers.css'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -19,6 +19,7 @@ const C = Object.assign(
     viz_type: 'bipartite',
     callouts: false,
     export_mode: false,
+    fields_to_show: ['code', 'OR', 'p_val', 'description', 'category'],
     update_freq: 5, // How often do we send back layout simulation progress?
   },
   options);
@@ -336,9 +337,10 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       on_mouseover(d);
 
       tooltip
-        .move([scales.X(d.x), scales.Y(d.y)])
-        .update(d.tooltip)
-        .show();
+        .show(d, [d3.event.clientX, d3.event.clientY]);
+        //.move([scales.X(d.x), scales.Y(d.y)])
+        //.update(d.tooltip)
+        //.show();
     })
     .on('mouseout', function(d){
       tooltip.hide();
