@@ -13,7 +13,7 @@ info_panel_UI <- function(id) {
   ns <- NS(id)
 
   shiny::tagList(
-    r2d3::d3Output(ns("info_banner"), height = '150px')
+    r2d3::d3Output(ns("info_banner"), height = '100%')
   )
 }
 
@@ -62,14 +62,14 @@ info_panel <- function(
 
     r2d3::r2d3(
       snp_info,
-      script = system.file("d3/info_panel/version2.js", package = "meToolkit"),
+      script = system.file("d3/info_panel/info_panel.js", package = "meToolkit"),
       container = 'div',
       dependencies = c(
         "d3-jetpack",
         system.file("d3/helpers.js", package = "meToolkit")
       ),
       css = c(
-        system.file("d3/info_panel/version2.css", package = "meToolkit"),
+        system.file("d3/info_panel/info_panel.css", package = "meToolkit"),
         system.file("d3/helpers.css", package = "meToolkit")
       )
     )

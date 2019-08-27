@@ -14,7 +14,7 @@ TWO_SNP_COPIES_COLOR <- "#de2d26"
 
 individual_data <- read_rds('data/simulated_ind_data.rds')
 results_data    <- read_rds('data/simulated_phewas_results.rds')
-snp_name        <- 'rs1234'
+snp_name        <- 'rs13283456'
 
 ui <- htmlTemplate(
   "template.html",

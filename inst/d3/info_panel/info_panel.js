@@ -1,14 +1,6 @@
-// !preview r2d3 data=readr::read_rds(here::here('data/fake_info_data.rds')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'))
+// !preview r2d3 data=readr::read_rds(here::here('data/fake_info_data.rds')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js')), css = c(here::here('inst/d3/info_panel/info_panel.css'), here::here('inst/d3/helpers.css'))
 
-// Info banner for SNP name, MAF for current selection and the entire cohort. Along with link to click for genome browser location of SNP.
-
-const snp_info_style = {
-  fontWeight: 'bold',
-};
-
-
-
-const padding = 15;
+const margin = {left: 5, right: 25};
 const exome_color = 'steelblue';
 const sel_color = 'orangered';
 const maf_chart_start = width/3;
@@ -16,125 +8,107 @@ const label_gap= 35;
 const point_r = 20;
 const selection_height = height/2 - (point_r*1.1);
 const exome_height =     height/2 + (point_r*1.1);
-const max_freq = Math.min(1, Math.max(maf_exome, maf_sel)*1.1);
 
-// turns proportion into a rounded percentange
-const toPercent = d3.format(".1%");
+const stick_size = 4;
+const lollypop_size = 5;
 
-// clear any old stuff left from previous visualization.
-svg.html('');
 
-// draw the snp name in the upper left corner
-svg.append('text')
-  .text(snp)
-  //.attr('class', 'snp_name')
-  .st({
-    alignmentBaseline: 'hanging',
-    textAnchor: 'start',
-    fontWeight: 'bold',
-    fontSize: '30px',
-  })
-  .attr('x', 10)
-  .attr('y', 10);
+const {maf_exome, maf_sel, snp, ...loc_info} = data;
 
-const snp_details = svg.append('g').attr('id', 'snp_details').st({fontSize: '18px'});
+// Setup the divs for our viz
+div.classed('container', true);
 
-snp_details.append('text')
-  .html(`Gene: `)
-  .attr('x', 10)
-  .attr('y', height - 50)
-  .append('tspan')
-    .text(gene)
-    .st(snp_info_style);
+// ================================================================
+// Title
+// ================================================================
+const header = div.append('div.snp_name.header');
+header.append('h1').text(data.snp);
 
-snp_details.append('text')
-  .html(`Chromosome: `)
-  .attr('x', 10)
-  .attr('y', height - 30)
-  .append('tspan')
-    .text(chromosome)
-    .st(snp_info_style);
 
-snp_details.append('text')
-  .html(`Genome Browser Link`)
-  .attr('class', 'genome_browser_link')
-  .st({
-    textDecoration: 'underline',
-    cursor: 'pointer',
-  })
-  .attr('x', 10)
-  .attr('y', height - 10)
-  .on('click', () => {
+// ================================================================
+// Allele Frequency Viz
+// ================================================================
+const maf_viz = div.append('div.maf_viz');
+maf_viz.append('div.header')
+  .append('h2')
+  .text('Minor Allele Frequency');
 
-    const db = 'hg19';
-    const link = `http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&db=${db}&position=ch${chromosome}:${snp}`;
+const svg = maf_viz.append('svg');
+const viz_w = +svg.style('width').replace('px', '') ;
+const viz_h = +svg.style('height').replace('px', '');
 
-    window.open(link, '_blank');
+// Decide what the max displayed frequency will be. This is either one or a small padding around the max.
+const max_freq = Math.min(1, Math.max(maf_exome, maf_sel)*1.2);
+const x_scale = d3.scaleLinear().domain([0,max_freq]).range([margin.left, viz_w - margin.right]);
+
+const line_styles = {
+  x1: margin.left,
+  stroke: 'black',
+  strokeWidth: 2,
+};
+
+const frequencies = svg.selectAll('g.frequencies')
+  .data([
+    {name: 'Entire Cohort',     freq: maf_exome},
+    {name: 'Current Selection', freq: maf_sel}
+  ])
+  .enter().append('g')
+  .translate((d,i) => [x_scale(d.freq), (i+1)*(viz_h/3)]);
+
+frequencies
+  .append('circle')
+  .at({
+    r: lollypop_size,
+    fill: 'black'
   });
 
-// MAF scale
-const x = d3.scaleLinear()
-  .domain([0,max_freq])
-  .range([maf_chart_start, width - padding*1.5]);
-
-svg.append("g")
-  .attr("transform", `translate(0,${exome_height})`)
-  .call( d3.axisBottom(x)
-    .tickValues([0, max_freq])
-    .tickFormat(toPercent)
-    .tickSizeOuter(0)
-  );
-
-// add label for MAF
-svg.append("text")
-  .attr('id', 'maf_axis_label')
-  .st({
-    textAnchor: 'middle',
-    fontSize: '14px',
-    fill: '#5c5b5b',
-  })
-  .attr("transform", `translate(${maf_chart_start + (width - maf_chart_start)/2},${exome_height + 35})`)
-  .text("Minor Allele Frequency (MAF)");
-
-
-svg.append('line')
-  .attr('x1', x(0))
-  .attr('x2', x(max_freq))
-  .attr('y1', selection_height)
-  .attr('y2', selection_height)
-  .attr('stroke', 'black')
-  .attr('stroke-width', 1);
-
-
-const maf_plot = svg.selectAll('#maf_plot')
-  .data([ {group: 'Entire Cohort', maf: maf_exome},
-          {group: 'Current Selection', maf: maf_sel} ])
-  .enter().append('g')
-  .attr('transform', d => `translate(${x(d.maf)}, ${d.group == 'Entire Cohort' ? exome_height: selection_height} )`);
-
-
-// group label text
-maf_plot.append('text')
-  .text(d => d.group)
-  .attr('class', 'labels')
-  .st({
-    textAnchor: 'end',
-    fontSize: '20px',
-  })
-  .attr('y', -3)
-  .attr('x', -(point_r + 3));
-
-// points on axis for groups
-maf_plot.append('circle')
-  .attr('r', point_r)
-  .attr('fill', d => d.group == 'Entire Cohort' ? exome_color: sel_color);
-
-maf_plot.append('text')
-  .text(d => toPercent(d.maf).replace('%',''))
-  .st({
-    fill: 'white',
+frequencies
+  .append('text')
+  .at({
+    x: lollypop_size*1.2,
     alignmentBaseline: 'middle',
-    textAnchor: 'middle',
-    fontSize: '16px',
   })
-  .attr('class', 'maf_points');
+  .text(d => toPercent(d.freq));
+
+frequencies
+  .append('text')
+  .at({
+    x: d => -x_scale(d.freq) + x_scale(0),
+    y: -stick_size,
+  })
+  .text(d => d.name);
+
+frequencies
+  .append('line')
+  .at({
+    x2: d => -x_scale(d.freq)  + x_scale(0),
+    stroke: 'black',
+    strokeWidth: stick_size,
+  });
+
+
+// ================================================================
+// Location info
+// ================================================================
+const location = div.append('div.location');
+
+location.append('div.header')
+  .append('h2')
+  .text('Location');
+
+const loc_table_body = Object.keys(loc_info)
+  .reduce((table, key) =>
+        table + `<tr>
+                  <td style='text-align:right'>${key}</td>
+                  <td style='text-align:left; padding-left: 1rem'>${loc_info[key]}</td>
+                </tr>`, '');
+
+location
+  .append('div.table_holder')
+  .append('table')
+  .html(loc_table_body);
+
+
+//debugger;
+
+
