@@ -11,8 +11,7 @@ const exome_height =     height/2 + (point_r*1.1);
 
 const lollypop_size = 5;
 
-const {maf_exome, maf_sel} = data;
-
+const {maf_exome, maf_sel, snp, ...loc_info} = data;
 
 // Setup the divs for our viz
 div.classed('container', true);
@@ -93,12 +92,7 @@ const location = div.append('div.location');
 
 location.append('div.header')
   .append('h2')
-  .text('Location')
-
-const loc_info = {
-  chr: '5',
-  gene: 'abcd3'
-};
+  .text('Location');
 
 const loc_table_body = Object.keys(loc_info)
   .reduce((table, key) =>
