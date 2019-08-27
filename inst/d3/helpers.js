@@ -66,4 +66,34 @@ function send_to_shiny(type, payload, destination){
   }
 }
 
+function setup_tooltip(dom_target){
+
+  const tooltip = dom_target.selectAppend('div.tooltip')
+    .st({
+      background:'rgba(255,255,255,0.7)',
+      position:'fixed',
+      fontSize: 18,
+    });
+
+  const show = function(d, loc){
+    tooltip
+     .st({
+       left: loc[0] + 10,
+       top:  loc[1] + 10,
+       display: 'block'
+     })
+     .html(d.tooltip);
+  };
+
+  const hide = function(){
+    tooltip
+      .st({
+        left: 0,
+        top: 0,
+        display: 'none',
+      });
+  };
+
+  return {show, hide}
+}
 

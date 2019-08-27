@@ -81,12 +81,9 @@ const my_table = setup_table(
   .add_data(viz_data, columns_to_show)
   .set_selection_callback(send_table_selection);
 
-const tooltip = div.selectAppend('div.tooltip')
-  .st({
-    background:'rgba(255,255,255,0.7)',
-    position:'fixed',
-    fontSize: 18,
-  });
+
+const tooltip = setup_tooltip(div);
+
 
 // Then we append a g element that has padding added to it to those svgs
 const main_viz = main_svg
@@ -115,6 +112,7 @@ const manhattan_scales = {
   x: d3.scaleLinear(),
   y: d3.scaleLinear(),
 };
+
 
 const histogram_scales = {
   x: d3.scaleLinear(),
@@ -354,10 +352,10 @@ function draw_manhattan(data){
     .attr('cy', d => manhattan_scales.y(d.log_pval))
     .at(default_point)
     .on('mouseover', function(d){
-      fill_tooltip(d, [d3.event.clientX, d3.event.clientY]);
+      tooltip.show(d, [d3.event.clientX, d3.event.clientY]);
     })
     .on('mouseout', function(d){
-      hide_tooltip();
+      tooltip.hide();
     });
 
 
@@ -453,27 +451,6 @@ function draw_histogram(data){
         .call(d3.axisLeft(histogram_scales.y).ticks(5).tickSizeOuter(0))
         .call(add_axis_label('# of Codes'))
     );
-}
-
-
-function fill_tooltip(d, loc){
-  tooltip
-   .st({
-     left: loc[0] + 10,
-     top:  loc[1] + 10,
-     display: 'block'
-   })
-   .html(d.tooltip);
-}
-
-
-function hide_tooltip(){
-  tooltip
-    .st({
-      left: 0,
-      top: 0,
-      display: 'none',
-    });
 }
 
 
