@@ -1,4 +1,4 @@
-// !preview r2d3 data=phewas_results, options=list(selected=first_selected), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'), here::here('inst/d3/helpers.css'))
+// !preview r2d3 data=phewas_results, options=list(selected=first_selected, colors = list(light_grey = "#f7f7f7",med_grey = "#d9d9d9",dark_grey = "#bdbdbd",light_blue = "#4292c6")), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'), here::here('inst/d3/helpers.css'))
 // ===============================================================
 // Initialization
 // ===============================================================
@@ -331,7 +331,7 @@ function draw_manhattan(data){
   const disabled_point = {
     r: 1,
     fillOpacity: 0.1,
-    fill: 'grey',
+    fill: options.colors.med_grey,
   };
 
   const highlighted_point = {
@@ -426,7 +426,7 @@ function hide_reset(){
 function draw_histogram(data){
 
   let hist_bars = or_hist
-    .attr("fill", "steelblue")
+    .attr("fill", options.colors.light_blue)
     .selectAll("rect.histogram_bar")
     .data(or_bins);
 
@@ -564,9 +564,8 @@ function initialize_histogram_brush(data){
 
   hist_brush_g.selectAll('.handle')
     .at({
-      //width: 15,
       strokeWidth: 2,
-      fill: 'darkgrey',
+      fill: options.colors.dark_grey,
     });
 
   function set_brush_pos([min, max]){
