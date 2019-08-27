@@ -13,6 +13,7 @@ if(snp_filtered){
   options <- data_for_upset$options
 }
 
+options$colors <- list(light_grey = "#f7f7f7",med_grey = "#d9d9d9",dark_grey = "#bdbdbd",light_blue = "#4292c6")
 options$min_set_size <- 150
 
 

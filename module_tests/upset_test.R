@@ -49,6 +49,7 @@ server <- function(input, output, session) {
     upset, 'upsetPlot',
     upset_data,
     all_snp_data,
+    colors = list(light_grey = "#f7f7f7",med_grey = "#d9d9d9",dark_grey = "#bdbdbd",light_blue = "#4292c6"),
     action_object )
 
 }
