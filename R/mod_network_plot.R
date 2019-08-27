@@ -85,7 +85,6 @@ network_plot <- function(
   # send data and options to the 2d plot
   output$plot <- r2d3::renderD3({
     validate(need(network_data(), message = FALSE))
-
     json_for_network <- jsonlite::toJSON(network_data());
 
     r2d3::r2d3(
@@ -97,7 +96,10 @@ network_plot <- function(
         system.file("d3/helpers.js", package = "meToolkit"),
         system.file("d3/network_plot/helpers.js", package = "meToolkit")
       ),
-      css = system.file("d3/network_plot/network.css", package = "meToolkit"),
+      css = c(
+        system.file("d3/helpers.css", package = "meToolkit"),
+        system.file("d3/network_plot/network.css", package = "meToolkit")
+      ),
       options = list(
         just_snp = snp_filter(),
         msg_loc = session$ns('message'),

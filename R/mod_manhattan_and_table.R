@@ -51,7 +51,10 @@ manhattan_plot_and_table <- function(
         system.file("d3/helpers.js", package = "meToolkit"),
         system.file("d3/manhattan_plot/phewas_table.js", package = "meToolkit")
       ),
-      css = system.file("d3/manhattan_plot/phewas_table.css", package = "meToolkit"),
+      css = c(
+        system.file("d3/helpers.css", package = "meToolkit"),
+        system.file("d3/manhattan_plot/phewas_table.css", package = "meToolkit")
+      ),
       options = list(
         msg_loc = session$ns('message'),
         selected = selected_codes()
