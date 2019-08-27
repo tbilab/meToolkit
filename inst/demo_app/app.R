@@ -18,9 +18,9 @@ COLORS <- list(
   green      = "#74c476"
 )
 
-NO_SNP_COLOR <- "#bdbdbd"
-ONE_SNP_COPY_COLOR <- "#fc9272"
-TWO_SNP_COPIES_COLOR <- "#de2d26"
+NO_SNP_COLOR <- COLORS$dark_grey
+ONE_SNP_COPY_COLOR <- COLORS$light_red
+TWO_SNP_COPIES_COLOR <- COLORS$dark_red
 
 individual_data <- read_rds('data/simulated_ind_data.rds')
 results_data    <- read_rds('data/simulated_phewas_results.rds')
