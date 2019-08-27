@@ -41,6 +41,8 @@ info_panel <- function(
   snp_info$snp <- snp_name
   snp_info$maf_exome <- cohort_maf
 
+
+
   output$info_banner <- r2d3::renderD3({
 
     # grab maf of newest subset of cohort
@@ -49,8 +51,16 @@ info_panel <- function(
 
     r2d3::r2d3(
       snp_info,
-      dependencies = "d3-jetpack",
-      script = system.file("d3/info_panel/info_panel.js", package = "meToolkit")
+      script = system.file("d3/info_panel/version2.js", package = "meToolkit"),
+      container = 'div',
+      dependencies = c(
+        "d3-jetpack",
+        system.file("d3/helpers.js", package = "meToolkit")
+      ),
+      css = c(
+        system.file("d3/info_panel/version2.css", package = "meToolkit"),
+        system.file("d3/helpers.css", package = "meToolkit")
+      )
     )
   })
 }

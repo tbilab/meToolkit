@@ -30,7 +30,9 @@ ui <- htmlTemplate(
   network =  network_plot_UI('network_plot',
     height = '100%',
     div_class = 'network_plot',
-    snp_colors = c(NO_SNP_COLOR, ONE_SNP_COPY_COLOR, TWO_SNP_COPIES_COLOR) )
+    snp_colors = c(NO_SNP_COLOR, ONE_SNP_COPY_COLOR, TWO_SNP_COPIES_COLOR)
+  ),
+  info_panel = info_panel_UI('info_panel')
 )
 
 
@@ -194,13 +196,13 @@ server <- function(input, output, session) {
     app_interaction(action_object_message)
   })
 
-  ## SNP info panel
-  # callModule(
-  #   info_panel, 'info_panel',
-  #   snp_name,
-  #   individual_data,
-  #   curr_ind_data
-  # )
+  # SNP info panel
+  callModule(
+    info_panel, 'info_panel',
+    snp_name,
+    individual_data,
+    curr_ind_data
+  )
 
 }
 

@@ -1,3 +1,5 @@
+// !preview r2d3 data=readr::read_rds(here::here('data/fake_info_data.rds')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'))
+
 // Info banner for SNP name, MAF for current selection and the entire cohort. Along with link to click for genome browser location of SNP.
 
 const snp_info_style = {
@@ -5,7 +7,6 @@ const snp_info_style = {
 };
 
 
-const {snp, maf_exome, maf_sel, gene, loc, chromosome} = data;
 
 const padding = 15;
 const exome_color = 'steelblue';

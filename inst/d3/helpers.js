@@ -9,6 +9,7 @@ function format_val(d, places = 3){
 const countFormat = d3.format(",d");
 const CiFormat = d3.format(".2f");
 const pValFormat = d3.format("0.2");
+const toPercent = d3.format(".1%");
 
 
 // Compare two tuples as equal.
