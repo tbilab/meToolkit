@@ -332,8 +332,9 @@ function draw_manhattan(data){
 
   const disabled_point = {
     r: 1,
-    fillOpacity: 0.1,
+    opacity: 0.15,
     fill: options.colors.med_grey,
+    stroke: options.colors.med_grey,
   };
 
   const highlighted_point = {
