@@ -323,9 +323,11 @@ function draw_manhattan(data){
   let currently_selected_points;
 
   const default_point = {
-    r: 2,
-    fillOpacity: 0.85,
-    fill: d => d.unselected_color,
+    r: d => d.log_or > 0 ? 2: 1.5,
+    opacity: 0.85,
+    fill: d => d.log_or > 0 ? d.unselected_color: 'white',
+    stroke: d => d.unselected_color,
+    strokeWidth: d => d.log_or > 0 ? 0 : 1.5,
   };
 
   const disabled_point = {
@@ -335,9 +337,11 @@ function draw_manhattan(data){
   };
 
   const highlighted_point = {
-    r: 3,
+    r: d => d.log_or > 0 ? 3: 2.5,
     fillOpacity: 1,
-    fill: d => d.color,
+    fill: d => d.log_or > 0 ? d.color: 'white',
+    stroke: d => d.color,
+    strokeWidth: d => d.log_or > 0 ? 0 : 1.5,
   };
 
   const code_selected = d => selected_codes.includes(d.code);
@@ -345,6 +349,7 @@ function draw_manhattan(data){
   let manhattan_points = main_viz.selectAll('circle')
     .data(data, d => d.code);
 
+  debugger;
   manhattan_points = manhattan_points.enter()
     .append('circle')
     .merge(manhattan_points)
