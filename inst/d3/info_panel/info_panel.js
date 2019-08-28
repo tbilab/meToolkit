@@ -69,7 +69,7 @@ const draw_lollypop = (maf, name, title, i) => {
     });
 
   lollypop_g
-    .selectAppend('text')
+    .selectAppend('text.percent')
     .at({
       x: lollypop_size*1.2,
       alignmentBaseline: 'middle',
@@ -77,10 +77,10 @@ const draw_lollypop = (maf, name, title, i) => {
     .text(toPercent(maf));
 
   lollypop_g
-    .selectAppend('text')
+    .selectAppend('text.title')
     .at({
       x: -x_scale(maf) + x_scale(0),
-      y: -stick_size - 3,
+      y: -stick_size - 1,
     })
     .text(title);
 
