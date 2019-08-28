@@ -116,6 +116,9 @@ function setup_tooltip(dom_target, fields_to_show = ['code','OR']){
       });
   };
 
+  // Start tooltip hidden.
+  hide();
+
   return {show, hide}
 }
 
