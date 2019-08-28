@@ -346,11 +346,14 @@ function draw_manhattan(data){
 
   const code_selected = d => selected_codes.includes(d.code);
 
-  let manhattan_points = main_viz.selectAll('circle')
+  //debugger;
+
+  let manhattan_points = main_viz.selectAll('circle.manhattan_points')
     .data(data, d => d.code);
 
   manhattan_points = manhattan_points.enter()
     .append('circle')
+    .attr('class', 'manhattan_points')
     .merge(manhattan_points)
     .attr('cx', d => manhattan_scales.x(d.index))
     .attr('cy', d => manhattan_scales.y(d.log_pval))
@@ -362,66 +365,66 @@ function draw_manhattan(data){
       tooltip.hide();
     });
 
-  // Draw simple legend
-  const legend_w = 200;
-  const legend_h = 30;
-  const legend_circ_r = 4;
-  const legend_circ_outline = 1.5;
-  const legend_gap = 15;
-  const legend_text_attrs = {
-    alignmentBaseline: 'middle',
-    fontSize: '0.7rem',
-    y: 1,
-  };
+ // Draw simple legend
+ const legend_w = 200;
+ const legend_h = 30;
+ const legend_circ_r = 4;
+ const legend_circ_outline = 1.5;
+ const legend_gap = 15;
+ const legend_text_attrs = {
+   alignmentBaseline: 'middle',
+   fontSize: '0.7rem',
+   y: 1,
+ };
 
-  const legend_g = main_viz
-    .selectAppend('g.legend')
-    .translate([0, -margin.top*0.9]);
-  legend_g.append('rect')
-    .at({
-      width: legend_w,
-      height: legend_h,
-      fill: options.colors.light_grey,
-      rx: 10,
-      stroke: options.colors.med_grey,
-      strokeWidth: 1,
-    });
+ const legend_g = main_viz
+   .selectAppend('g.legend')
+   .translate([0, -margin.top*0.9]);
+ legend_g.selectAppend('rect')
+   .at({
+     width: legend_w,
+     height: legend_h,
+     fill: options.colors.light_grey,
+     rx: 10,
+     stroke: options.colors.med_grey,
+     strokeWidth: 1,
+   });
 
-  const negative_g = legend_g.selectAppend('g.negative')
-    .translate([legend_w/2 - legend_gap, legend_h/2]);
+ const negative_g = legend_g.selectAppend('g.negative')
+   .translate([legend_w/2 - legend_gap, legend_h/2]);
 
-  const positive_g = legend_g.selectAppend('g.positive')
-    .translate([legend_w/2 + legend_gap, legend_h/2]);
+ const positive_g = legend_g.selectAppend('g.positive')
+   .translate([legend_w/2 + legend_gap, legend_h/2]);
 
-  negative_g.append('circle')
-    .at({
-      r: legend_circ_r,
-      fill: 'white',
-      stroke: 'orangered',
-      strokeWidth: legend_circ_outline,
-    });
+ negative_g.selectAppend('circle')
+   .at({
+     r: legend_circ_r,
+     fill: 'white',
+     stroke: 'orangered',
+     strokeWidth: legend_circ_outline,
+   });
 
-   positive_g.append('circle')
-    .at({
-      r: legend_circ_r + legend_circ_outline/2,
-      fill: 'orangered',
-    });
+  positive_g.selectAppend('circle')
+   .at({
+     r: legend_circ_r + legend_circ_outline/2,
+     fill: 'orangered',
+   });
 
-  negative_g.append('text')
-    .text('Log-OR < 0')
-    .at(legend_text_attrs)
-    .at({
-      x: -legend_circ_r*2,
-      textAnchor: 'end',
-    })
+ negative_g.selectAppend('text')
+   .text('Log-OR < 0')
+   .at(legend_text_attrs)
+   .at({
+     x: -legend_circ_r*2,
+     textAnchor: 'end',
+   })
 
-  positive_g.append('text')
-    .text('Log-OR > 0')
-    .at(legend_text_attrs)
-    .at({
-      x: legend_circ_r*2,
-      //textAnchor: 'end',
-    })
+ positive_g.selectAppend('text')
+   .text('Log-OR > 0')
+   .at(legend_text_attrs)
+   .at({
+     x: legend_circ_r*2,
+     //textAnchor: 'end',
+   })
 
 
 
