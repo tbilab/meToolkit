@@ -3,23 +3,28 @@ body {
   box-sizing: border-box;
 }
 
+h1, h2 {
+  margin: 0;
+}
+
 .container {
   height: 100%;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 4rem 2fr 2fr 3fr;
+  grid-template-rows: 4rem 1fr 1fr 2fr;
   grid-column-gap: 0px;
   grid-row-gap: 10px;
 }
 
 .header {
-  padding-left: 0.25rem;
   height: 2rem;
 }
 
-h1, h2 {
-  margin: 0;
+.header h1,
+.header h2 {
+  margin-left: 0.5rem;
 }
+
 
 .snp_name {
   grid-area: 1 / 1 / 2 / 2;

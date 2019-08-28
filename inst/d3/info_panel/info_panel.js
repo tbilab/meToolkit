@@ -1,6 +1,6 @@
 // !preview r2d3 data=readr::read_rds(here::here('data/fake_info_data.rds')), options = readr::read_rds(here::here('data/fake_info_options.rds')),  container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js')), css = c(here::here('inst/d3/info_panel/info_panel.css'), here::here('inst/d3/helpers.css'))
 
-const margin = {left: 5, right: 25};
+const margin = {left: 15, right: 25};
 const exome_color = 'steelblue';
 const sel_color = 'orangered';
 const maf_chart_start = width/3;
@@ -35,6 +35,7 @@ const instructions = div.selectAppend('div.instructions');
 // ================================================================
 header.selectAppend('h1')
   .style('border-bottom', `1px solid ${options.colors.med_grey}`)
+  .style('width', '100%')
   .text(data.snp)
   .style('color', main_title_color);
 
