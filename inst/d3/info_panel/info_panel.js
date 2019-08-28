@@ -124,6 +124,8 @@ location
 // ================================================================
 instructions
   .style('color', subtitle_color)
+  .style('border-top', `1px solid ${options.colors.dark_grey}`)
+  .style('padding-top', '1rem')
   .html(options.instructions);
 
 

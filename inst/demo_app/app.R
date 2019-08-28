@@ -8,7 +8,7 @@ library(magrittr)
 library(here)
 library(glue)
 
-MAX_ALLOWED_CODES = 45;
+MAX_ALLOWED_CODES <- 45;
 
 COLORS <- list(
   light_grey = "#f7f7f7",
@@ -27,6 +27,19 @@ TWO_SNP_COPIES_COLOR <- COLORS$dark_red
 individual_data <- read_rds('data/simulated_ind_data.rds')
 results_data    <- read_rds('data/simulated_phewas_results.rds')
 snp_name        <- 'rs13283456'
+
+
+usage_instructions <- div(
+  h2('How To Use'),
+  h3("Manhattan Plot"),
+  p("Use the Manhattan plot to select your codes of interest via dragging on main plot or selecting via the table."),
+  p("Once you have your desired codes selected press 'Update Network' button at top of pane to update the network data with individuals possessing the selected codes."),
+  h3("Upset Plot"),
+  p("The upset plot allows you to see basic statistics about the currently selected comorbidity patterns such as number of patients with a pattern and the risk of that pattern occuring in individuals with at least one copy of the minor allele."),
+  p("Clicking on a given pattern in the upset plot will highlight the patients with that pattern in the below network plot."),
+  h3("Network Plot"),
+  p("The network plot provides a direct look at the individual-level data. You can click on codes to select them for isolation or deletion from the current selecion.")
+)
 
 ui <- htmlTemplate(
   "template.html",
@@ -233,7 +246,7 @@ server <- function(input, output, session) {
     info_panel, 'info_panel',
     snp_name = snp_name,
     all_individual_data = individual_data,
-    instructions = div(h1('Hi there'), p("This is some text for my info panel")),
+    instructions = usage_instructions,
     colors = COLORS,
     current_individual_data = curr_ind_data
   )
