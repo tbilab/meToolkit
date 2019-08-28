@@ -7,7 +7,6 @@ library(tidyverse)
 library(magrittr)
 library(here)
 library(glue)
-library(shinyjs)
 
 MAX_ALLOWED_CODES = 25;
 
