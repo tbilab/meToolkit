@@ -349,7 +349,6 @@ function draw_manhattan(data){
   let manhattan_points = main_viz.selectAll('circle')
     .data(data, d => d.code);
 
-  debugger;
   manhattan_points = manhattan_points.enter()
     .append('circle')
     .merge(manhattan_points)
@@ -362,6 +361,69 @@ function draw_manhattan(data){
     .on('mouseout', function(d){
       tooltip.hide();
     });
+
+  // Draw simple legend
+  const legend_w = 200;
+  const legend_h = 30;
+  const legend_circ_r = 4;
+  const legend_circ_outline = 1.5;
+  const legend_gap = 15;
+  const legend_text_attrs = {
+    alignmentBaseline: 'middle',
+    fontSize: '0.7rem',
+    y: 1,
+  };
+
+  const legend_g = main_viz
+    .selectAppend('g.legend')
+    .translate([0, -margin.top*0.9]);
+  legend_g.append('rect')
+    .at({
+      width: legend_w,
+      height: legend_h,
+      fill: options.colors.light_grey,
+      rx: 10,
+      stroke: options.colors.med_grey,
+      strokeWidth: 1,
+    });
+
+  const negative_g = legend_g.selectAppend('g.negative')
+    .translate([legend_w/2 - legend_gap, legend_h/2]);
+
+  const positive_g = legend_g.selectAppend('g.positive')
+    .translate([legend_w/2 + legend_gap, legend_h/2]);
+
+  negative_g.append('circle')
+    .at({
+      r: legend_circ_r,
+      fill: 'white',
+      stroke: 'orangered',
+      strokeWidth: legend_circ_outline,
+    });
+
+   positive_g.append('circle')
+    .at({
+      r: legend_circ_r + legend_circ_outline/2,
+      fill: 'orangered',
+    });
+
+  negative_g.append('text')
+    .text('Log-OR < 0')
+    .at(legend_text_attrs)
+    .at({
+      x: -legend_circ_r*2,
+      textAnchor: 'end',
+    })
+
+  positive_g.append('text')
+    .text('Log-OR > 0')
+    .at(legend_text_attrs)
+    .at({
+      x: legend_circ_r*2,
+      //textAnchor: 'end',
+    })
+
+
 
 
   // Draw the axes
