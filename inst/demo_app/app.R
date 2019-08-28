@@ -211,9 +211,10 @@ server <- function(input, output, session) {
   # SNP info panel
   callModule(
     info_panel, 'info_panel',
-    snp_name,
-    individual_data,
-    curr_ind_data
+    snp_name = snp_name,
+    all_individual_data = individual_data,
+    colors = COLORS,
+    current_individual_data = curr_ind_data
   )
 
 }

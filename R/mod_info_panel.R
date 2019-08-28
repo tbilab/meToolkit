@@ -22,6 +22,7 @@ info_panel_UI <- function(id) {
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param snp_name String of the snp name
 #' @param all_individual_data Individual level data for all patients inc urrent cohort, needs to contain column \code{snp} containing copies of MA.
+#' @param colors A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.
 #' @param current_individual_data Reactive individual level data for the currently viewed subset of the cohort, again needs a \code{snp} column.
 #'
 #' @return Server component of info panel module
@@ -33,6 +34,7 @@ info_panel <- function(
   input, output, session,
   snp_name,
   all_individual_data,
+  colors,
   current_individual_data ) {
 
   cohort_maf <- mean(all_individual_data$snp > 0)
@@ -54,7 +56,7 @@ info_panel <- function(
 
     snp_info = list(
       snp = snp_name,
-      chromosome = loc_info$chr,
+      chr = loc_info$chr,
       gene = loc_info$gene,
       maf_exome = cohort_maf,
       maf_sel =  mean(current_individual_data()$snp > 0) # grab maf of newest subset of cohort
@@ -62,6 +64,7 @@ info_panel <- function(
 
     r2d3::r2d3(
       snp_info,
+      options = list(colors = colors),
       script = system.file("d3/info_panel/info_panel.js", package = "meToolkit"),
       container = 'div',
       dependencies = c(
