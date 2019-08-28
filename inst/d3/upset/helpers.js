@@ -91,7 +91,7 @@ function draw_pattern_matrix(g, patterns, marginals, scales, sizes){
     .at({
       x1: d => get_pattern_info(d, scales).range[0],
       x2: d => get_pattern_info(d, scales).range[1],
-      stroke: colors.code_present,
+      stroke: colors.pattern_bar,
       strokeWidth: scales.matrix_dot_size/2
     });
 

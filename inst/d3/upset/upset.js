@@ -15,6 +15,7 @@ const colors = {
   rr_interval: viz_options.colors.dark_red,
   null_rr_interval: 'black',
   code_missing: viz_options.colors.dark_grey,
+  pattern_bar: "#252525",
   interaction_box_border: viz_options.colors.med_grey,
   silder_handle: viz_options.colors.green,
 };
