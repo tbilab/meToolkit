@@ -1,4 +1,4 @@
-// !preview r2d3 data=readr::read_rds(here::here('data/fake_info_data.rds')), options = list(colors = list(dark_red   = "#ef3b2c", light_grey = "#f7f7f7",med_grey = "#d9d9d9",dark_grey = "#bdbdbd",light_blue = "#4292c6")),  container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js')), css = c(here::here('inst/d3/info_panel/info_panel.css'), here::here('inst/d3/helpers.css'))
+// !preview r2d3 data=readr::read_rds(here::here('data/fake_info_data.rds')), options = readr::read_rds(here::here('data/fake_info_options.rds')),  container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js')), css = c(here::here('inst/d3/info_panel/info_panel.css'), here::here('inst/d3/helpers.css'))
 
 const margin = {left: 5, right: 25};
 const exome_color = 'steelblue';
@@ -9,7 +9,7 @@ const point_r = 20;
 const selection_height = height/2 - (point_r*1.1);
 const exome_height =     height/2 + (point_r*1.1);
 
-const stick_size = 4;
+const stick_size = 5;
 const lollypop_size = 5;
 
 
@@ -18,26 +18,36 @@ const {maf_exome, maf_sel, snp, ...loc_info} = data;
 // Setup the divs for our viz
 div.classed('container', true);
 
-const header_colors = {
-  color: 'dimgrey',
-}
+const main_title_color = '#252525';
+const subtitle_color = '#525252';
+
+
+// ================================================================
+// Main layout of panel
+// ================================================================
+const header = div.selectAppend('div.snp_name.header');
+const maf_viz = div.selectAppend('div.maf_viz');
+const location = div.selectAppend('div.location');
+const instructions = div.selectAppend('div.instructions');
+
 // ================================================================
 // Title
 // ================================================================
-const header = div.append('div.snp_name.header');
-header.append('h1').text(data.snp).st(header_colors);
+header.selectAppend('h1')
+  .style('border-bottom', `1px solid ${options.colors.med_grey}`)
+  .text(data.snp)
+  .style('color', main_title_color);
 
 
 // ================================================================
 // Allele Frequency Viz
 // ================================================================
-const maf_viz = div.append('div.maf_viz');
-maf_viz.append('div.header')
-  .append('h2')
+maf_viz.selectAppend('div.header')
+  .selectAppend('h2')
   .text('Minor Allele Frequency')
-  .st(header_colors);;
+  .style('color', subtitle_color);
 
-const svg = maf_viz.append('svg');
+const svg = maf_viz.selectAppend('svg');
 const viz_w = +svg.style('width').replace('px', '') ;
 const viz_h = +svg.style('height').replace('px', '');
 
@@ -45,55 +55,55 @@ const viz_h = +svg.style('height').replace('px', '');
 const max_freq = Math.min(1, Math.max(maf_exome, maf_sel)*1.2);
 const x_scale = d3.scaleLinear().domain([0,max_freq]).range([margin.left, viz_w - margin.right]);
 
+const draw_lollypop = (maf, name, title, i) => {
+  const dist_between_lines = 20;
 
-const frequencies = svg.selectAll('g.frequencies')
-  .data([
-    {name: 'Entire Cohort',     freq: maf_exome},
-    {name: 'Current Selection', freq: maf_sel}
-  ])
-  .enter().append('g')
-  .translate((d,i) => [x_scale(d.freq), (i+1)*(viz_h/3)]);
+  const lollypop_g = svg.selectAppend(`g.${name}`)
+    .translate([x_scale(maf), (viz_h/2) + (-1 + 2*i)*dist_between_lines]);
 
-frequencies
-  .append('circle')
-  .at({
-    r: lollypop_size,
-    fill: options.colors.dark_red,
-  });
+  lollypop_g
+    .selectAppend('circle')
+    .at({
+      r: lollypop_size,
+      fill: options.colors.dark_red,
+    });
 
-frequencies
-  .append('text')
-  .at({
-    x: lollypop_size*1.2,
-    alignmentBaseline: 'middle',
-  })
-  .text(d => toPercent(d.freq));
+  lollypop_g
+    .selectAppend('text')
+    .at({
+      x: lollypop_size*1.2,
+      alignmentBaseline: 'middle',
+    })
+    .text(toPercent(maf));
 
-frequencies
-  .append('text')
-  .at({
-    x: d => -x_scale(d.freq) + x_scale(0),
-    y: -stick_size,
-  })
-  .text(d => d.name);
+  lollypop_g
+    .selectAppend('text')
+    .at({
+      x: -x_scale(maf) + x_scale(0),
+      y: -stick_size - 3,
+    })
+    .text(title);
 
-frequencies
-  .append('line')
-  .at({
-    x2: d => -x_scale(d.freq)  + x_scale(0),
-    stroke: options.colors.dark_red,
-    strokeWidth: stick_size,
-  });
+  lollypop_g
+    .selectAppend('line')
+    .at({
+      x2: -x_scale(maf)  + x_scale(0),
+      stroke: options.colors.dark_red,
+      strokeWidth: stick_size,
+    });
+};
+
+draw_lollypop(maf_exome, 'cohort_freq', 'Entire Cohort', 0);
+draw_lollypop(maf_sel, 'selection_freq', 'Current Selection', 1);
+
 
 // ================================================================
 // Location info
 // ================================================================
-const location = div.append('div.location');
-
-location.append('div.header')
-  .append('h2')
+location.selectAppend('div.header')
+  .selectAppend('h2')
   .text('Location')
-  .st(header_colors);
+  .style('color', subtitle_color);
 
 const loc_table_body = Object.keys(loc_info)
   .reduce((table, key) =>
@@ -103,11 +113,16 @@ const loc_table_body = Object.keys(loc_info)
                 </tr>`, '');
 
 location
-  .append('div.table_holder')
-  .append('table')
+  .selectAppend('div.table_holder')
+  .selectAppend('table')
   .html(loc_table_body);
 
 
-//debugger;
+// ================================================================
+// Instruction text
+// ================================================================
+instructions
+  .style('color', subtitle_color)
+  .html(options.instructions);
 
 

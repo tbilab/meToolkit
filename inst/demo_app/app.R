@@ -233,6 +233,7 @@ server <- function(input, output, session) {
     info_panel, 'info_panel',
     snp_name = snp_name,
     all_individual_data = individual_data,
+    instructions = div(h1('Hi there'), p("This is some text for my info panel")),
     colors = COLORS,
     current_individual_data = curr_ind_data
   )
