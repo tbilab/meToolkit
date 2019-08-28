@@ -2,6 +2,8 @@
 <!-- template.html -->
 <html>
   <head>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
     {{ headContent() }}
     <style>
     body {
@@ -43,6 +45,9 @@
     </style>
   </head>
   <body>
+    <script>
+      Shiny.addCustomMessageHandler('load_popup', message =>  swal(message) );
+    </script>
 
     <div class = 'info_header'>
       <h2 class = 'app-title'> {{ app_title }} </h2>

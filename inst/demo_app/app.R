@@ -7,6 +7,9 @@ library(tidyverse)
 library(magrittr)
 library(here)
 library(glue)
+library(shinyjs)
+
+MAX_ALLOWED_CODES = 25;
 
 COLORS <- list(
   light_grey = "#f7f7f7",
@@ -127,8 +130,26 @@ server <- function(input, output, session) {
           print('selecting codes!')
           codes_to_select <- action_payload %>%
             extract_codes()
-          if(length(codes_to_select) < 2){
-            warnAboutSelection()
+
+          num_requested_codes <- length(codes_to_select)
+
+          # Check size of request.
+          if(num_requested_codes < 2){
+            session$sendCustomMessage(
+              "load_popup",
+              list(
+                title = "Too few codes requested",
+                text = "Try selecting at least two codes."
+              )
+            )
+          } else if (num_requested_codes > MAX_ALLOWED_CODES) {
+            session$sendCustomMessage(
+              "load_popup",
+              list(
+                title = "Too many codes requested",
+                text = glue("The maximum allowed is {MAX_ALLOWED_CODES} and {num_requested_codes} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!")
+              )
+            )
           } else {
             state$selected_codes(codes_to_select)
           }
