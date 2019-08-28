@@ -5,7 +5,7 @@
 \title{Server function of manhattan plot module. Returns a reactive variable that dispenses interaction events in the common type, payload format of \code{meToolkit} modules.}
 \usage{
 manhattan_plot_and_table(input, output, session, results_data,
-  selected_codes, action_object)
+  selected_codes, colors, action_object)
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
@@ -13,6 +13,8 @@ manhattan_plot_and_table(input, output, session, results_data,
 \item{results_data}{Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.}
 
 \item{selected_codes}{A reactive variable containing array of code \code{id}s that are currently selected in the app.}
+
+\item{colors}{A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.}
 
 \item{action_object}{A \code{reactiveVal} that will be updated by the module upon selection}
 }

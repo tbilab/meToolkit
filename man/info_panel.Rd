@@ -4,7 +4,7 @@
 \alias{info_panel}
 \title{Server function of snp info panel}
 \usage{
-info_panel(input, output, session, snp_name, all_individual_data,
+info_panel(input, output, session, snp_name, all_individual_data, colors,
   current_individual_data)
 }
 \arguments{
@@ -13,6 +13,8 @@ info_panel(input, output, session, snp_name, all_individual_data,
 \item{snp_name}{String of the snp name}
 
 \item{all_individual_data}{Individual level data for all patients inc urrent cohort, needs to contain column \code{snp} containing copies of MA.}
+
+\item{colors}{A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.}
 
 \item{current_individual_data}{Reactive individual level data for the currently viewed subset of the cohort, again needs a \code{snp} column.}
 }
