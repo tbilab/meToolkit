@@ -205,8 +205,6 @@ let selected_codes = [],
     };
 
 
-
-
 //------------------------------------------------------------
 // On Render
 //------------------------------------------------------------
@@ -278,6 +276,10 @@ function size_viz(width, height){
 // Function to draw svg parts of network
 function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click, on_mouseover){
 
+  nodes.forEach(d => {
+    d.code = d.name;
+  });
+
   const x_max = scales.X.range()[1];
   const y_max = scales.Y.range()[1];
 
@@ -335,16 +337,10 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
   all_nodes
     .on('mouseover', function(d){
       on_mouseover(d);
-
-      tooltip
-        .show(d, [d3.event.clientX, d3.event.clientY]);
-        //.move([scales.X(d.x), scales.Y(d.y)])
-        //.update(d.tooltip)
-        //.show();
+      tooltip.show(d, [d3.event.clientX, d3.event.clientY]);
     })
     .on('mouseout', function(d){
       tooltip.hide();
-
       // Reset nodes that may have been highlighted
       draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
     })

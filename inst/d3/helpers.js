@@ -90,6 +90,7 @@ function setup_tooltip(dom_target, fields_to_show = ['code','OR']){
     // By filtering I avoid errors caused by not having data for something
     const table_body = Object.keys(d)
       .filter(key => fields_to_show.includes(key))
+      .sort((a,b) => a == 'code' ? -1 : 1) // trick to make sure code field shows up first
       .reduce((table, key) =>
         table + `<tr>
                   <td style='text-align:right'>${santatize_key(key)}</td>
