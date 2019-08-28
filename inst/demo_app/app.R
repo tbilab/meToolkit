@@ -8,7 +8,7 @@ library(magrittr)
 library(here)
 library(glue)
 
-MAX_ALLOWED_CODES = 25;
+MAX_ALLOWED_CODES = 45;
 
 COLORS <- list(
   light_grey = "#f7f7f7",
