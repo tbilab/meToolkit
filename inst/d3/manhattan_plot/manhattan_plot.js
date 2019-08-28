@@ -53,8 +53,9 @@ const send_button = buttons.append('button')
 // Reset button that shows up when there is something selected
 // allowing the user to back out to default.
 const reset_button = buttons.append('button')
-  .text('Reset')
+  .text('Undo selection changes')
   .style('display', 'inline-block')
+  .style('margin-left', '0.5rem')
   .on('click', () => app_state.pass_action('reset_button', null));
 
 const main_svg = div.append('svg')
