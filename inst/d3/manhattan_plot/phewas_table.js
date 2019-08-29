@@ -103,8 +103,27 @@ function setup_table(dom_target, sizes){
   };
 
   const select_codes = function(codes_to_select){
+
     selected_codes = codes_to_select;
-    rows.classed('selected', d => codes_to_select.includes(d.code));
+    let number_changed = 0;
+
+    rows.classed('selected', function(d){
+      const is_selected = codes_to_select.includes(d.code);
+      if(is_selected){
+        // Check to see if this code was selected before to keep track of number of codes changed.
+        const new_selection = !d3.select(this).classed('selected');
+        if(new_selection) number_changed++;
+      }
+      return is_selected;
+    });
+
+    // If more than one code has changed in one go that means the user selected codes using dragging so
+    // we want to raise selected codes to top of table
+    if(number_changed > 1){
+      raise_selected_codes();
+    }
+
+    // If more than two selected codes have been changed, sort table too.
     return this;
   };
 
@@ -132,9 +151,6 @@ function setup_table(dom_target, sizes){
     if(is_disabled) return;
 
     const new_selection = !row.classed('selected');
-
-    // toggle selection class
-    row.classed('selected', new_selection);
 
     if(new_selection){
       selected_codes.push(d.code);
@@ -225,7 +241,7 @@ function setup_table(dom_target, sizes){
     search_clear_btn.classed('visible', true);
   }
 
-  return {add_data, select_codes, disable_codes, set_selection_callback};
+  return {add_data, select_codes, disable_codes, set_selection_callback, raise_selected_codes};
 }
 
 
