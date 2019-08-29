@@ -9,8 +9,6 @@ const point_r = 20;
 const selection_height = height/2 - (point_r*1.1);
 const exome_height =     height/2 + (point_r*1.1);
 
-const stick_size = 5;
-const lollypop_size = 5;
 
 
 const {maf_exome, maf_sel, snp, ...loc_info} = data;
@@ -57,33 +55,12 @@ const max_freq = Math.min(1, Math.max(maf_exome, maf_sel)*1.2);
 const x_scale = d3.scaleLinear().domain([0,max_freq]).range([margin.left, viz_w - margin.right]);
 
 const draw_lollypop = (maf, name, title, i) => {
-  const dist_between_lines = 20;
+  const dist_between_lines = 25;
+  const stick_size = 20;
+  const lollypop_size = stick_size/2;
 
   const lollypop_g = svg.selectAppend(`g.${name}`)
     .translate([x_scale(maf), (viz_h/2) + (-1 + 2*i)*dist_between_lines]);
-
-  lollypop_g
-    .selectAppend('circle')
-    .at({
-      r: lollypop_size,
-      fill: options.colors.dark_red,
-    });
-
-  lollypop_g
-    .selectAppend('text.percent')
-    .at({
-      x: lollypop_size*1.2,
-      alignmentBaseline: 'middle',
-    })
-    .text(toPercent(maf));
-
-  lollypop_g
-    .selectAppend('text.title')
-    .at({
-      x: -x_scale(maf) + x_scale(0),
-      y: -stick_size - 1,
-    })
-    .text(title);
 
   lollypop_g
     .selectAppend('line')
@@ -92,6 +69,35 @@ const draw_lollypop = (maf, name, title, i) => {
       stroke: options.colors.dark_red,
       strokeWidth: stick_size,
     });
+
+  lollypop_g
+    .selectAppend('circle')
+    .at({
+      r: lollypop_size,
+      fill: options.colors.dark_red,
+    });
+
+  // Percent number
+  lollypop_g
+    .selectAppend('text.percent')
+    .at({
+      x: lollypop_size - 2,
+      y: 1,
+      textAnchor: 'end',
+      alignmentBaseline: 'middle',
+      fill: 'white',
+    })
+    .text(toPercent(maf));
+
+  // Bar title
+  lollypop_g
+    .selectAppend('text.title')
+    .at({
+      x: -x_scale(maf) + x_scale(0),
+      y: -stick_size/2 - 2,
+      fill: subtitle_color,
+    })
+    .text(title);
 };
 
 draw_lollypop(maf_exome, 'cohort_freq', 'Entire Cohort', 0);
@@ -125,7 +131,6 @@ location
 instructions
   .style('color', subtitle_color)
   .style('border-top', `1px solid ${options.colors.dark_grey}`)
-  .style('padding-top', '1rem')
   .html(options.instructions);
 
 

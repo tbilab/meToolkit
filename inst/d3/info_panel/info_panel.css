@@ -64,3 +64,8 @@ h1, h2 {
 .location table {
   font-size: 1.25rem;
 }
+
+.instructions {
+  padding-top: '1rem';
+  overflow: scroll;
+}
