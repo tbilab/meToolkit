@@ -1,6 +1,5 @@
 // Helper functions for upset plot
 
-
 function remove_zero_tick(axis){
   // Get rid of the zero tick value on an axis for cleanliness
   axis.selectAll('.tick')
@@ -29,6 +28,7 @@ function filter_set_size(data, marginal_data, min_set_size = 100){
   };
 }
 
+
 function setup_set_size_x_scale(patterns, sizes){
   // Setup the x-scale for counts of the patterns
   return d3.scaleLinear()
@@ -47,10 +47,6 @@ function get_pattern_info(d, scales) {
       code: p,
       pos: scales.matrix_width_scale(p) + scales.matrix_width_scale.bandwidth()/2,
     }));
-
-  //const positions_of_codes = d.pattern
-  //  .split('-')
-  //  .map(p => scales.matrix_width_scale(p) + scales.matrix_width_scale.bandwidth()/2);
 
   const range_of_pattern = d3.extent(positions_of_codes, d => d.pos);
 
@@ -329,7 +325,6 @@ function draw_code_marginal_bars(g, marginals, scales, sizes){
     });
 
 }
-
 
 
 //-------------------------------------------------------

@@ -9,7 +9,6 @@ let viz_data = data,
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
 
-
 const colors = {
   pattern_count_bars: viz_options.colors.light_blue,
   rr_interval: viz_options.colors.dark_red,
@@ -185,7 +184,6 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       d3.select(this).attr('opacity', 0);
   },
     click: function(d){
-
       // Flip highlighted status
       d.highlighted = (!d.highlighted || false);
 
@@ -219,6 +217,17 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       left_info_panel.hide();
       right_info_panel.hide();
       d3.select(this).attr('opacity', 0);
+    },
+    click: function(d){
+     // Flip highlighted status
+     d.highlighted = (!d.highlighted || false);
+
+   // Send message to shiny about the highlighted pattern
+     if(d.highlighted){
+       send_to_shiny('pattern_highlight', [d.code], viz_options.msg_loc || 'no_shiny');
+     } else {
+       send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
+     }
     }
   };
 
@@ -232,7 +241,6 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
 }
 
 function draw_upset(){
-
   // ----------------------------------------------------------------------
   // Start main visualization drawing
   // ---------------------------------------------------------------------
@@ -248,7 +256,6 @@ function draw_upset(){
   // Add a g to pad chart
   const g = svg.selectAppend('g.padding')
     .translate([sizes.margin.left, sizes.margin.top]);
-
 
   // Check if we have enough data to make a meaningful upset chart
   if(viz_data.length < 2){
