@@ -44,7 +44,16 @@ main_dashboard <- function(
   results_data,
   individual_data,
   MAX_ALLOWED_CODES,
-  COLORS
+  usage_instructions,
+  COLORS = list(
+    light_grey = "#f7f7f7",
+    med_grey   = "#d9d9d9",
+    dark_grey  = "#bdbdbd",
+    light_red  = "#fcbba1",
+    dark_red   = "#ef3b2c",
+    light_blue = "#4292c6",
+    green      = "#74c476"
+  )
  ) {
   # Add colors to codes in results data.
   results_data <- buildColorPalette(results_data, category)
@@ -88,9 +97,9 @@ main_dashboard <- function(
       data = curr_ind_data(),
       phecode_info = results_data,
       inverted_codes = state$inverted_codes(),
-      no_copies = NO_SNP_COLOR,
-      one_copy = ONE_SNP_COPY_COLOR,
-      two_copies = TWO_SNP_COPIES_COLOR
+      no_copies = COLORS$dark_grey,
+      one_copy = COLORS$light_red,
+      two_copies = COLORS$dark_red
     )
   })
 
@@ -108,8 +117,6 @@ main_dashboard <- function(
     remove_codes <- function(codes, to_remove){
       codes[!(codes %in% to_remove)]
     }
-
-    print(glue("Action of type {action_type} received"))
 
     action_type %>%
       switch(
