@@ -42,8 +42,6 @@ manhattan_plot_and_table <- function(
   # send data and options to the 2d plot
   output$plot <- r2d3::renderD3({
 
-    json_for_viz <- jsonlite::toJSON(results_data);
-
     r2d3::r2d3(
       data = results_data,
       script = system.file("d3/manhattan_plot/manhattan_plot.js", package = "meToolkit"),
