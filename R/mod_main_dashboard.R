@@ -65,7 +65,7 @@ main_dashboard <- function(
   #----------------------------------------------------------------
   state <- list(
     # Start with top 5 codes selected
-    selected_codes = shiny::reactiveVal(results_data %>% arrange(p_val) %>% head(5) %>% pull(code)),
+    selected_codes = shiny::reactiveVal(results_data %>% dplyr::arrange(p_val) %>% head(5) %>% dplyr::pull(code)),
     # Start with all codes not inverted
     inverted_codes = shiny::reactiveVal(c()),
     # Start with all individuals regardless of snp status
@@ -163,13 +163,13 @@ main_dashboard <- function(
           }
         },
         snp_filter_change = {
-          print('filtering snp status')
           state$snp_filter(!state$snp_filter())
-          print(glue('New snp filter status is {state$snp_filter()}'))
+          # print('filtering snp status')
+          # print(glue::glue('New snp filter status is {state$snp_filter()}'))
         },
         pattern_highlight = {
-          print('Upset sent a pattern higlight request')
-          print(extract_codes(action_payload))
+          # print('Upset sent a pattern higlight request')
+          # print(extract_codes(action_payload))
           state$highlighted_pattern(extract_codes(action_payload))
         },
         stop("Unknown input")
@@ -180,8 +180,8 @@ main_dashboard <- function(
   # Setup all the components of the app
   #----------------------------------------------------------------
   ## Network plot
-  callModule(
-    network_plot, 'network_plot',
+  shiny::callModule(
+    meToolkit::network_plot, 'network_plot',
     curr_network_data,
     state$highlighted_pattern,
     snp_filter = state$snp_filter,
@@ -191,18 +191,18 @@ main_dashboard <- function(
   )
 
   ## Upset plot
-  upset_plot <- callModule(
-    upset, 'upsetPlot',
+  shiny::callModule(
+    meToolkit::upset, 'upsetPlot',
     curr_ind_data,
-    select(individual_data, IID, snp),
+    dplyr::select(individual_data, IID, snp),
     results_data = results_data,
     colors = COLORS,
     app_interaction
   )
 
   ## Manhattan plot
-  manhattan_plot <- callModule(
-    manhattan_plot_and_table, 'manhattan_plot',
+  shiny::callModule(
+    meToolkit::manhattan_plot_and_table, 'manhattan_plot',
     results_data = results_data,
     selected_codes = state$selected_codes,
     action_object = app_interaction,
@@ -210,26 +210,15 @@ main_dashboard <- function(
   )
 
   ## PheWAS table
-  callModule(
-    phewas_table, 'phewas_table',
+  shiny::callModule(
+    meToolkit::phewas_table, 'phewas_table',
     results_data = results_data,
     selected_codes = state$selected_codes,
     action_object = app_interaction
   )
 
-  ## Multicode selecter input
-  observeEvent(input$filter_to_desired, {
-    codes_desired <- input$desired_codes
-    action_object_message <-  list(
-      type = 'selection',
-      payload = codes_desired
-    )
-
-    app_interaction(action_object_message)
-  })
-
   # SNP info panel
-  callModule(
+  shiny::callModule(
     info_panel, 'info_panel',
     snp_name = snp_name,
     all_individual_data = individual_data,
@@ -238,4 +227,13 @@ main_dashboard <- function(
     current_individual_data = curr_ind_data
   )
 
+  # Multicode selecter input
+  shiny::observeEvent(input$filter_to_desired, {
+    codes_desired <- input$desired_codes
+    action_object_message <-  list(
+      type = 'selection',
+      payload = codes_desired
+    )
+    app_interaction(action_object_message)
+  })
 }

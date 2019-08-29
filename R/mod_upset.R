@@ -81,7 +81,7 @@ upset <- function(
     testEnrichment <- function(currentPattern){
 
       patient_to_pattern %>%
-        select(-snp) %>%
+        dplyr::select(-snp) %>%
         dplyr::right_join(all_patient_snps, by = 'IID') %>%
         dplyr::mutate(
           hasPattern = dplyr::case_when(

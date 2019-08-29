@@ -50,7 +50,7 @@ makeNetworkData <- function(
     dplyr::mutate( inverted = code %in% inverted_codes ) %>%
     dplyr::rename(name = code)
 
-  vertices <- data_frame(
+  vertices <- dplyr::tibble(
     # Integer index for keeping track of edges source and destinations
     index = 1:(n_cases + n_phenos),
     # How many snp allele copies for each case, 0s for phenotypes for obvious reasons
@@ -74,7 +74,7 @@ makeNetworkData <- function(
   colnames(data_small) <- (n_cases + 1):(n_cases + n_phenos)
 
   edges <- data_small %>%
-    dplyr::mutate(case = as.character(1:n())) %>%
+    dplyr::mutate(case = as.character(1:dplyr::n())) %>%
     tidyr::gather(code, connected, -case) %>%
     dplyr::filter(connected == 1) %>%
     dplyr::transmute(source = as.numeric(case), target = as.numeric(code))

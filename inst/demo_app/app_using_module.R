@@ -1,12 +1,11 @@
 # testing main app module in own shiny app.
-library(meToolkit)
 library(shiny)
-library(shinydashboard)
-library(shinydashboardPlus)
-library(tidyverse)
-library(magrittr)
 library(here)
-library(glue)
+library(meToolkit)
+library(readr)
+# library(tidyverse)
+# library(magrittr)
+# library(glue)
 
 usage_instructions <- div(
   h2('How To Use'),
@@ -29,10 +28,10 @@ ui <- htmlTemplate(
 server <- function(input, output, session) {
   callModule(
     main_dashboard, 'main_app',
-    snp_name          = 'rs13283456',
-    results_data      = read_rds('data/simulated_phewas_results.rds') ,
-    individual_data   = read_rds('data/simulated_ind_data.rds'),
-    MAX_ALLOWED_CODES = 45,
+    snp_name           = 'rs13283456',
+    results_data       = read_rds('data/simulated_phewas_results.rds') ,
+    individual_data    = read_rds('data/simulated_ind_data.rds'),
+    MAX_ALLOWED_CODES  = 45,
     usage_instructions = usage_instructions
   )
 
