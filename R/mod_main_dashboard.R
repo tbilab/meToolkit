@@ -11,7 +11,7 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
   ns <- NS(id)
   shiny::tagList(
     shiny::htmlTemplate(
-      system.file("modular_demo_app/template.html", package = "meToolkit"),
+      system.file("html_templates/template.html", package = "meToolkit"),
       app_title = 'Multimorbidity Explorer',
       manhattan_plot = meToolkit::manhattan_plot_and_table_UI(
         ns('manhattan_plot'),
