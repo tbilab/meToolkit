@@ -129,3 +129,17 @@ tr.found_in_search td:first-child {
   opacity: 0;
   transition: visibility 0s var(--fade-length), opacity var(--fade-length) linear;
 }
+
+
+/* ================================================== */
+/* Histogram titles */
+/* ================================================== */
+svg .main-title {
+  font-size: 1rem;
+}
+
+svg .sub-title {
+  font-style: italic;
+  opacity: 0.75;
+  font-size: 0.8rem;
+}

@@ -1,4 +1,4 @@
-// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'), here::here('inst/d3/helpers.css'))
+// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'))
 // ===============================================================
 // Initialization
 // ===============================================================
@@ -497,6 +497,9 @@ function hide_reset(){
 
 function draw_histogram(data){
 
+  const scales = histogram_scales; // Rename to make function code a bit neater
+
+  // Draw bars
   let hist_bars = or_hist
     .attr("fill", options.colors.light_blue)
     .selectAll("rect.histogram_bar")
@@ -505,24 +508,34 @@ function draw_histogram(data){
   hist_bars = hist_bars.enter().append('rect')
     .attr('class', 'histogram_bar')
     .merge(hist_bars)
-    .attr("x", d =>  histogram_scales.x(d.x0) + 1)
-    .attr("width", d => Math.max(0,  histogram_scales.x(d.x1) -  histogram_scales.x(d.x0) - 1))
-    .attr("y", d =>  histogram_scales.y(d.length))
-    .attr("height", d =>  histogram_scales.y(0) -  histogram_scales.y(d.length));
+    .attr("x", d =>  scales.x(d.x0) + 1)
+    .attr("width", d => Math.max(0,  scales.x(d.x1) - scales.x(d.x0) - 1))
+    .attr("y", d =>  scales.y(d.length))
+    .attr("height", d =>  scales.y(0) -  scales.y(d.length));
 
+  // Append axes
   or_hist.selectAppend("g.x-axis")
     .call(g =>
-      g.attr("transform", `translate(0,${histogram_scales.y.range()[0]})`)
-        .call(d3.axisBottom(histogram_scales.x).tickSizeOuter(0))
+      g.attr("transform", `translate(0,${scales.y.range()[0]})`)
+        .call(d3.axisBottom(scales.x).tickSizeOuter(0))
         .call(add_axis_label('Log Odds-Ratio', false))
     );
 
   or_hist.selectAppend("g.y-axis")
     .call(
       g => g.attr("transform", `translate(${-5},0)`)
-        .call(d3.axisLeft(histogram_scales.y).ticks(5).tickSizeOuter(0))
+        .call(d3.axisLeft(scales.y).ticks(5).tickSizeOuter(0))
         .call(add_axis_label('# of Codes'))
     );
+
+  const title = or_hist.selectAppend('text.title')
+    .style('fill', 'dimgrey')
+    .translate([5, -5])
+    .html(
+      `<tspan class = 'main-title'>Log Odds-Ratios distribution</tspan>   <tspan class = 'sub-title'>Drag handles to filter to codes in a given range</tspan>`
+    );
+
+
 }
 
 
@@ -573,7 +586,6 @@ function process_new_data(data){
     d.index = i;
   });
 }
-
 // ================================================================
 // Brush setup functions.
 // ================================================================
