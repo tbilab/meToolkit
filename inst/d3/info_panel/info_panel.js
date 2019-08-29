@@ -94,7 +94,7 @@ const draw_lollypop = (maf, name, title, i) => {
     .selectAppend('text.title')
     .at({
       x: -x_scale(maf) + x_scale(0),
-      y: -stick_size/2 - 2,
+      y: -stick_size/2 - 3,
       fill: subtitle_color,
     })
     .text(title);
