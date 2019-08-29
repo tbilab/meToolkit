@@ -9,24 +9,24 @@
 #' upset_UI('my_mod')
 main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c")) {
   ns <- NS(id)
-  tagList(
-    htmlTemplate(
+  shiny::tagList(
+    shiny::htmlTemplate(
       system.file("modular_demo_app/template.html", package = "meToolkit"),
       app_title = 'Multimorbidity Explorer',
-      manhattan_plot = manhattan_plot_and_table_UI(
+      manhattan_plot = meToolkit::manhattan_plot_and_table_UI(
         ns('manhattan_plot'),
         div_class = 'manhattan_plot'
       ),
-      upset = upset_UI(
+      upset = meToolkit::upset_UI(
         ns('upsetPlot'),
         div_class = 'upset_plot'
       ),
-      network =  network_plot_UI(ns('network_plot'),
+      network = meToolkit::network_plot_UI(ns('network_plot'),
                                  height = '100%',
                                  div_class = 'network_plot',
                                  snp_colors = snp_colors
       ),
-      info_panel = info_panel_UI(ns('info_panel'))
+      info_panel = meToolkit::info_panel_UI(ns('info_panel'))
     )
   )
 }
@@ -56,7 +56,7 @@ main_dashboard <- function(
   )
  ) {
   # Add colors to codes in results data.
-  results_data <- buildColorPalette(results_data, category)
+  results_data <- meToolkit::buildColorPalette(results_data, category)
 
   #----------------------------------------------------------------
   # App state that can be modified by user.
@@ -65,35 +65,35 @@ main_dashboard <- function(
   #----------------------------------------------------------------
   state <- list(
     # Start with top 5 codes selected
-    selected_codes = reactiveVal(results_data %>% arrange(p_val) %>% head(5) %>% pull(code)),
+    selected_codes = shiny::reactiveVal(results_data %>% arrange(p_val) %>% head(5) %>% pull(code)),
     # Start with all codes not inverted
-    inverted_codes = reactiveVal(c()),
+    inverted_codes = shiny::reactiveVal(c()),
     # Start with all individuals regardless of snp status
-    snp_filter = reactiveVal(FALSE),
+    snp_filter = shiny::reactiveVal(FALSE),
     # Pattern to highlight in network plot,
-    highlighted_pattern = reactiveVal(c())
+    highlighted_pattern = shiny::reactiveVal(c())
   )
 
   #----------------------------------------------------------------
   # App values that change based upon the current state
   #----------------------------------------------------------------
   # Individual data subset by the currently viewed phecodes and if we've filtered the snp
-  curr_ind_data <- reactive({
+  curr_ind_data <- shiny::reactive({
 
     keep_everyone <- !(state$snp_filter())
     # Filter the individual data to just MA carriers if needed, otw keep everyone
 
     individual_data %>%
-      filter((snp > 0) | keep_everyone) %>%
-      subsetToCodes(
+      dplyr::filter((snp > 0) | keep_everyone) %>%
+      meToolkit::subsetToCodes(
         desired_codes = state$selected_codes(),
         codes_to_invert = state$inverted_codes()
       )
   })
 
   # Network representation of the current data for use in the network plot(s)
-  curr_network_data <- reactive({
-    makeNetworkData(
+  curr_network_data <- shiny::reactive({
+    meToolkit::makeNetworkData(
       data = curr_ind_data(),
       phecode_info = results_data,
       inverted_codes = state$inverted_codes(),
@@ -108,50 +108,47 @@ main_dashboard <- function(
   # app's values
   #----------------------------------------------------------------
   # Reactive variable that stores the most recent interaction
-  app_interaction <- reactiveVal()
+  app_interaction <- shiny::reactiveVal()
 
-  observeEvent(app_interaction(),{
-    action_type <- app_interaction() %>% pluck('type')
-    action_payload <- app_interaction() %>% pluck('payload')
+  shiny::observeEvent(app_interaction(),{
+    action_type <- app_interaction()[['type']]
+    action_payload <- app_interaction()[['payload']]
     extract_codes <- . %>% unlist() %>% tail(-1)
-    remove_codes <- function(codes, to_remove){
-      codes[!(codes %in% to_remove)]
+
+    bad_request_msg <- function(num_requested = 1){
+      if(num_requested < 2){
+        message <- list(
+          title = "Too few codes requested",
+          text = "Try selecting at least two codes."
+        )
+      } else {
+        message <- list(
+          title = "Too many codes requested",
+          text = glue::glue("The maximum allowed is {MAX_ALLOWED_CODES} and {num_requested} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!")
+        )
+      }
+      session$sendCustomMessage("load_popup", message)
     }
 
     action_type %>%
       switch(
         delete = {
-          codes_to_delete <- action_payload %>% extract_codes()
+          codes_to_delete <- extract_codes(action_payload)
           prev_selected_codes <- state$selected_codes()
-          state$selected_codes(remove_codes(prev_selected_codes, codes_to_delete))
-
-          print('deleting codes:')
-          print(codes_to_delete)
+          state$selected_codes(
+            prev_selected_codes[!(prev_selected_codes %in% codes_to_delete)]
+          )
+          # print('deleting codes:')
+          # print(codes_to_delete)
         },
         selection = {
-          print('selecting codes!')
-          codes_to_select <- action_payload %>%
-            extract_codes()
-
+          # print('selecting codes!')
+          codes_to_select <- extract_codes(action_payload)
           num_requested_codes <- length(codes_to_select)
 
           # Check size of request.
-          if(num_requested_codes < 2){
-            session$sendCustomMessage(
-              "load_popup",
-              list(
-                title = "Too few codes requested",
-                text = "Try selecting at least two codes."
-              )
-            )
-          } else if (num_requested_codes > MAX_ALLOWED_CODES) {
-            session$sendCustomMessage(
-              "load_popup",
-              list(
-                title = "Too many codes requested",
-                text = glue("The maximum allowed is {MAX_ALLOWED_CODES} and {num_requested_codes} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!")
-              )
-            )
+          if((num_requested_codes < 2 )| (num_requested_codes > MAX_ALLOWED_CODES)){
+            bad_request_msg(num_requested_codes)
           } else {
             state$selected_codes(codes_to_select)
           }
@@ -160,7 +157,7 @@ main_dashboard <- function(
           print('isolating codes!')
           desired_codes <- extract_codes(action_payload)
           if(length(desired_codes) < 2){
-            warnAboutSelection()
+            not_enough_codes_msg()
           } else {
             state$selected_codes(desired_codes)
           }
