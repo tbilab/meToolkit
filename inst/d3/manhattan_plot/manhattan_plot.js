@@ -1,4 +1,4 @@
-// !preview r2d3 data=phewas_results, options=list(selected=first_selected, colors = list(light_grey = "#f7f7f7",med_grey = "#d9d9d9",dark_grey = "#bdbdbd",light_blue = "#4292c6")), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'), here::here('inst/d3/helpers.css'))
+// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/phewas_table.css'), here::here('inst/d3/helpers.css'))
 // ===============================================================
 // Initialization
 // ===============================================================
