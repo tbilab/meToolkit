@@ -55,7 +55,7 @@ const max_freq = Math.min(1, Math.max(maf_exome, maf_sel)*1.2);
 const x_scale = d3.scaleLinear().domain([0,max_freq]).range([margin.left, viz_w - margin.right]);
 
 const draw_lollypop = (maf, name, title, i) => {
-  const dist_between_lines = 25;
+  const dist_between_lines = 30;
   const stick_size = 20;
   const lollypop_size = stick_size/2;
 
@@ -109,7 +109,7 @@ draw_lollypop(maf_sel, 'selection_freq', 'Current Selection', 1);
 // ================================================================
 location.selectAppend('div.header')
   .selectAppend('h2')
-  .text('Location')
+  .text('Annotations')
   .style('color', subtitle_color);
 
 const loc_table_body = Object.keys(loc_info)
