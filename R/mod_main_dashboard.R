@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @examples
-#' upset_UI('my_mod')
+#' main_dashboard_UI('my_app')
 main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c")) {
   ns <- NS(id)
   shiny::tagList(
@@ -33,19 +33,25 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
 #' Server function of upset module
 #'
 #' @param input,output,session Auto-filled by callModule | ignore
-#' @return Shiny module
+#' @param snp_name Character string containing the RSID of the snp you're viewing. Used to find annotation information.
+#' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
+#' @param individual_data Dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.
+#' @param max_allowed_codes How many codes can the app show at any given time. Defaults to 40. (Too many and app may get slow.)
+#' @param usage_instructions HTML tags corresponding to static content to be displayed in bottom half of info panel. Any html content works.
+#' @param colors A list of CSS-valid colors to paint interface in if custom colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue, light_red, dark_red, light_blue, green}.
+#' @return Shiny module of main Multimorbidity Explorer dashboard
 #' @export
 #'
 #' @examples
-#' main_dashboard(upset, 'my_mod')
+#' main_dashboard(upset, 'my_app', 'rs12345', my_results_data, my_individual_data, usage_instructions = 'This app is complicated!')
 main_dashboard <- function(
   input, output, session,
   snp_name,
   results_data,
   individual_data,
-  MAX_ALLOWED_CODES,
+  max_allowed_codes = 40,
   usage_instructions,
-  COLORS = list(
+  colors = list(
     light_grey = "#f7f7f7",
     med_grey   = "#d9d9d9",
     dark_grey  = "#bdbdbd",
@@ -97,9 +103,9 @@ main_dashboard <- function(
       data = curr_ind_data(),
       phecode_info = results_data,
       inverted_codes = state$inverted_codes(),
-      no_copies = COLORS$dark_grey,
-      one_copy = COLORS$light_red,
-      two_copies = COLORS$dark_red
+      no_copies = colors$dark_grey,
+      one_copy = colors$light_red,
+      two_copies = colors$dark_red
     )
   })
 
@@ -124,7 +130,7 @@ main_dashboard <- function(
       } else {
         message <- list(
           title = "Too many codes requested",
-          text = glue::glue("The maximum allowed is {MAX_ALLOWED_CODES} and {num_requested} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!")
+          text = glue::glue("The maximum allowed is {max_allowed_codes} and {num_requested} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!")
         )
       }
       session$sendCustomMessage("load_popup", message)
@@ -147,7 +153,7 @@ main_dashboard <- function(
           num_requested_codes <- length(codes_to_select)
 
           # Check size of request.
-          if((num_requested_codes < 2 )| (num_requested_codes > MAX_ALLOWED_CODES)){
+          if((num_requested_codes < 2 )| (num_requested_codes > max_allowed_codes)){
             bad_request_msg(num_requested_codes)
           } else {
             state$selected_codes(codes_to_select)
@@ -196,7 +202,7 @@ main_dashboard <- function(
     curr_ind_data,
     dplyr::select(individual_data, IID, snp),
     results_data = results_data,
-    colors = COLORS,
+    colors = colors,
     app_interaction
   )
 
@@ -206,7 +212,7 @@ main_dashboard <- function(
     results_data = results_data,
     selected_codes = state$selected_codes,
     action_object = app_interaction,
-    colors = COLORS
+    colors = colors
   )
 
   ## PheWAS table
@@ -223,7 +229,7 @@ main_dashboard <- function(
     snp_name = snp_name,
     all_individual_data = individual_data,
     instructions = usage_instructions,
-    colors = COLORS,
+    colors = colors,
     current_individual_data = curr_ind_data
   )
 
