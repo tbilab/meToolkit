@@ -32,13 +32,13 @@ snp_name        <- 'rs13283456'
 usage_instructions <- div(
   h2('How To Use'),
   h3("Manhattan Plot"),
-  p("Use the Manhattan plot to select your codes of interest via dragging on main plot or selecting via the table."),
+  p("Use the Manhattan plot to select your codes of interest by dragging a box on main plot or searching/selecting with the table."),
   p("Once you have your desired codes selected press 'Update Network' button at top of pane to update the network data with individuals possessing the selected codes."),
   h3("Upset Plot"),
-  p("The upset plot allows you to see basic statistics about the currently selected comorbidity patterns such as number of patients with a pattern and the risk of that pattern occuring in individuals with at least one copy of the minor allele."),
+  p("The upset plot allows you to see basic statistics about comorbidity patterns in the selected subset of codes, such as number of patients with a pattern and the risk of that pattern occuring in individuals with at least one copy of the minor allele."),
   p("Clicking on a given pattern in the upset plot will highlight the patients with that pattern in the below network plot."),
   h3("Network Plot"),
-  p("The network plot provides a direct look at the individual-level data. You can click on codes to select them for isolation or deletion from the current selecion.")
+  p("The network plot provides a direct look at the individual-level data. You can click on codes to select them for isolation or deletion from the current selection.")
 )
 
 ui <- htmlTemplate(
