@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!-- template.html -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+  Shiny.addCustomMessageHandler('load_popup', message =>  swal(message) );
+</script>
+
+<style>
+  body {
+    box-sizing: border-box;
+    margin: 2px;
+    background-color: #bdbdbd;
+  }
+
+  .info_header {
+    height: 3rem;
+  }
+
+  .parent {
+    height: calc(100vh - 3rem);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+  }
+
+  .input-panel {
+    grid-area: 1 / 1 / 6 / 3;
+  }
+
+  .instructions-panel {
+    grid-area: 1 / 3 / 6 / 6;
+  }
+
+  .section {
+    background-color: white;
+    box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.49);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .app-title {
+    margin: 0;
+    padding-top: 0.5rem;
+    padding-left: 0.5rem;
+  }
+</style>
+
+<div class = 'info_header'>
+  <h2 class = 'app-title'> {{ app_title }} </h2>
+</div>
+<div class = 'parent'>
+  <div class = 'input-panel section'>
+    {{ input_panel }}
+  </div>
+  <div class = 'instructions-panel section'>
+     {{ instruction_panel }}
+  </div>
+</div>

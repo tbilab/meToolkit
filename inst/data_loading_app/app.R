@@ -3,7 +3,6 @@ library(shiny)
 library(meToolkit)
 library(readr)
 
-
 usage_instructions <- div(
   h2('How To Use'),
   h3("Manhattan Plot"),
@@ -18,20 +17,35 @@ usage_instructions <- div(
 
 ui <- htmlTemplate(
   system.file("html_templates/empty_page.html", package = "meToolkit"),
-  app_content = main_dashboard_UI("main_app")
+  app_content = uiOutput("ui")
 )
 
-
 server <- function(input, output, session) {
-  callModule(
-    main_dashboard, 'main_app',
-    snp_name           = 'rs13283456',
-    results_data       = read_rds('data/simulated_phewas_results.rds') ,
-    individual_data    = read_rds('data/simulated_ind_data.rds'),
-    max_allowed_codes  = 45,
-    usage_instructions = usage_instructions
-  )
 
+  loaded_data <- callModule(data_loader, 'data_loader', 'data/preloaded')
+
+  output$ui <- renderUI({
+    no_data <- is.null(loaded_data())
+    if(no_data){
+      data_loader_UI("data_loader", "Load Data for ME")
+    }else{
+      main_dashboard_UI("main_app")
+    }
+  })
+
+  observeEvent(loaded_data(), {
+    app_data <- loaded_data()
+
+    callModule(
+      main_dashboard, 'main_app',
+      snp_name           = app_data$snp_name,
+      results_data       = app_data$phewas_data,
+      individual_data    = app_data$individual_data,
+      max_allowed_codes  = 45,
+      usage_instructions = usage_instructions
+    )
+  })
 }
+
 
 shinyApp(ui, server)
