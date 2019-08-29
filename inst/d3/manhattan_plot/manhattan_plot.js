@@ -259,7 +259,6 @@ function new_state(state){
     }
   }
 
-
   // Make sure manhattan and table have selected codes.
   if(state.has_changed('selected_codes') || state.has_changed('sizes')){
     manhattan_plot.highlight(state.get('selected_codes'));
@@ -320,35 +319,35 @@ r2d3.onResize(function(width, height){
 function draw_manhattan(data){
   // Make sure that the neccesary info is provided before drawing.
   if(data === null) return;
+  const point_size = 3;
+  const outline = 1.5;
 
   let currently_selected_points;
 
   const default_point = {
-    r: d => d.log_or > 0 ? 2: 1.5,
-    opacity: 0.85,
+    r: d => point_size - (d.log_or > 0 ? 0: outline/2),
+    opacity: 0.8,
     fill: d => d.log_or > 0 ? d.unselected_color: 'white',
     stroke: d => d.unselected_color,
-    strokeWidth: d => d.log_or > 0 ? 0 : 1.5,
+    strokeWidth: d => d.log_or > 0 ? 0 : outline,
+  };
+
+  const selected_point = {
+    r: d => point_size*1.5 - (d.log_or > 0 ? 0: outline/2),
+    fillOpacity: 1,
+    fill: d => d.log_or > 0 ? d.color: 'white',
+    stroke: d => d.color,
+    strokeWidth: d => d.log_or > 0 ? 0 : outline,
   };
 
   const disabled_point = {
-    r: 1,
-    opacity: 0.15,
+    r: point_size/3,
+    opacity: 0.1,
     fill: options.colors.med_grey,
     stroke: options.colors.med_grey,
   };
 
-  const highlighted_point = {
-    r: d => d.log_or > 0 ? 3: 2.5,
-    fillOpacity: 1,
-    fill: d => d.log_or > 0 ? d.color: 'white',
-    stroke: d => d.color,
-    strokeWidth: d => d.log_or > 0 ? 0 : 1.5,
-  };
-
   const code_selected = d => selected_codes.includes(d.code);
-
-  //debugger;
 
   let manhattan_points = main_viz.selectAll('circle.manhattan_points')
     .data(data, d => d.code);
@@ -418,17 +417,14 @@ function draw_manhattan(data){
    .at({
      x: -legend_circ_r*2,
      textAnchor: 'end',
-   })
+   });
 
  positive_g.selectAppend('text')
    .text('Log-OR > 0')
    .at(legend_text_attrs)
    .at({
      x: legend_circ_r*2,
-     //textAnchor: 'end',
-   })
-
-
+   });
 
 
   // Draw the axes
@@ -468,7 +464,7 @@ function draw_manhattan(data){
     manhattan_points
       .filter(d => selected_codes.includes(d.code))
       .raise()
-      .at(highlighted_point);
+      .at(selected_point);
 
     // Make sure points that are not disabled but not highlighted are back at default settings
     manhattan_points
