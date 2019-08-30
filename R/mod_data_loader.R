@@ -37,7 +37,7 @@ data_loader_UI <- function(id, app_title = "Multimorbidity Explorer") {
 #' Server function of upset module
 #'
 #' @param input,output,session Auto-filled by callModule | ignore
-#' @param preloaded_path File path relative to app that preloaded data is stored. Defaults to \code{'data/preloaded'}.
+#' @param preloaded_path File path relative to app that preloaded data is stored. Defaults to \code{NULL}.
 #' @return Reactive object containing the data needed to run the main Multimorbidity Explorer dashboard.
 #' @export
 #'
@@ -45,7 +45,7 @@ data_loader_UI <- function(id, app_title = "Multimorbidity Explorer") {
 #' callModule(data_loader, 'data_loader', 'data/preloaded')
 data_loader <- function(
   input, output, session,
-  preloaded_path = 'data/preloaded'
+  preloaded_path = NULL
 ) {
 
 
@@ -63,20 +63,25 @@ data_loader <- function(
     snp_name = NULL              # Name of the current snp being looked at.
   )
 
-  # find all the snps we have preloaded
-  preloaded_snps <- list.files(preloaded_path, pattern = 'rs')
-  if(length(preloaded_snps) > 0){
-    output$preloaded_snps <- renderUI({
-      shiny::tagList(
-        selectInput(
-          session$ns("dataset_selection"),
-          "Select a pre-loaded dataset:",
-          preloaded_snps
-        ),
-        shiny::actionButton(session$ns('preLoadedData'), 'Use preloaded data'),
-        shiny::hr()
-      )
-    })
+
+  # Check if the user has given us a path to find preloaded data
+  if(!is.null(preloaded_path)){
+    # If they have, find all the snps they have preloaded
+    preloaded_snps <- list.files(preloaded_path, pattern = 'rs')
+    if(length(preloaded_snps) > 0){
+      # Only show selector if there actually is data
+      output$preloaded_snps <- renderUI({
+        shiny::tagList(
+          selectInput(
+            session$ns("dataset_selection"),
+            "Select a pre-loaded dataset:",
+            preloaded_snps
+          ),
+          shiny::actionButton(session$ns('preLoadedData'), 'Use preloaded data'),
+          shiny::hr()
+        )
+      })
+    }
   }
 
 
