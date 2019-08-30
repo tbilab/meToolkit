@@ -7,11 +7,11 @@
 #' shiny::tagList(use_pretty_popup(),h1('Hi there'))
 use_pretty_popup <- function(){
   shiny::tags$head(
-    shiny::tags$script(
-      glue::glue("
-        Shiny.addCustomMessageHandler('load_popup', function(message){
-          swal(message);
-        });", .open = "[", .close = "]")
+    shiny::tags$script(src = "https://unpkg.com/sweetalert/dist/sweetalert.min.js"),
+    shiny::tags$script("
+      Shiny.addCustomMessageHandler('load_popup', function(message){
+        swal(message);
+      });"
     )
   )
 }
