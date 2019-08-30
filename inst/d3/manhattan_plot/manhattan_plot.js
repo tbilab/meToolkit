@@ -439,8 +439,8 @@ function draw_manhattan(data){
     .call(g =>
       g.attr("transform", `translate(0,${manhattan_scales.y.range()[0]})`)
         .call(d3.axisBottom(histogram_scales.x).ticks(1).tickSizeOuter(0))
-        .call(add_axis_label('PheCode', false))
         .call(g => g.select(".tick:first-of-type").remove())
+        .call(add_axis_label('PheCode', false))
     );
 
   const disable_codes = or_bounds => {
@@ -514,7 +514,7 @@ function draw_histogram(data){
     .call(g =>
       g.attr("transform", `translate(0,${scales.y.range()[0]})`)
         .call(d3.axisBottom(scales.x).tickSizeOuter(0))
-        .call(add_axis_label('Log Odds-Ratio', false))
+        .call(add_axis_label('Log OR', false))
     );
 
   or_hist.selectAppend("g.y-axis")
@@ -782,9 +782,20 @@ function add_axis_label(label, y_axis = true){
   };
 
   return g => {
-    g.select(".tick:last-of-type line").remove();
+    let last_tick = g.select(".tick:last-of-type");
+    const no_ticks = last_tick.empty();
+    if(no_ticks){
+      //debugger;
+      last_tick = g.append('g')
+        .attr('class', 'tick')
+        .translate([viz_width - margin.left - margin.right, 5]);
+      last_tick.append('text')
+        .attr('fill', "#000");
+    }
 
-    g.select(".tick:last-of-type text")
+    last_tick.select("line").remove();
+
+    last_tick.select("text")
             .at(axis_label_style)
             .text(label);
   };
