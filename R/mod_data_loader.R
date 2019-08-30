@@ -31,10 +31,17 @@ data_loader_UI <- function(id, app_title = "Multimorbidity Explorer") {
     shiny::fileInput(ns("phenome"), "ID to phenome file",
               accept = ACCEPTED_FORMATS
     ),
-    shiny::actionButton(ns("goToApp"), "Enter App")
+    shiny::actionButton(ns('toggle_stuff'), 'Toggle Enter Button'),
+    div(
+      id = 'go-button',
+      class = 'hidden',
+      shiny::actionButton(ns("goToApp"), "Enter App")
+    )
   )
 
   shiny::tagList(
+    use_reveal_element(),
+    use_pretty_popup(),
     shiny::htmlTemplate(
       system.file("html_templates/data_loading_template.html", package = "meToolkit"),
       app_title = app_title,
@@ -57,9 +64,6 @@ data_loader <- function(
   preloaded_path = 'data/preloaded'
 ) {
 
-  bad_request_msg <- function(title, body){
-    session$sendCustomMessage("load_popup",  list(title = title, text = body))
-  }
 
   #----------------------------------------------------------------
   # Reactive Values based upon user input
@@ -84,6 +88,10 @@ data_loader <- function(
     )
   })
 
+  observeEvent(input$toggle_stuff, {
+    session %>% reveal_element('go-button')
+  })
+
   observeEvent(input$genome, {
 
     tryCatch({
@@ -95,7 +103,8 @@ data_loader <- function(
     },
     error = function(message){
       print(message)
-      bad_request_msg(
+      pretty_popup(
+        session,
         "There's something wrong with the format of your genome data",
         " Make sure the file has two columns. One with the title IID with unique id and one with the title of your snp containing copies of the minor allele."
       )
@@ -109,7 +118,8 @@ data_loader <- function(
     },
     error = function(message){
       print(message)
-      bad_request_msg(
+      pretty_popup(
+        session,
         "There's something wrong with the format of your results data.",
         "Make sure the file has the right columns as listed."
       )
@@ -122,7 +132,8 @@ data_loader <- function(
     },
     error = function(message){
       print(message)
-      bad_request_msg(
+      pretty_popup(
+        session,
         "There's something wrong with the format of your phenome data.",
         "Make sure the file has the right columns as listed."
       )
