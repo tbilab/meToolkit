@@ -7,11 +7,14 @@
 #' shiny::tagList(use_reveal_element(),h1('Hi there', id = 'hi_message', class = 'hidden'))
 use_reveal_element <- function(){
   shiny::tags$head(
-    shiny::tags$script(
-      glue::glue("
-        Shiny.addCustomMessageHandler('show_element', function(target){
-          document.getElementById(target).classList.remove('hidden');
-        });", .open = "[", .close = "]")
+    shiny::tags$script("
+      Shiny.addCustomMessageHandler('show_element', function(target){
+        document.getElementById(target).classList.remove('hidden');
+      });"
+    ),
+    shiny::tags$style("
+      .show { transition: opacity 400ms;}
+      .hidden { opacity: 0; }"
     )
   )
 }
