@@ -141,7 +141,10 @@ upset <- function(
         colors = colors
       ),
       script = system.file("d3/upset/upset.js", package = "meToolkit"),
-      css = system.file("d3/upset/upset.css", package = "meToolkit"),
+      css = c(
+        system.file("d3/helpers.css", package = "meToolkit"),
+        system.file("d3/upset/upset.css", package = "meToolkit")
+      ),
       dependencies = c(
         "d3-jetpack",
         system.file("d3/helpers.js", package = "meToolkit"),
