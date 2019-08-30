@@ -17,26 +17,10 @@ data_loader_UI <- function(id, app_title = "Multimorbidity Explorer") {
 
   input_panel <- shiny::div(
     shiny::uiOutput(ns('preloaded_snps')),
-    shiny::actionButton(ns('preLoadedData'), 'Use preloaded data'),
-    shiny::hr(),
     shiny::h3('Load your data'),
-    shiny::fileInput(ns("phewas"), "Phewas results file",
-              accept = ACCEPTED_FORMATS
-
-    ),
-    shiny::fileInput(ns("genome"), "ID to SNP file",
-              accept = ACCEPTED_FORMATS
-
-    ),
-    shiny::fileInput(ns("phenome"), "ID to phenome file",
-              accept = ACCEPTED_FORMATS
-    ),
-    shiny::actionButton(ns('toggle_stuff'), 'Toggle Enter Button'),
-    div(
-      id = 'go-button',
-      class = 'hidden',
-      shiny::actionButton(ns("goToApp"), "Enter App")
-    )
+    shiny::fileInput(ns("phewas"), "Phewas results file", accept = ACCEPTED_FORMATS ),
+    shiny::fileInput(ns("genome"), "ID to SNP file", accept = ACCEPTED_FORMATS ),
+    shiny::fileInput(ns("phenome"), "ID to phenome file", accept = ACCEPTED_FORMATS )
   )
 
   shiny::tagList(
@@ -81,16 +65,20 @@ data_loader <- function(
 
   # find all the snps we have preloaded
   preloaded_snps <- list.files(preloaded_path, pattern = 'rs')
+  if(length(preloaded_snps) > 0){
+    output$preloaded_snps <- renderUI({
+      shiny::tagList(
+        selectInput(
+          session$ns("dataset_selection"),
+          "Select a pre-loaded dataset:",
+          preloaded_snps
+        ),
+        shiny::actionButton(session$ns('preLoadedData'), 'Use preloaded data'),
+        shiny::hr()
+      )
+    })
+  }
 
-  output$preloaded_snps <- renderUI({
-    selectInput(session$ns("dataset_selection"), "Select a pre-loaded dataset:",
-                preloaded_snps
-    )
-  })
-
-  observeEvent(input$toggle_stuff, {
-    session %>% reveal_element('go-button')
-  })
 
   observeEvent(input$genome, {
 
@@ -146,7 +134,6 @@ data_loader <- function(
   # Watches for all files to be loaded and then triggers.
   observe({
     req(app_data$phewas_raw, app_data$genome_raw, app_data$phenome_raw)
-    # browser()
 
     withProgress(message = 'Loading data', value = 0, {
       # read files into R's memory
@@ -177,14 +164,10 @@ data_loader <- function(
       # Sending to app
       incProgress(3/3, detail = "Sending to application!")
 
-      # show("goToApp")
       app_data$data_loaded <- TRUE
     }) # end progress messages
   })
 
-  observeEvent(input$goToApp,{
-    app_data$data_loaded <- TRUE
-  })
 
   observeEvent(input$preLoadedData,{
     base_dir <- glue('data/preloaded/{input$dataset_selection}')
