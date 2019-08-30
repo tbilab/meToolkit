@@ -22,7 +22,7 @@ ui <- htmlTemplate(
 
 server <- function(input, output, session) {
 
-  loaded_data <- callModule(data_loader, 'data_loader', 'data/preloaded')
+  loaded_data <- callModule(data_loader, 'data_loader', 'sample_data/')
 
   output$ui <- renderUI({
     no_data <- is.null(loaded_data())
