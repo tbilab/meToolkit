@@ -250,10 +250,14 @@ function new_state(state){
       state.get('or_bounds'),
       [-Infinity, Infinity] );
 
-    const no_codes_selected = state.get('selected_codes').length === 0;
-
-    if(default_bounds && no_codes_selected){
+    //const no_codes_selected = state.get('selected_codes').length === 0;
+    const no_change_from_default = arrays_equal(
+      state.get('selected_codes'),
+      default_selection
+    );
+    if(default_bounds && no_change_from_default){
       hide_reset();
+
     } else {
       show_reset();
     }
