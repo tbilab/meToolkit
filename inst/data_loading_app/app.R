@@ -29,7 +29,7 @@ server <- function(input, output, session) {
   output$ui <- renderUI({
     no_data <- is.null(loaded_data())
     if(no_data){
-      data_loader_UI("data_loader", "Load Data for ME")
+      data_loader_UI("data_loader", "Load Data for PheWAS-ME")
     }else{
       main_dashboard_UI("main_app")
     }
