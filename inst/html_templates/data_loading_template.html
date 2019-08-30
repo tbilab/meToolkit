@@ -1,9 +1,5 @@
 <!DOCTYPE html>
 <!-- template.html -->
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script>
-  Shiny.addCustomMessageHandler('load_popup', message =>  swal(message) );
-</script>
 
 <style>
   body {
@@ -38,6 +34,7 @@
     box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.49);
     border-radius: 4px;
     overflow: hidden;
+    padding: 1rem;
   }
 
   .app-title {
@@ -45,6 +42,41 @@
     padding-top: 0.5rem;
     padding-left: 0.5rem;
   }
+
+
+  .btn {
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding: 2px 4px;
+    cursor: pointer;
+  }
+
+  span.btn {
+    font-weight: 200;
+  }
+
+  button.btn {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .form-group {
+    padding: 0.5rem 0;
+  }
+
+  .form-group .input-group {
+    padding-top: 0.5rem;
+  }
+
+  .form-group input {
+    margin-left: 1rem;
+    padding: 2px 5px;
+  }
+
+  .go-button {
+    margin-top: 1.5rem;
+  }
+
 </style>
 
 <div class = 'info_header'>
