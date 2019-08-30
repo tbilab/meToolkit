@@ -10,10 +10,11 @@ use_reveal_element <- function(){
     shiny::tags$script("
       Shiny.addCustomMessageHandler('show_element', function(target){
         document.getElementById(target).classList.remove('hidden');
+        document.getElementById(target).classList.add('show');
       });"
     ),
     shiny::tags$style("
-      .show { transition: opacity 400ms;}
+      .show { transition: opacity 500ms;}
       .hidden { opacity: 0; }"
     )
   )
