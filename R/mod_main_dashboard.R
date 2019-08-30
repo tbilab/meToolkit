@@ -10,8 +10,9 @@
 main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c")) {
   ns <- NS(id)
   shiny::tagList(
+    use_pretty_popup(),
     shiny::htmlTemplate(
-      system.file("html_templates/template.html", package = "meToolkit"),
+      system.file("html_templates/main_dashboard.html", package = "meToolkit"),
       app_title = 'Multimorbidity Explorer',
       manhattan_plot = meToolkit::manhattan_plot_and_table_UI(
         ns('manhattan_plot'),
@@ -123,17 +124,18 @@ main_dashboard <- function(
 
     bad_request_msg <- function(num_requested = 1){
       if(num_requested < 2){
-        message <- list(
-          title = "Too few codes requested",
-          text = "Try selecting at least two codes."
+        meToolkit::pretty_popup(
+          session,
+          "Too few codes requested",
+          "Try selecting at least two codes."
         )
       } else {
-        message <- list(
-          title = "Too many codes requested",
-          text = glue::glue("The maximum allowed is {max_allowed_codes} and {num_requested} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!")
+        meToolkit::pretty_popup(
+          session,
+          "Too many codes requested",
+          glue::glue("The maximum allowed is {max_allowed_codes} and {num_requested} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!")
         )
       }
-      session$sendCustomMessage("load_popup", message)
     }
 
     action_type %>%
