@@ -383,7 +383,9 @@ function draw_manhattan(data){
     .call(function(g){
       g.attr("transform", `translate(${-5},0)`)
       .call(d3.axisLeft(manhattan_scales.y).tickSizeOuter(0))
-      .call(add_axis_label('-Log10 P'));
+      .call(add_axis_label(`
+        <tspan>-Log</tspan> <tspan dx='-0.3em' font-size="0.6rem" baseline-shift = "sub">10</tspan> <tspan dx='-0.2em'>(P)</tspan>
+      `));
     });
 
   main_viz.selectAppend("g.x-axis")
@@ -795,7 +797,7 @@ function add_axis_label(label, y_axis = true){
     [bump_axis]: y_axis ? -3: 8,
     textAnchor: 'end',
     fontWeight: 'bold',
-    fontSize: '0.7rem'
+    fontSize: '0.8rem'
   };
 
   return g => {
@@ -814,7 +816,7 @@ function add_axis_label(label, y_axis = true){
 
     last_tick.select("text")
             .at(axis_label_style)
-            .text(label);
+            .html(label);
   };
 }
 
