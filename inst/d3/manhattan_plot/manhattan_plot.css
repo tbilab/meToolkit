@@ -1,15 +1,29 @@
 .table_holder {
   display: flex;
   justify-content: center;
-}
-
-.table_main {
   width: 100%;
 }
+
+.control_panel{
+  height: 50px;
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: .2rem;
+}
+
+.phewas_table {
+  width: 100%;
+}
+
 /* ================================================== */
 /* Table */
 /* ================================================== */
 
+div.table {
+  overflow-x: scroll;
+}
 /* Table-body style */
 tbody.phewas_table{
   width: 100%;
@@ -34,28 +48,16 @@ tr div span {
 /* ================================================== */
 /* Buttons */
 /* ================================================== */
-
+/*
 button.raise_selected {
   width: 120px;
   padding:6px 15px;
-}
+}*/
 
 button.clear_search {
   padding: 5px 3px;
 }
 
-.phewas_table {
-  width: 100%;
-}
-
-.control_panel{
-  height: 50px;
-  display: flex;
-  width: 100%;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding-bottom: .2rem;
-}
 
 
 

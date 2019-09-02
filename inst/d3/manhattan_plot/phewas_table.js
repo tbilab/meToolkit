@@ -43,10 +43,10 @@ function setup_table(dom_target, sizes){
   // ==============================================================
   // Bring selected codes to top button
   control_panel.append('button.raise_selected')
-    .text('Bring selected codes to top')
+    .text('Bring selected to top')
     .on('click', raise_selected_codes);
 
-  const table = main_div.append('div')
+  const table = main_div.append('div.table')
     .style('overflow', 'scroll')
     .append('table')
     .attr('class', 'fixed_header');
