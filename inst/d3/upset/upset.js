@@ -167,8 +167,8 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       <tspan dy="${line_height}">(${CiFormat(d.lower)}, ${CiFormat(d.upper)})</tspan>`;
 
       const size_message = `
-      <tspan>Appears</tspan>
-      <tspan dy="${line_height}">${countFormat(d.count)} times</tspan>`;
+      <tspan>Appears in</tspan>
+      <tspan dy="${line_height}">${countFormat(d.count)} subjects</tspan>`;
       const codes_in_pattern = d.pattern.split('-');
 
       // Update right panel with rr info

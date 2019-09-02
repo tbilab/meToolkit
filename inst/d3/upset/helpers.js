@@ -181,7 +181,7 @@ function draw_pattern_count_bars(g, patterns, scales, sizes){
       textAnchor: 'middle',
       y: sizes.matrix_plot_h + sizes.margin.bottom - sizes.padding*2.5,
     })
-    .html(`<tspan>Size of pattern</tspan>
+    .html(`<tspan>Pattern frequency</tspan>
            <tspan font-size='13px' dy='15'>(drag handle to change threshold)</tspan>`)
     .selectAll('tspan')
       .attr('x', sizes.set_size_bars_w/2);
