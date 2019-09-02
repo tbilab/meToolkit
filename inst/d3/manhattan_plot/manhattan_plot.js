@@ -316,6 +316,7 @@ r2d3.onResize(function(width, height){
   app_state.pass_action('new_sizes', [viz_width, height]);
 });
 
+
 // ================================================================
 // Main drawing functions.
 // ================================================================
@@ -374,7 +375,7 @@ function draw_manhattan(data){
   // Draw a legend
    main_viz
      .selectAppend('g.legend')
-     .translate([0, -margin.top + 1])
+     .translate([margin.left, -margin.top + 1])
      .call(draw_legend);
 
 
@@ -437,8 +438,8 @@ function draw_manhattan(data){
 function draw_legend(legend_g){
 
    // Draw simple legend
- const legend_w = 120;
- const legend_h = 30;
+ const legend_w = 110;
+ const legend_h = 25;
  const negative_circ_r = 4.5;
  const circ_outline = 1.5;
  const positive_circ_r = negative_circ_r + circ_outline/2;
@@ -449,12 +450,28 @@ function draw_legend(legend_g){
      width: legend_w,
      height: legend_h,
      fill: options.colors.light_grey,
-     rx: 1,
      stroke: options.colors.med_grey,
      strokeWidth: 1,
    });
 
- let legend_elements = legend_g.selectAll('g.legend_element')
+  const text_attrs = {
+    alignmentBaseline: 'middle',
+    textAnchor: 'end',
+    y: 1,
+  };
+
+  const g = legend_g.selectAppend('g.text_holder')
+    .st({
+      fontSize: '0.75rem',
+    })
+    .translate([0, legend_h/2]);
+
+  g.selectAppend('text.lead')
+    .at(text_attrs)
+    .attr('x', -legend_gap)
+    .text('OR for test: ');
+
+ let legend_elements = g.selectAll('g.legend_element')
   .data(['negative', 'positive']);
 
  legend_elements
@@ -470,7 +487,7 @@ function draw_legend(legend_g){
     // Draw the circles
     element_g.selectAppend(`circle.${d}`)
      .at({
-        cy: (negative_circ_r + legend_gap),
+        cx: (is_neg ? negative_circ_r: positive_circ_r) + 5,
         stroke: 'orangered',
         r: is_neg ? negative_circ_r: positive_circ_r,
         fill: is_neg ? 'white': 'orangered',
@@ -479,14 +496,9 @@ function draw_legend(legend_g){
 
   // Write the text
    element_g.selectAppend('text')
-     .text(is_neg ? 'OR < 1': 'OR > 1')
-     .at({
-       textAnchor: 'middle',
-       fontSize: '0.7rem',
-       y: legend_h - legend_gap,
-     });
-
-  })
+     .text(is_neg ? '< 1': '> 1')
+     .at(text_attrs);
+  });
 
   legend_g.selectAppend('line')
     .at({
