@@ -215,52 +215,60 @@ function draw_rr_intervals(g, patterns, scales, sizes){
     });
 
 
-  const rr_binding = g.selectAll('.rr_intervals')
+  let rr_lines = g.selectAll('.rr_intervals')
     .data(patterns, d => d.pattern);
 
-  rr_binding.exit().remove();
+  rr_lines.exit().remove();
 
   // Now draw the intervals
-  const new_intervals = rr_binding.enter()
-    .append('g.rr_intervals');
-
-  const new_interval_lines = new_intervals.append('line')
-    .at({
-      x1: d => scales.rr_x(d.pointEst),
-      x2: d => scales.rr_x(d.pointEst),
-      stroke: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
-      strokeWidth: size_of_interval_line,
-    });
-
-  const new_interval_points = new_intervals.append('circle')
-    .at({
-      cx: d => scales.rr_x(d.pointEst),
-      r: 0,
-      fill: d => d.pointEst === 0 ? colors.null_rr_interval: colors.rr_interval,
-    });
-
-  // existing intervals
-  rr_binding
-    .merge(new_intervals)
+  rr_lines =  rr_lines.enter()
+    .append('g.rr_intervals')
+    .merge(rr_lines)
     .transition()
     .translate((d,i) => [0, scales.pattern_y(i) + scales.matrix_row_height/2]);
 
-  rr_binding.select('line')
-    .merge(new_interval_lines)
-    .transition()
-    .at({
-      x1: d => scales.rr_x(d.lower),
-      x2: d => scales.rr_x(d.upper),
-    });
+  rr_lines.each(function(d){
 
+    const is_null_interval = (d.upper === null) || (d.lower === null);
 
-  rr_binding.select('circle')
-    .merge(new_interval_points)
-    .transition()
-    .at({
-      cx: d => scales.rr_x(d.pointEst),
-      r: size_of_pe,
-    });
+    const rr_g = d3.select(this);
+
+    // Draw intervals
+
+    // No need to draw interval if it's not defined.
+    if(!is_null_interval){
+      rr_g.selectAppend('line')
+        .at({
+          x1: scales.rr_x(d.lower),
+          x2: scales.rr_x(d.upper),
+          stroke: colors.rr_interval,
+          strokeWidth: size_of_interval_line,
+        });
+    }
+
+    const point_est_circle = rr_g.selectAppend('circle')
+      .at({
+        cx: scales.rr_x(d.pointEst),
+        r: size_of_pe
+      });
+
+    if(is_null_interval){
+      point_est_circle
+        .at({
+          fill: colors.null_rr_interval,
+          fillOpacity: 0.1,
+          stroke: colors.null_rr_interval,
+          strokeWidth: 1.5,
+          opacity: 0.5,
+        });
+    } else {
+      point_est_circle
+        .at({
+          fill: colors.rr_interval
+        });
+    }
+
+  });
 
   // Title subplot
   g.selectAppend('text.title')
