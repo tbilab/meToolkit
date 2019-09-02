@@ -370,65 +370,12 @@ function draw_manhattan(data){
       tooltip.hide();
     });
 
- // Draw simple legend
- const legend_w = 200;
- const legend_h = 30;
- const legend_circ_r = 4;
- const legend_circ_outline = 1.5;
- const legend_gap = 15;
- const legend_text_attrs = {
-   alignmentBaseline: 'middle',
-   fontSize: '0.7rem',
-   y: 1,
- };
 
- const legend_g = main_viz
-   .selectAppend('g.legend')
-   .translate([0, -margin.top*0.9]);
- legend_g.selectAppend('rect')
-   .at({
-     width: legend_w,
-     height: legend_h,
-     fill: options.colors.light_grey,
-     rx: 10,
-     stroke: options.colors.med_grey,
-     strokeWidth: 1,
-   });
-
- const negative_g = legend_g.selectAppend('g.negative')
-   .translate([legend_w/2 - legend_gap, legend_h/2]);
-
- const positive_g = legend_g.selectAppend('g.positive')
-   .translate([legend_w/2 + legend_gap, legend_h/2]);
-
- negative_g.selectAppend('circle')
-   .at({
-     r: legend_circ_r,
-     fill: 'white',
-     stroke: 'orangered',
-     strokeWidth: legend_circ_outline,
-   });
-
-  positive_g.selectAppend('circle')
-   .at({
-     r: legend_circ_r + legend_circ_outline/2,
-     fill: 'orangered',
-   });
-
- negative_g.selectAppend('text')
-   .text('Log-OR < 0')
-   .at(legend_text_attrs)
-   .at({
-     x: -legend_circ_r*2,
-     textAnchor: 'end',
-   });
-
- positive_g.selectAppend('text')
-   .text('Log-OR > 0')
-   .at(legend_text_attrs)
-   .at({
-     x: legend_circ_r*2,
-   });
+  // Draw a legend
+   main_viz
+     .selectAppend('g.legend')
+     .translate([0, -margin.top + 1])
+     .call(draw_legend);
 
 
   // Draw the axes
@@ -484,6 +431,72 @@ function draw_manhattan(data){
   };
 }
 
+
+function draw_legend(legend_g){
+
+   // Draw simple legend
+ const legend_w = 120;
+ const legend_h = 30;
+ const negative_circ_r = 4.5;
+ const circ_outline = 1.5;
+ const positive_circ_r = negative_circ_r + circ_outline/2;
+ const legend_gap = 4;
+
+ legend_g.selectAppend('rect')
+   .at({
+     width: legend_w,
+     height: legend_h,
+     fill: options.colors.light_grey,
+     rx: 1,
+     stroke: options.colors.med_grey,
+     strokeWidth: 1,
+   });
+
+ let legend_elements = legend_g.selectAll('g.legend_element')
+  .data(['negative', 'positive']);
+
+ legend_elements
+  .enter().append('g')
+  .attr('class', d => d)
+  .merge(legend_elements)
+  .translate((d,i)=> [(1 + 2*i)*legend_w/(4), 0])
+  .each(function(d){
+    const element_g = d3.select(this);
+
+    const is_neg = d === 'negative';
+
+    // Draw the circles
+    element_g.selectAppend(`circle.${d}`)
+     .at({
+        cy: (negative_circ_r + legend_gap),
+        stroke: 'orangered',
+        r: is_neg ? negative_circ_r: positive_circ_r,
+        fill: is_neg ? 'white': 'orangered',
+        strokeWidth: is_neg ? circ_outline: 0,
+      });
+
+  // Write the text
+   element_g.selectAppend('text')
+     .text(is_neg ? 'OR < 1': 'OR > 1')
+     .at({
+       textAnchor: 'middle',
+       fontSize: '0.7rem',
+       y: legend_h - legend_gap,
+     });
+
+  })
+
+  legend_g.selectAppend('line')
+    .at({
+      x1: legend_w/2,
+      x2: legend_w/2,
+      y1: legend_h,
+      y2: 0,
+      stroke: options.colors.med_grey,
+      strokeWidth: circ_outline,
+    });
+
+}
 
 function show_reset(){
   reset_button.style('display', 'inline-block');
