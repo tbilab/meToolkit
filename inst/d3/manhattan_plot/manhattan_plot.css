@@ -3,6 +3,9 @@
   justify-content: center;
 }
 
+.table_main {
+  width: 100%;
+}
 /* ================================================== */
 /* Table */
 /* ================================================== */
@@ -41,11 +44,16 @@ button.clear_search {
   padding: 5px 3px;
 }
 
+.phewas_table {
+  width: 100%;
+}
 
 .control_panel{
   height: 50px;
   display: flex;
+  width: 100%;
   align-items: flex-end;
+  justify-content: space-between;
   padding-bottom: .2rem;
 }
 

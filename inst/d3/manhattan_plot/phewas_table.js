@@ -17,7 +17,8 @@ function setup_table(dom_target, sizes){
 
   // Let CSS know this is the main container div.
   dom_target.classed('table_holder', true);
-  const main_div = dom_target.append('div');
+
+  const main_div = dom_target.append('div.table_main');
 
   const control_panel = main_div.append('div.control_panel');
 
