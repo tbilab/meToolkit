@@ -7,7 +7,7 @@ let viz_width = width,
     viz_data = data,
     default_selection = [];
 
-const margin = {left: 70, right: 25, top: 30, bottom: 20};
+const margin = {left: 70, right: 25, top: 35, bottom: 20};
 
 const manhattan_unit = 3;
 const hist_unit = 1;
