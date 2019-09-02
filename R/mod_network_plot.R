@@ -98,7 +98,8 @@ network_plot <- function(
       ),
       css = c(
         system.file("d3/helpers.css", package = "meToolkit"),
-        system.file("d3/network_plot/network.css", package = "meToolkit")
+        system.file("d3/network_plot/network.css", package = "meToolkit"),
+        system.file("css/buttons.css", package = "meToolkit")
       ),
       options = list(
         just_snp = snp_filter(),

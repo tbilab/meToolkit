@@ -1,23 +1,11 @@
-.viz_button,
-.download_button {
-  cursor: pointer;
-}
-
-.viz_button {
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 3px;
-  background-color: rgba(239,237,245, 0.95);
-  height: auto;
-  margin-top: 2px;
-  transform: scale(1);
-  transition: transform 500ms;
-}
-
-.viz_button.hidden,
-.download_button.hidden {
+.hidden {
   transform: scale(0);
 }
+
+button {
+  font-size: 0.8rem;
+}
+
 
 .message_holders,
 .settings_menu {

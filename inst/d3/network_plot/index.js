@@ -1,4 +1,4 @@
-// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/network_plot/helpers.js')), css = c(here::here('inst/d3/network_plot/network.css'),  here::here('inst/d3/helpers.css'))
+// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/network_plot/helpers.js')), css = c(here::here('inst/d3/network_plot/network.css'),  here::here('inst/d3/helpers.css'), here::here('inst/css/buttons.css'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
@@ -502,21 +502,22 @@ const download_button = settings_menu.selectAppend('div.download_button')
         });
     });
 
-const callout_button = settings_menu.selectAppend('div.callout_button')
-  .html(`Turn On Callouts`)
-  .classed('viz_button', true)
+const callout_button = settings_menu.selectAppend('button.callout_button')
+  .html(`Turn on callouts`)
   .classed('hidden', true)
-  .on('click', () => {
+  .on('click', function(){
     // Toggle callout status
     C.callouts = !C.callouts;
+
+    d3.select(this)
+      .html(C.callouts ? `Turn off callouts`: `Turn on callouts`)
 
     // Redraw viz with new callout status
     size_viz(viz.width, viz.height);
   });
 
-const export_mode_button = settings_menu.selectAppend('div.export_mode_button')
+const export_mode_button = settings_menu.selectAppend('button.export_mode_button')
   .html(`${C.export_mode? 'Turn off e': 'E'}xport mode`)
-  .classed('viz_button', true)
   .on('click', function(){
     // Toggle export mode
     C.export_mode = !C.export_mode;
@@ -529,6 +530,7 @@ const export_mode_button = settings_menu.selectAppend('div.export_mode_button')
 
     if(!C.export_mode){
       C.callouts = false;
+      callout_button.html(`Turn on callouts`)
     }
 
     size_viz(viz.width, viz.height);
