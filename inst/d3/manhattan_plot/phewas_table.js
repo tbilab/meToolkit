@@ -210,8 +210,16 @@ function setup_table(dom_target, sizes){
 
     let num_results = 0;
     rows.each(function(d){
-      d.found_in_search = d.code.includes(current_search);
+
+      d.found_in_search = (
+        d.code.includes(current_search) ||
+        d.description.includes(current_search)
+      );
+
       if(d.found_in_search) num_results++;
+
+      // Update classes of each row to let css know if it
+      // was found and what it was found because of
       d3.select(this).classed('found_in_search', d.found_in_search);
     })
 

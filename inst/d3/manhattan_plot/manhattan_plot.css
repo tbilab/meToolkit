@@ -106,7 +106,7 @@ input[type=text], textarea {
 /* Style the found results from the search to match the search bar for visual continuity */
 input[type=text]:focus,
 textarea:focus,
-tr.found_in_search td:first-child {
+.found_in_search {
   box-shadow: 0 0 5px #2ca25f;
   border: 1px solid #2ca25f;
 }
