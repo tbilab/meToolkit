@@ -26,6 +26,7 @@ data_loader_UI <- function(id, app_title = "Multimorbidity Explorer") {
   shiny::tagList(
     use_reveal_element(),
     use_pretty_popup(),
+    shiny::includeCSS(system.file("css/buttons.css", package = "meToolkit")),
     shiny::htmlTemplate(
       system.file("html_templates/data_loading_template.html", package = "meToolkit"),
       app_title = app_title,
