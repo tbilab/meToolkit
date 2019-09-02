@@ -46,7 +46,6 @@ function setup_table(dom_target, sizes){
     .on('click', raise_selected_codes);
 
   const table = main_div.append('div')
-    //.style('height', `${sizes.height}px`)
     .style('overflow', 'scroll')
     .append('table')
     .attr('class', 'fixed_header');
@@ -61,7 +60,6 @@ function setup_table(dom_target, sizes){
     table.append('thead')
       .st({
         height: `${sizes.header}px`,
-        paddingBottom: `${sizes.padding}px`,
       })
       .append('tr')
       .selectAll('th')
