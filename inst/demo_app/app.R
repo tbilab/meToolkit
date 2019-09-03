@@ -11,3 +11,11 @@ my_ME_app <- build_me_app(
 )
 
 shinyApp(my_ME_app$ui, my_ME_app$server)
+
+
+# build_me_app(
+#   snp_name        = 'rs13283456',
+#   results_data    = read_rds(here::here('inst/demo_app/data/simulated_phewas_results.rds')) ,
+#   individual_data = read_rds(here::here('inst/demo_app/data/simulated_ind_data.rds')),
+#   run = TRUE
+# )
