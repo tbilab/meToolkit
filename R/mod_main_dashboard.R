@@ -11,6 +11,7 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
   ns <- NS(id)
   shiny::tagList(
     use_pretty_popup(),
+    shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
     shiny::htmlTemplate(
       system.file("html_templates/main_dashboard.html", package = "meToolkit"),
       app_title = 'Multimorbidity Explorer',
