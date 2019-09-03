@@ -81,6 +81,37 @@ main_dashboard <- function(
   # Add colors to codes in results data.
   results_data <- meToolkit::buildColorPalette(results_data, category)
 
+
+  # Get available codes sorted by p-value
+  available_codes <- results_data %>%
+    dplyr::arrange(p_val) %>%
+    dplyr::pull(code)
+
+  # Look to see if the URL used had desired codes in it.
+  url_message <- isolate(session$clientData$url_search)
+  print(url_message)
+
+
+  starting_codes <- c()
+  if(url_message != ""){
+    requested_codes <- url_message %>%
+      stringr::str_remove('\\?') %>%
+      stringr::str_split('_') %>%
+      purrr::pluck(1) %>%
+      stringr::str_replace("(.{3})(.*)", "\\1.\\2")
+
+    # Make sure that we actually have these codes...
+    starting_codes <- intersect(requested_codes, available_codes)
+
+    print("User has requested custom codes in URL.")
+  }
+
+  # Fall back to using the five most significant codes if nothing was suggested
+  # or no codes of the suggested could be found
+  if(length(starting_codes) == 0){
+      starting_codes <- head(available_codes, 5)
+  }
+
   #----------------------------------------------------------------
   # App state that can be modified by user.
   #   This explicitely defines what the user can interact with.
@@ -88,7 +119,7 @@ main_dashboard <- function(
   #----------------------------------------------------------------
   state <- list(
     # Start with top 5 codes selected
-    selected_codes = shiny::reactiveVal(results_data %>% dplyr::arrange(p_val) %>% head(5) %>% dplyr::pull(code)),
+    selected_codes = shiny::reactiveVal(starting_codes),
     # Start with all codes not inverted
     inverted_codes = shiny::reactiveVal(c()),
     # Start with all individuals regardless of snp status
@@ -196,7 +227,15 @@ main_dashboard <- function(
         },
         stop("Unknown input")
       )
+
+     # Update the URL of the app so user's can return to point easily
+    print('updating URL')
+
+    saved_codes <- paste(stringr::str_remove(state$selected_codes(), '\\.'), collapse = '_')
+
+    shiny::updateQueryString(glue::glue("?{saved_codes}"))
   })
+
 
   #----------------------------------------------------------------
   # Setup all the components of the app
