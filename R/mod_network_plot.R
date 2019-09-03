@@ -38,7 +38,7 @@ network_plot_UI <- function(
     }
 
     .me-network-controls {
-      padding: 0 0.25rem;;
+      padding: 0.25rem;;
       border-bottom: 1px solid #e4e0e0;
       align-self: center;
     }
