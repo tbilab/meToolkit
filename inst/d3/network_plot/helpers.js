@@ -145,6 +145,7 @@ function setup_progress_meter(svg, C){
     })
     .st({
       alignmentBaseline: 'hanging',
+      dominantBaseline: 'hanging',
       textAnchor: 'middle',
       fontSize: '1.5em',
       userSelect: "none",
@@ -177,7 +178,6 @@ function setup_progress_meter(svg, C){
       y: C.progress_bar_height - 3,
     })
     .st({
-      alignmentBaseline: 'bottom',
       fontSize: 20,
     });
 

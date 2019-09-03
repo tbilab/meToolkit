@@ -7,7 +7,7 @@ let viz_width = width,
     viz_data = data,
     default_selection = [];
 
-const margin = {left: 70, right: 25, top: 35, bottom: 20};
+const margin = {left: 70, right: 15, top: 35, bottom: 20};
 
 const manhattan_unit = 3;
 const hist_unit = 1;
@@ -456,6 +456,7 @@ function draw_legend(legend_g){
 
   const text_attrs = {
     alignmentBaseline: 'middle',
+    dominantBaseline: 'middle',
     textAnchor: 'end',
     y: 1,
   };
@@ -552,7 +553,7 @@ function draw_histogram(data){
     .call(
       g => g.attr("transform", `translate(${-5},0)`)
         .call(d3.axisLeft(scales.y).ticks(5).tickSizeOuter(0))
-        .call(add_axis_label('# of Codes'))
+        .call(add_axis_label('# Codes'))
     );
 
   const title = or_hist.selectAppend('text.title')

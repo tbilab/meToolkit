@@ -85,6 +85,7 @@ const draw_lollypop = (maf, name, title, i) => {
       y: 1,
       textAnchor: 'end',
       alignmentBaseline: 'middle',
+      dominantBaseline: 'middle',
       fill: 'white',
     })
     .text(toPercent(maf));

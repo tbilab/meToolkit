@@ -440,6 +440,7 @@ function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_releas
       y: handle_h/2 + 2,
       x: -2,
       alignmentBaseline: 'middle',
+      dominantBaseline: 'middle',
       opacity: 0,
     });
 
@@ -537,6 +538,7 @@ function create_info_panel(g, panel_size, side = 'left'){
     .st({
       fontSize: font_size, // make font size's mildly responsive to try and avoid overlapping axis
       alignmentBaseline: 'middle',
+      dominantBaseline: 'middle',
       textAnchor: text_anchor,
     });
 
