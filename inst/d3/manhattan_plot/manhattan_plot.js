@@ -571,9 +571,6 @@ function send_selection_to_shiny(){
   const currently_selected = app_state.get('selected_codes');
   // Hook up the to app code here.
 
-  // Only try and send a message if we have codes to do so.
-  if(currently_selected.length === 0) return;
-
   send_to_shiny(
     'selection',
     currently_selected,

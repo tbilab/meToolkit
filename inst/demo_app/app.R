@@ -6,7 +6,7 @@ library(readr)
 
 my_ME_app <- build_me_app(
   snp_name        = 'rs13283456',
-  results_data    = read_rds('data/simulated_phewas_results.rds') ,
+  results_data    = read_rds('data/simulated_phewas_results.rds'),
   individual_data = read_rds('data/simulated_ind_data.rds')
 )
 
