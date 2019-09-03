@@ -2,6 +2,7 @@
 
 export("%>%")
 export(buildColorPalette)
+export(build_me_app)
 export(calcRrCi)
 export(checkGenomeFile)
 export(checkPhenomeFile)

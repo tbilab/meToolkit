@@ -25,7 +25,7 @@ use_reveal_element <- function(){
 #' @param session The session variable from your server or module function.
 #' @param target_id Unique character string of the id if your element to be revealed.
 #'
-#' @return
+#' @return Desired element shown in UI of shiny app.
 #' @export
 #'
 #' @examples

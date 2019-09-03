@@ -12,6 +12,9 @@ reveal_element(session, target_id)
 
 \item{target_id}{Unique character string of the id if your element to be revealed.}
 }
+\value{
+Desired element shown in UI of shiny app.
+}
 \description{
 Reveal hidden element
 Targets a given UI element and toggles it from hidden to visable.
