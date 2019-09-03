@@ -54,7 +54,7 @@ manhattan_plot_and_table <- function(
       css = c(
         system.file("d3/helpers.css", package = "meToolkit"),
         system.file("d3/manhattan_plot/manhattan_plot.css", package = "meToolkit"),
-        system.file("css/buttons.css", package = "meToolkit")
+        system.file("css/common.css", package = "meToolkit")
       ),
       options = list(
         msg_loc = session$ns('message'),

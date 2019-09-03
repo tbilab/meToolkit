@@ -1,4 +1,4 @@
-// !preview r2d3 data = readr::read_rds(here::here('data/fake_upset_main.rds')), options = readr::read_rds(here::here('data/fake_upset_options.rds')), dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/upset/helpers.js')), css=here::here('inst/d3/upset/upset.css')
+// !preview r2d3 data = readr::read_rds(here::here('data/fake_upset_main.rds')), options = readr::read_rds(here::here('data/fake_upset_options.rds')), dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/upset/helpers.js')), css=c(here::here('inst/d3/upset/upset.css'), here::here('inst/css/common.css'))
 
 let viz_data = data,
     viz_svg = svg,

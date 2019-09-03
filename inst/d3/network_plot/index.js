@@ -1,4 +1,4 @@
-// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/network_plot/helpers.js')), css = c(here::here('inst/d3/network_plot/network.css'),  here::here('inst/d3/helpers.css'), here::here('inst/css/buttons.css'))
+// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/network_plot/helpers.js')), css = c(here::here('inst/d3/network_plot/network.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value

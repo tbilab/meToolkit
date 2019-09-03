@@ -1,4 +1,4 @@
-// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/buttons.css'))
+// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
 // ===============================================================
 // Initialization
 // ===============================================================
@@ -808,7 +808,7 @@ function add_axis_label(label, y_axis = true){
   const axis_label_style = {
     [bump_axis]: y_axis ? -3: 8,
     textAnchor: 'end',
-    fontWeight: 'bold',
+    fontWeight: '500',
     fontSize: '0.8rem'
   };
 
