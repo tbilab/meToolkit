@@ -38,7 +38,7 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
 #' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
 #' @param individual_data Dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.
 #' @param max_allowed_codes How many codes can the app show at any given time. Defaults to 40. (Too many and app may get slow.)
-#' @param usage_instructions HTML tags corresponding to static content to be displayed in bottom half of info panel. Any html content works.
+#' @param usage_instructions HTML tags corresponding to static content to be displayed in bottom half of info panel. Any html content works. Defaults to light description.
 #' @param colors A list of CSS-valid colors to paint interface in if custom colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue, light_red, dark_red, light_blue, green}.
 #' @return Shiny module of main Multimorbidity Explorer dashboard
 #' @export
@@ -51,7 +51,7 @@ main_dashboard <- function(
   results_data,
   individual_data,
   max_allowed_codes = 40,
-  usage_instructions,
+  usage_instructions = 'default',
   colors = list(
     light_grey = "#f7f7f7",
     med_grey   = "#d9d9d9",
@@ -62,6 +62,22 @@ main_dashboard <- function(
     green      = "#74c476"
   )
  ) {
+
+  if(usage_instructions == 'default'){
+    app_instructions <- div(
+      h2('How To Use'),
+      h3("Manhattan Plot"),
+      p("Use the Manhattan plot to select your codes of interest by dragging a box on main plot or searching/selecting with the table."),
+      p("Once you have your desired codes selected press 'Update Network' button at top of pane to update the network data with individuals possessing the selected codes."),
+      h3("Upset Plot"),
+      p("The upset plot allows you to see basic statistics about comorbidity patterns in the selected subset of codes, such as number of patients with a pattern and the risk of that pattern occuring in individuals with at least one copy of the minor allele."),
+      p("Clicking on a given pattern in the upset plot will highlight the patients with that pattern in the below network plot."),
+      h3("Network Plot"),
+      p("The network plot provides a direct look at the individual-level data. You can click on codes to select them for isolation or deletion from the current selection.")
+    )
+  } else {
+    app_instructions <- usage_instructions
+  }
   # Add colors to codes in results data.
   results_data <- meToolkit::buildColorPalette(results_data, category)
 
@@ -228,7 +244,7 @@ main_dashboard <- function(
     info_panel, 'info_panel',
     snp_name = snp_name,
     all_individual_data = individual_data,
-    instructions = usage_instructions,
+    instructions = app_instructions,
     colors = colors,
     current_individual_data = curr_ind_data
   )
