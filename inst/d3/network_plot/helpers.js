@@ -117,14 +117,19 @@ function setup_message_buttons(div, message_send_func){
 
   const message_buttons = message_holders.selectAll('div')
     .data(['delete', 'isolate', 'invert'])
-    .enter().append('div.hidden')
+    .enter().append('button.hidden')
     .text(d => d)
-    .classed('viz_button', true)
+    .attr('id', d => `${d}-button`)
     .on('click', message_send_func);
 
+  const show = function(which = 'all') {
+    const all_opened = which === 'all';
+    message_buttons
+      .classed('hidden', d => !(which.includes(d) || all_opened));
+  };
 
   return {
-    show: () => message_buttons.classed('hidden', false),
+    show,
     hide: () => message_buttons.classed('hidden', true),
   };
 }
@@ -368,7 +373,9 @@ function on_node_click(d){
 
   // do we have selected codes currently? If so display the action popup.
   if(selected_codes.length > 0){
-    dom_elements.message_buttons.show();
+    dom_elements.message_buttons.show(
+      selected_codes.length === 1 ? ['delete', 'invert']: 'all'
+    );
   } else {
     dom_elements.message_buttons.hide();
   }
