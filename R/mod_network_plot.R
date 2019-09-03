@@ -3,7 +3,6 @@
 #' @param id Unique id of module
 #' @param height How tall we want this module to be in css units (defaults to '500px')
 #' @param snp_colors A three element array of colors corresponding to the color of patient nodes and their snp status in order of 0,1,2 copies of minor allele.
-#' @param div_class A character string containing a class name for the entire plot to be wrapped in. This can then be used to style with external css. Defaults to 'network_plot'.
 #'
 #' @return HTML tag containing interactive network
 #' @export
@@ -14,10 +13,40 @@
 network_plot_UI <- function(
   id,
   height = '500px',
-  snp_colors = c('#bdbdbd','#fcae91', '#a50f15'),
-  div_class = 'network_plot'
+  snp_colors = c('#bdbdbd','#fcae91', '#a50f15')
 ) {
   ns <- NS(id)
+
+  module_css <- "
+    .me-network-plot {
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: 2rem 1fr;
+      grid-column-gap: 0px;
+      grid-row-gap: 0px;
+      }
+
+    .minor-allele-checkbox {
+      grid-area: 1 / 1 / 2 / 2;
+      text-align: left;
+    }
+
+    .minor-allele-legend {
+      grid-area: 1 / 2 / 2 / 3;
+      text-align: right;
+    }
+
+    .me-network-controls {
+      padding: 0 0.25rem;;
+      border-bottom: 1px solid #e4e0e0;
+      align-self: center;
+    }
+
+    .me-network_holder {
+      grid-area: 2 / 1 / 3 / 3;
+    }
+    "
 
   # CSS Styles
   rounded_span <- function(color){
@@ -26,35 +55,29 @@ network_plot_UI <- function(
       padding: 1px 6px;
       background: {color};")
   }
-  header_style <- glue::glue("
-    height: 1.5rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 8px 10px;
-    border-bottom: 1px solid #e4e0e0;
-    align-items: center;
-  ")
 
   tagList(
-    div(
-      class = div_class,
-      style = glue::glue("height: {height};"),
-      div(style = header_style,
-        div(
-          checkboxInput(
-            ns("snp_filter"),
-            label = "Just minor-allele carriers",
-            value = FALSE
-          )
-        ),
-        div(style = 'text-align: right;',
-          span('Copies of minor allele:'),
-          span(style=rounded_span(snp_colors[1]), "0"),
-          span(style=rounded_span(snp_colors[2]), "1"),
-          span(style=rounded_span(snp_colors[3]), "2")
+    shiny::tags$style(module_css),
+    div(class = 'me-network-plot',
+      div(
+        class = 'me-network-controls minor-allele-checkbox',
+        checkboxInput(
+          ns("snp_filter"),
+          label = "Just minor-allele carriers",
+          value = FALSE
         )
       ),
-      r2d3::d3Output(ns("plot"), height = "90%")
+      div(
+        class = 'me-network-controls minor-allele-legend',
+        span('Copies of minor allele:'),
+        span(style=rounded_span(snp_colors[1]), "0"),
+        span(style=rounded_span(snp_colors[2]), "1"),
+        span(style=rounded_span(snp_colors[3]), "2")
+      ),
+      div(
+        class = 'me-network_holder',
+        r2d3::d3Output(ns("plot"), height = "100%")
+      )
     )
   )
 }
@@ -86,6 +109,7 @@ network_plot <- function(
   output$plot <- r2d3::renderD3({
     validate(need(network_data(), message = FALSE))
     json_for_network <- jsonlite::toJSON(network_data());
+
 
     r2d3::r2d3(
       data = json_for_network,

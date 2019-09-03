@@ -25,7 +25,6 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
       ),
       network = meToolkit::network_plot_UI(ns('network_plot'),
                                  height = '100%',
-                                 div_class = 'network_plot',
                                  snp_colors = snp_colors
       ),
       info_panel = meToolkit::info_panel_UI(ns('info_panel'))
