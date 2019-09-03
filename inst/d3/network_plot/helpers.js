@@ -62,7 +62,7 @@ function send_to_shiny(type, codes, C){
 
   // Build message
   const message_body = {
-    type: type,
+    type: type.toLowerCase(),
     // append the date to the begining so sent value always changes.
     payload: [Date.now().toString(), ...codes]
   };
@@ -116,7 +116,7 @@ function setup_message_buttons(div, message_send_func){
   const message_holders = div.selectAppend('div.message_holders');
 
   const message_buttons = message_holders.selectAll('div')
-    .data(['delete', 'isolate', 'invert'])
+    .data(['Delete', 'Isolate', 'Invert'])
     .enter().append('button.hidden')
     .text(d => d)
     .attr('id', d => `${d}-button`)
@@ -374,7 +374,7 @@ function on_node_click(d){
   // do we have selected codes currently? If so display the action popup.
   if(selected_codes.length > 0){
     dom_elements.message_buttons.show(
-      selected_codes.length === 1 ? ['delete', 'invert']: 'all'
+      selected_codes.length === 1 ? ['Delete', 'Invert']: 'all'
     );
   } else {
     dom_elements.message_buttons.hide();
