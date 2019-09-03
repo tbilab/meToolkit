@@ -10,7 +10,15 @@ use_pretty_popup <- function(){
     shiny::tags$script(src = "https://unpkg.com/sweetalert/dist/sweetalert.min.js"),
     shiny::tags$script("
       Shiny.addCustomMessageHandler('load_popup', function(message){
-        swal(message);
+        swal(Object.assign(
+        message,
+        {
+          button: {
+            text: 'Okay',
+            className: 'btn',
+          }
+        }
+        ));
       });"
     )
   )
