@@ -11,11 +11,12 @@ These files are:
 __Phewas results file__: This file contains the results of the (most likely) univariate statistical analysis correlating each phenotype code to your SNP or biomarker of interest. The columns are
 
 - `code`: character value uniquely denoting a given phenotype
+- `OR`: Odds ratio from statistical test associating the given phenotype code with the biomarker of interest.
+- `p_val`: The p-value associated with same test.
+- `description`: Short description in words of what the code represents (E.g. `"Heart Failure"`).
 - `category`: A hierarchical category denoting some grouping structure in your phenotypes. For instance all codes related to 'infectious diseases'. These categories are used in coloring the manhattan plot.
-- `p_val`: The p-value associated with your statistical test associating the given phenotype code with the biomarker of interest. 
-- `tooltip`: Any interesting information about the code can be put here. It will show up as text on mouseover of the code in the manhattan or network plots. Allows use html formating of any kind for tables etc.
 
-If a tooltip column is not included then the app will automatically make one by just displaying each code's column values next to the column title. 
+Any other columns that are added will be included in a small table available on mouseover of codes in app. 
 
 
 __ID to SNP file__: Mapping between individual's IDs and the number of copies of the minor allele they have for the SNP of interest. A row is only needed if an individual has one or more copies of the minor allele (but data provided with rows for zero copies will work as well, just be less space efficient). 
