@@ -23,7 +23,7 @@ calcRrCi <- function(pattern_n, pattern_snp, other_n, other_snp, CI_size = 0.95)
     byrow = TRUE
   )
 
-  RR_estimates <- epitools::riskratio.small(cont_table, rev = "b", conf.level = CI_size)$measure[2,]
+  RR_estimates <- suppressWarnings(epitools::riskratio.small(cont_table, rev = "b", conf.level = CI_size)$measure[2,])
 
   list(
     PE = RR_estimates[1],
