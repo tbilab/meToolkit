@@ -285,20 +285,32 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
   const x_max = scales.X.range()[1];
   const y_max = scales.Y.range()[1];
 
-  const choose_stroke_width = (d) => {
+  // Special attributes for selected codes
+  const choose_stroke_color = d => d.inverted ?  d.color: 'black';
+
+  const choose_stroke_width = d => {
+    if(d.inverted) return 3;
+
     const selected = selected_codes.includes(d.name);
 
-    return d.inverted ? 3:
-           selected ? 2 : 0;
+    return selected ? 2 : 0;
   };
+
+  const choose_fill = d => {
+    if(d.inverted){
+      return selected_codes.includes(d.name) ? 'grey' : 'white';
+    } else {
+      return d.color;
+    }
+  }
 
   const node_attrs = {
     r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
     cx: d => scales.X(d.x),
     cy: d => scales.Y(d.y),
-    stroke: d => d.inverted ?  d.color: 'black',
+    stroke: choose_stroke_color,
     strokeWidth: choose_stroke_width,
-    fill: d => d.inverted ? 'white': d.color,
+    fill: choose_fill,
   };
 
   // If we isolated the phenotypes before we need to remove them

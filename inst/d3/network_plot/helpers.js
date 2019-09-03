@@ -351,7 +351,7 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
 }
 
 
-// Logic for what is done when a node is clicked.
+// Logic for when a svg node is clicked.
 function on_node_click(d){
   const node = d3.select(this);
 
@@ -361,14 +361,23 @@ function on_node_click(d){
     selected_codes = selected_codes.filter(code => code !== d.name);
 
     // reset the style of node
-    node.attr("stroke-width", 0);
+    if(d.inverted){
+      node.attr("fill", 'white');
+    } else {
+      node.attr("stroke-width", 0);
+    }
+
 
   } else {
     // add code to selected codes list
     selected_codes = [d.name, ...selected_codes];
 
-    // Outline node to emphasize highlight
-     node.attr("stroke-width", 2);
+    // Emphasize highlight
+    if(d.inverted){
+      node.attr("fill", 'grey');
+    } else {
+      node.attr("stroke-width", 2);
+    }
   }
 
   // do we have selected codes currently? If so display the action popup.
