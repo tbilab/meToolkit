@@ -146,11 +146,8 @@ main_dashboard <- function(
           state$selected_codes(
             prev_selected_codes[!(prev_selected_codes %in% codes_to_delete)]
           )
-          # print('deleting codes:')
-          # print(codes_to_delete)
         },
         selection = {
-          # print('selecting codes!')
           codes_to_select <- extract_codes(action_payload)
           num_requested_codes <- length(codes_to_select)
 
@@ -162,7 +159,6 @@ main_dashboard <- function(
           }
         },
         isolate = {
-          print('isolating codes!')
           desired_codes <- extract_codes(action_payload)
           if(length(desired_codes) < 2){
             not_enough_codes_msg()
@@ -172,13 +168,15 @@ main_dashboard <- function(
         },
         snp_filter_change = {
           state$snp_filter(!state$snp_filter())
-          # print('filtering snp status')
-          # print(glue::glue('New snp filter status is {state$snp_filter()}'))
         },
         pattern_highlight = {
-          # print('Upset sent a pattern higlight request')
-          # print(extract_codes(action_payload))
           state$highlighted_pattern(extract_codes(action_payload))
+        },
+        invert = {
+          currently_inverted <- state$inverted_codes()
+          requested_inversion <- extract_codes(action_payload)
+          new_inverted_list <- meToolkit::invertCodes(requested_inversion, currently_inverted)
+          state$inverted_codes(new_inverted_list)
         },
         stop("Unknown input")
       )
