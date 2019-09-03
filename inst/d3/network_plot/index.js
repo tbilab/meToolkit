@@ -183,6 +183,8 @@ const dom_elements = setup_dom_elements(
   // Function that is called when a message button is pressed. Passed the type of message
   function(type){
     send_to_shiny(type, selected_codes, C);
+    // Reset out selected codes
+    selected_codes = [];
   });
 
 // Setup the progress bar for network simulation progress
