@@ -87,6 +87,9 @@ function setup_network_viz(dom_elements, on_node_click){
     // Remove old network nodes
     dom_elements.svg.selectAll('circle').remove();
 
+    // Make sure message buttons are hidden
+    dom_elements.message_buttons.hide();
+
     // Update scale domains
     X.domain(d3.extent(nodes, d => d.x));
     Y.domain(d3.extent(nodes, d => d.y));
@@ -217,8 +220,10 @@ r2d3.onRender(function(data, div, width, height, options){
   const new_data = is_new_data(viz.data, data);
 
   if(new_data){
-     // Update the global viz info object
+    // Update the global viz info object
     viz.data = data;
+    // Reset selected codes
+    selected_codes = [];
   } else {
     network_viz.highlight(options.highlighted_pattern);
   }
