@@ -764,6 +764,8 @@ function reset_scales(data, sizes){
   // ===============================================================
   // Manhattan plot
   // ===============================================================
+  // How much should we pad the top of the axis in terms of percent?
+  const y_buffer = 1.1;
   const max_log_pval = d3.max(data, d => d.log_pval);
 
   manhattan_scales.x
@@ -771,7 +773,7 @@ function reset_scales(data, sizes){
     .range([0, width - margin.left - margin.right]);
 
   manhattan_scales.y
-    .domain([0, max_log_pval])
+    .domain([0, y_buffer*max_log_pval])
     .range([(size_props.manhattan*height) - margin.top - margin.bottom, 0]);
 
 
