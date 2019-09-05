@@ -266,10 +266,14 @@ function new_state(state){
     setup_quadtree(viz_data, manhattan_scales);
 
     manhattan_plot = draw_manhattan(viz_data);
+    // Make sure to respect or bounds in drawn plot
+    manhattan_plot.disable(this.get('or_bounds'));
+
     initialize_manhattan_brush(viz_data);
 
     draw_histogram(viz_data);
-    hist_brush = initialize_histogram_brush(data);
+
+    hist_brush = initialize_histogram_brush(data, this.get('or_bounds'));
   }
 
 
@@ -309,7 +313,6 @@ function new_state(state){
     }
   }
 
-
   // Make all the props completed.
   changed_props.forEach(p => state.mark_completed(p));
 }
@@ -330,9 +333,14 @@ const app_state = new App_State(initial_state, new_state);
 r2d3.onRender(function(data, svg, width, height, options) {
   default_selection = options.selected;
 
-  app_state.pass_action('new_sizes', [viz_width, height]);
-  app_state.pass_action('reset_button', null);
-  app_state.pass_action('table_selection', default_selection);
+  // Check if selection is different from current state and only reset if it is.
+  const new_selection = !arrays_equal(default_selection, app_state.get('selected_codes'));
+
+  if(new_selection){
+    app_state.pass_action('new_sizes', [viz_width, height]);
+    app_state.pass_action('reset_button', null);
+    app_state.pass_action('table_selection', default_selection);
+  }
 });
 
 // ===============================================================
@@ -702,7 +710,7 @@ function initialize_manhattan_brush(data){
 }
 
 
-function initialize_histogram_brush(data){
+function initialize_histogram_brush(data, initial_position = null){
 
   const [x_min, x_max] = histogram_scales.x.range();
   const [y_min, y_max] = histogram_scales.y.range();
@@ -712,9 +720,10 @@ function initialize_histogram_brush(data){
     [x_max + 1, y_min]
   ];
 
+
   const hist_brush = d3.brushX()
-    .extent(selection_range)
-    .on('end', on_hist_brush);
+    .extent(selection_range);
+
 
   // Add a g element and call the brush on it.
   const hist_brush_g = or_hist
@@ -732,6 +741,15 @@ function initialize_histogram_brush(data){
       strokeWidth: 2,
       fill: options.colors.dark_grey,
     });
+
+  // If the user has requested an initial position and that initial position is not just the default
+  // then place the brush before initializing the on-watcher.
+  if((initial_position !== null) && !tuples_equal(initial_position, [-Infinity, Infinity])){
+    set_brush_pos(initial_position.map(histogram_scales.x))
+  }
+
+   // Kick of watcher for dragging.
+   hist_brush.on('end', on_hist_brush);
 
   function set_brush_pos([min, max]){
     hist_brush_g.call(hist_brush.move, [min, max]);
@@ -872,7 +890,6 @@ function add_axis_label(label, y_axis = true){
     let last_tick = g.select(".tick:last-of-type");
     const no_ticks = last_tick.empty();
     if(no_ticks){
-      //debugger;
       last_tick = g.append('g')
         .attr('class', 'tick')
         .translate([viz_width - margin.left - margin.right, 5]);
