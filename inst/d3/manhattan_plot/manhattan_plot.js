@@ -188,6 +188,19 @@ class App_State{
         const newly_selected = manhattan_filter(this.get('or_bounds'), payload);
         this.modify_property('selected_codes', newly_selected);
         break;
+
+      case 'manhattan_click':
+        // Click function passed a single code that was clicked.
+        const current_selection = this.get('selected_codes');
+
+        // Add code if it's not selected, remove if it is.
+        this.modify_property(
+          'selected_codes',
+          current_selection.includes(payload) ?
+            current_selection.filter(c => c !== payload) :
+            [...current_selection, payload]
+        );
+        break;
       case 'hist_brush':
         // Update OR bounds
         this.modify_property('or_bounds', payload);
@@ -352,8 +365,6 @@ function draw_manhattan(data){
     stroke: options.colors.med_grey,
   };
 
-  const code_selected = d => selected_codes.includes(d.code);
-
   let manhattan_points = main_viz.selectAll('circle.manhattan_points')
     .data(data, d => d.code);
 
@@ -365,10 +376,17 @@ function draw_manhattan(data){
     .attr('cy', d => manhattan_scales.y(d.log_pval))
     .at(default_point)
     .on('mouseover', function(d){
+      if(d.disabled) return;
       tooltip.show(d, [d3.event.clientX, d3.event.clientY]);
     })
     .on('mouseout', function(d){
+      if(d.disabled) return;
       tooltip.hide();
+    })
+    .on('click', function(d){
+      if(d.disabled) return;
+      // Send clicked code id to the app state
+      app_state.pass_action('manhattan_click', d.code);
     });
 
 
