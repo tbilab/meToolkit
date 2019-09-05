@@ -197,6 +197,14 @@ class App_State{
           ]
         );
         break;
+      case 'manhattan_brush_delete':
+        // Only keep codes that are not contained in the dragged box.
+        const codes_to_delete = manhattan_filter(this.get('or_bounds'), payload);
+        this.modify_property(
+          'selected_codes',
+          this.get('selected_codes').filter(code => !codes_to_delete.includes(code))
+        );
+        break;
       case 'manhattan_click':
         // Click function passed a single code that was clicked.
         const current_selection = this.get('selected_codes');
@@ -539,6 +547,7 @@ function draw_legend(legend_g){
 
 }
 
+
 function show_reset(){
   reset_button.style('display', 'inline-block');
 }
@@ -659,17 +668,19 @@ function initialize_manhattan_brush(data){
     .selectAppend('g#manhattan_brush')
     .attr('class', 'brush');
 
-
   manhattan_brush_g.call(manhattan_brush);
 
   let a_pressed = false;
+  let d_pressed = false;
 
   d3.select('body')
     .on('keydown', function(d){
       a_pressed = d3.event.key === 'a';
+      d_pressed = d3.event.key === 'd';
     })
     .on('keyup', function(d){
       a_pressed = false;
+      d_pressed = false;
     });
 
   function on_manhattan_brush(){
@@ -681,14 +692,13 @@ function initialize_manhattan_brush(data){
     manhattan_brush_g.call(manhattan_brush.move, null);
 
     if(a_pressed){
-      // Send result of brush event to the app state
       app_state.pass_action('manhattan_brush_add', selection);
+    } else if (d_pressed){
+      app_state.pass_action('manhattan_brush_delete', selection);
     } else {
-      // Send result of brush event to the app state
       app_state.pass_action('manhattan_brush', selection);
     }
-
-}
+  }
 }
 
 
