@@ -121,7 +121,7 @@ main_dashboard <- function(
     # Start with all individuals regardless of snp status
     snp_filter = shiny::reactiveVal(FALSE),
     # Pattern to highlight in network plot,
-    highlighted_pattern = shiny::reactiveVal(c())
+    highlighted_pattern = shiny::reactiveVal(list(type = 'pattern', codes = c()))
   )
 
   #----------------------------------------------------------------
@@ -213,7 +213,16 @@ main_dashboard <- function(
           state$snp_filter(!state$snp_filter())
         },
         pattern_highlight = {
-          state$highlighted_pattern(extract_codes(action_payload))
+          # Highlight all nodes with specific pattern
+          state$highlighted_pattern(
+            list(type = 'pattern', codes = extract_codes(action_payload))
+          )
+        },
+        code_highlight = {
+          # Highlight all nodes who have a connection to a given code.
+          state$highlighted_pattern(
+            list(type = 'code', codes = extract_codes(action_payload)[1])
+          )
         },
         invert = {
           currently_inverted <- state$inverted_codes()
@@ -231,7 +240,6 @@ main_dashboard <- function(
 
     shiny::updateQueryString(glue::glue("?{saved_codes}"))
   })
-
 
   #----------------------------------------------------------------
   # Setup all the components of the app

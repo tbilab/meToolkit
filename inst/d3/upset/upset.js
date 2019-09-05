@@ -224,9 +224,9 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
 
    // Send message to shiny about the highlighted pattern
      if(d.highlighted){
-       send_to_shiny('pattern_highlight', [d.code], viz_options.msg_loc || 'no_shiny');
+       send_to_shiny('code_highlight', [d.code], viz_options.msg_loc || 'no_shiny');
      } else {
-       send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
+       send_to_shiny('code_highlight', [], viz_options.msg_loc || 'no_shiny');
      }
     }
   };

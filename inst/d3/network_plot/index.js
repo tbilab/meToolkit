@@ -1,8 +1,9 @@
-// !preview r2d3 data= jsonlite::toJSON(readr::read_rds(here::here('data/fake_network_data.rds'))), options = list(export_mode = FALSE, viz_type = 'free', update_freq = 5, highlighted_pattern = c('401.22', '411.00')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/network_plot/helpers.js')), css = c(here::here('inst/d3/network_plot/network.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
+// !preview r2d3 data= readr::read_rds(here::here('data/fake_network_data.rds')), options = readr::read_rds(here::here('data/fake_network_options.rds')), container = 'div', dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/network_plot/helpers.js')), css = c(here::here('inst/d3/network_plot/network.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
 
 
 // Constants object for viz, all can be overwritten if passed a different value
 // with the options argument of r2d3
+
 const C = Object.assign(
   {
     padding: 20,
@@ -129,7 +130,9 @@ function setup_network_viz(dom_elements, on_node_click){
     update_scales();
 
     // Draw svg nodes of network
-    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, d => highlight([d.name]));
+    const on_mouseover_callback = d => highlight({type: 'code', codes: d.name});
+
+    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, on_mouseover_callback);
 
     draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
 
@@ -139,15 +142,23 @@ function setup_network_viz(dom_elements, on_node_click){
     patient_patterns = patterns;
   };
 
-  const highlight = function(codes_to_highlight){
+  const highlight = function({type, codes}){
     if(layout_data){
 
-      const single_code = typeof codes_to_highlight === 'string';
+      let to_highlight;
 
-      // Find the patient nodes who have the pattern we want to highlight
-      const to_highlight = patient_patterns
-        .filter(d => arrays_equal(d.pattern, single_code ? [codes_to_highlight] : codes_to_highlight))
-        .map(d => d.name);
+      if(type === 'code'){
+        to_highlight = patient_patterns
+          .filter(d => d.pattern.includes(codes))
+          .map(d => d.name);
+      } else {
+        const single_code = typeof codes === 'string';
+
+        // Find the patient nodes who have the pattern we want to highlight
+        to_highlight = patient_patterns
+          .filter(d => arrays_equal(d.pattern, single_code ? [codes] : codes))
+          .map(d => d.name);
+      }
 
       // Make sure scales are update width current zoom
       update_scales();
