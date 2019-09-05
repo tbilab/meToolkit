@@ -10,7 +10,6 @@ const selection_height = height/2 - (point_r*1.1);
 const exome_height =     height/2 + (point_r*1.1);
 
 
-
 const {maf_exome, maf_sel, snp, ...loc_info} = data;
 
 // Setup the divs for our viz
@@ -81,7 +80,7 @@ const draw_lollypop = (maf, name, title, i) => {
   lollypop_g
     .selectAppend('text.percent')
     .at({
-      x: lollypop_size - 2,
+      x: lollypop_size - 5,
       y: 1,
       textAnchor: 'end',
       alignmentBaseline: 'middle',
