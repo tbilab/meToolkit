@@ -89,8 +89,6 @@ main_dashboard <- function(
 
   # Look to see if the URL used had desired codes in it.
   url_message <- isolate(session$clientData$url_search)
-  print(url_message)
-
 
   starting_codes <- c()
   if(url_message != ""){
@@ -102,8 +100,6 @@ main_dashboard <- function(
 
     # Make sure that we actually have these codes...
     starting_codes <- intersect(requested_codes, available_codes)
-
-    print("User has requested custom codes in URL.")
   }
 
   # Fall back to using the five most significant codes if nothing was suggested
@@ -229,9 +225,9 @@ main_dashboard <- function(
       )
 
      # Update the URL of the app so user's can return to point easily
-    print('updating URL')
-
-    saved_codes <- paste(stringr::str_remove(state$selected_codes(), '\\.'), collapse = '_')
+    saved_codes <- state$selected_codes() %>%
+      stringr::str_remove('\\.') %>%
+      paste(collapse = '_')
 
     shiny::updateQueryString(glue::glue("?{saved_codes}"))
   })
