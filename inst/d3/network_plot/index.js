@@ -283,6 +283,9 @@ function size_viz(width, height){
 // Function to draw svg parts of network
 function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click, on_mouseover){
 
+  // Make sure we have node positions provided by the webworker before we try and draw
+  if(nodes[0].x === undefined) return;
+
   nodes.forEach(d => {
     d.code = d.name;
   });
