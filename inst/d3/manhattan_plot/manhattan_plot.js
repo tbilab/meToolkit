@@ -188,7 +188,15 @@ class App_State{
         const newly_selected = manhattan_filter(this.get('or_bounds'), payload);
         this.modify_property('selected_codes', newly_selected);
         break;
-
+      case 'manhattan_brush_add':
+        // User has held a while dragging so we just need to append new selection
+        this.modify_property(
+          'selected_codes',
+          [...this.get('selected_codes'),
+          ...manhattan_filter(this.get('or_bounds'), payload)
+          ]
+        );
+        break;
       case 'manhattan_click':
         // Click function passed a single code that was clicked.
         const current_selection = this.get('selected_codes');
@@ -640,15 +648,29 @@ function initialize_manhattan_brush(data){
     .y(d => manhattan_scales.y(d.log_pval))
     .addAll(data);
 
-  const manhattan_brush = d3.brush().on('end', on_manhattan_brush);
+  const manhattan_brush = d3.brush()
+    .on('end', on_manhattan_brush)
+    .on("start.nokey", function() {
+      d3.select(window).on("keydown.brush keyup.brush", null);
+    });
 
   // Add a g element and call the brush on it.
   const manhattan_brush_g = main_viz
     .selectAppend('g#manhattan_brush')
     .attr('class', 'brush');
 
+
   manhattan_brush_g.call(manhattan_brush);
 
+  let a_pressed = false;
+
+  d3.select('body')
+    .on('keydown', function(d){
+      a_pressed = d3.event.key === 'a';
+    })
+    .on('keyup', function(d){
+      a_pressed = false;
+    });
 
   function on_manhattan_brush(){
     const { selection } = d3.event;
@@ -658,8 +680,14 @@ function initialize_manhattan_brush(data){
 
     manhattan_brush_g.call(manhattan_brush.move, null);
 
-    // Send result of brush event to the app state
-    app_state.pass_action('manhattan_brush', selection);
+    if(a_pressed){
+      // Send result of brush event to the app state
+      app_state.pass_action('manhattan_brush_add', selection);
+    } else {
+      // Send result of brush event to the app state
+      app_state.pass_action('manhattan_brush', selection);
+    }
+
 }
 }
 
