@@ -436,7 +436,7 @@ function draw_manhattan(data){
       g.attr("transform", `translate(0,${manhattan_scales.y.range()[0]})`)
         .call(d3.axisBottom(histogram_scales.x).ticks(1).tickSizeOuter(0))
         .call(g => g.select(".tick:first-of-type").remove())
-        .call(add_axis_label('PheCode', false))
+        .call(add_axis_label('Phecode', false))
     );
 
   const disable_codes = or_bounds => {
@@ -512,7 +512,7 @@ function draw_legend(legend_g){
   g.selectAppend('text.lead')
     .at(text_attrs)
     .attr('x', -legend_gap)
-    .text('OR for test: ');
+    .text('Odds Ratio: ');
 
  let legend_elements = g.selectAll('g.legend_element')
   .data(['negative', 'positive']);
@@ -603,7 +603,7 @@ function draw_histogram(data){
     .style('fill', 'dimgrey')
     .translate([5, -5])
     .html(
-      `<tspan class = 'main-title'>Log Odds-Ratios distribution</tspan>   <tspan class = 'sub-title'>Drag handles to filter to codes in a given range</tspan>`
+      `<tspan class = 'main-title'>Log Odds Ratio distribution</tspan>   <tspan class = 'sub-title'>Drag handles to filter to codes in a given range</tspan>`
     );
 
 
