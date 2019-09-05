@@ -374,6 +374,10 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       const node_callouts = svg.selectAll('g.node_callout')
         .data(phenotype_nodes, d => d.name);
 
+      // Remove callouts for nodes that are no longer in network
+      node_callouts.exit().remove();
+
+      // Add new codes and update all positions
       const callout_g = node_callouts.enter()
         .append('g.node_callout')
         .style('cursor', 'move')
