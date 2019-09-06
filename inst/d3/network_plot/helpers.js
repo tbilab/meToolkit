@@ -81,7 +81,7 @@ function setup_dom_elements(div, C, on_message){
   // Make div relatively positioned so we can overlay svg and canvas
   div
     .style('position', 'relative')
-    .style('margin-bottom', '0');
+    .style('bottom', '0');
 
   // Append the svg and padded g element
   const svg = div.selectAppend('svg')
