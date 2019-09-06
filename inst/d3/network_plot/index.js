@@ -4,6 +4,18 @@
 // Constants object for viz, all can be overwritten if passed a different value
 // with the options argument of r2d3
 
+// Holds the currently selected codes.
+let selected_codes = [];
+
+let viz = {
+      data: {},
+      width,
+      height,
+      options,
+      patient_patterns: null,
+    };
+
+
 const C = Object.assign(
   {
     padding: 20,
@@ -88,8 +100,11 @@ function setup_network_viz(dom_elements, on_node_click){
     // Remove old network nodes
     dom_elements.svg.selectAll('circle').remove();
 
-    // Make sure message buttons are hidden
-    dom_elements.message_buttons.hide();
+    // Make sure message buttons are hidden only if
+    // no codes are selected.
+    if(selected_codes.length == 0) {
+      dom_elements.message_buttons.hide();
+    }
 
     // Update scale domains
     X.domain(d3.extent(nodes, d => d.x));
@@ -135,7 +150,6 @@ function setup_network_viz(dom_elements, on_node_click){
     draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, on_mouseover_callback);
 
     draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
-
   };
 
   const new_patterns = function(patterns){
@@ -209,16 +223,6 @@ const network_viz = setup_network_viz(dom_elements, on_node_click);
 network_viz.new_data(data);
 
 const webworker = setup_webworker(C);
-
-// Holds the currently selected codes.
-let selected_codes = [],
-    viz = {
-      data: {},
-      width,
-      height,
-      options,
-      patient_patterns: null,
-    };
 
 
 //------------------------------------------------------------
