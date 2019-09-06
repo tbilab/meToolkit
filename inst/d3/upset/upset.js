@@ -268,9 +268,10 @@ function draw_upset(){
 
   } else {
     // Figure out starting min_set_size.
-    const sorted_sizes = viz_data.map(d => d.count).sort((a,b) => a - b);
+    const sorted_sizes = viz_data.map(d => d.count).sort((a,b) => b - a);
+
     // How many patterns will be shown with default min size?
-    const num_patterns_shown = sorted_sizes.findIndex(d => d > viz_options.min_set_size);
+    const num_patterns_shown = sorted_sizes.findIndex(d => d < viz_options.min_set_size);
 
     // If the viz is only showing 2 or fewer patterns adjust min size to show at least 2.
     const starting_min_size = num_patterns_shown < 2 ? sorted_sizes[2]: viz_options.min_set_size;
@@ -282,7 +283,7 @@ function draw_upset(){
         set_size_x,
         sizes,
         starting_min_size,
-        (new_size) => draw_with_set_size(g, new_size, sizes, set_size_x, filtered_on_snp));
+        new_size => draw_with_set_size(g, new_size, sizes, set_size_x, filtered_on_snp));
 
     // Initialize viz
     draw_with_set_size(g, starting_min_size, sizes, set_size_x, filtered_on_snp);
