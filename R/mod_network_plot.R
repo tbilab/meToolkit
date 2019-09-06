@@ -23,7 +23,7 @@ network_plot_UI <- function(
       grid-template-rows: 2rem 1fr;
       grid-column-gap: 0px;
       grid-row-gap: 0px;
-      position: relative;
+      align-content: end;
     }
 
     .minor-allele-checkbox {
@@ -43,6 +43,7 @@ network_plot_UI <- function(
     }
 
     .me-network_holder {
+      position: relative;
       grid-area: 2 / 1 / 3 / 3;
     }
     "
