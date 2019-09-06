@@ -15,14 +15,17 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
     shiny::htmlTemplate(
       system.file("html_templates/main_dashboard.html", package = "meToolkit"),
       app_title = 'Multimorbidity Explorer',
+      manhattan_plot_title = 'Interactive Phewas Manhattan Plot',
       manhattan_plot = meToolkit::manhattan_plot_and_table_UI(
         ns('manhattan_plot'),
         div_class = 'manhattan_plot'
       ),
+      upset_title = 'Comorbidity Upset Plot',
       upset = meToolkit::upset_UI(
         ns('upsetPlot'),
         div_class = 'upset_plot'
       ),
+      network_title = 'Individual-Level Network',
       network = meToolkit::network_plot_UI(ns('network_plot'),
                                  height = '100%',
                                  snp_colors = snp_colors

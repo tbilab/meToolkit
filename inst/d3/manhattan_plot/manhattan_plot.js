@@ -417,7 +417,7 @@ function draw_manhattan(data){
   // Draw a legend
    main_viz
      .selectAppend('g.legend')
-     .translate([margin.left, -margin.top + 1])
+     .translate([margin.left, -margin.top + 5])
      .call(draw_legend);
 
 
