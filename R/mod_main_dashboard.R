@@ -16,18 +16,11 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
       system.file("html_templates/main_dashboard.html", package = "meToolkit"),
       app_title = 'Multimorbidity Explorer',
       manhattan_plot_title = 'Interactive Phewas Manhattan Plot',
-      manhattan_plot = meToolkit::manhattan_plot_and_table_UI(
-        ns('manhattan_plot'),
-        div_class = 'manhattan_plot'
-      ),
+      manhattan_plot = meToolkit::manhattan_plot_and_table_UI(ns('manhattan_plot')),
       upset_title = 'Comorbidity Upset Plot',
-      upset = meToolkit::upset_UI(
-        ns('upsetPlot'),
-        div_class = 'upset_plot'
-      ),
+      upset = meToolkit::upset_UI(ns('upsetPlot')),
       network_title = 'Individual-Level Network',
       network = meToolkit::network_plot_UI(ns('network_plot'),
-                                 height = '100%',
                                  snp_colors = snp_colors
       ),
       info_panel = meToolkit::info_panel_UI(ns('info_panel'))
@@ -81,9 +74,9 @@ main_dashboard <- function(
   } else {
     app_instructions <- usage_instructions
   }
+
   # Add colors to codes in results data.
   results_data <- meToolkit::buildColorPalette(results_data, category)
-
 
   # Get available codes sorted by p-value
   available_codes <- results_data %>%
@@ -133,7 +126,7 @@ main_dashboard <- function(
   # Individual data subset by the currently viewed phecodes and if we've filtered the snp
   curr_ind_data <- shiny::reactive({
 
-    keep_everyone <- !(state$snp_filter())
+    keep_everyone <- !state$snp_filter()
     # Filter the individual data to just MA carriers if needed, otw keep everyone
 
     individual_data %>%
@@ -163,10 +156,14 @@ main_dashboard <- function(
   # Reactive variable that stores the most recent interaction
   app_interaction <- shiny::reactiveVal()
 
+  # Function to retreive codes from an action payload
+  extract_codes <- function(payload){
+    tail(unlist(payload), -1)
+  }
+
   shiny::observeEvent(app_interaction(),{
     action_type <- app_interaction()[['type']]
     action_payload <- app_interaction()[['payload']]
-    extract_codes <- . %>% unlist() %>% tail(-1)
 
     bad_request_msg <- function(num_requested = 1){
       if(num_requested < 2){
@@ -207,7 +204,7 @@ main_dashboard <- function(
         isolate = {
           desired_codes <- extract_codes(action_payload)
           if(length(desired_codes) < 2){
-            not_enough_codes_msg()
+            bad_request_msg(length(desired_codes))
           } else {
             state$selected_codes(desired_codes)
           }
@@ -250,8 +247,8 @@ main_dashboard <- function(
   ## Network plot
   shiny::callModule(
     meToolkit::network_plot, 'network_plot',
-    curr_network_data,
-    state$highlighted_pattern,
+    network_data = curr_network_data,
+    highlighted_codes = state$highlighted_pattern,
     snp_filter = state$snp_filter,
     viz_type = 'free',
     update_freq = 25,
@@ -261,8 +258,8 @@ main_dashboard <- function(
   ## Upset plot
   shiny::callModule(
     meToolkit::upset, 'upsetPlot',
-    curr_ind_data,
-    dplyr::select(individual_data, IID, snp),
+    individual_data = curr_ind_data,
+    all_patient_snps = dplyr::select(individual_data, IID, snp),
     results_data = results_data,
     colors = colors,
     app_interaction

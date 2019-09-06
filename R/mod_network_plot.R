@@ -1,7 +1,6 @@
 #' Interactive individual-level data network diagram of patients to codes
 #'
 #' @param id Unique id of module
-#' @param height How tall we want this module to be in css units (defaults to '500px')
 #' @param snp_colors A three element array of colors corresponding to the color of patient nodes and their snp status in order of 0,1,2 copies of minor allele.
 #'
 #' @return HTML tag containing interactive network
@@ -12,7 +11,6 @@
 #' network_plot_UI('mycomorbiditynetwork_plot', '100%')
 network_plot_UI <- function(
   id,
-  height = '500px',
   snp_colors = c('#bdbdbd','#fcae91', '#a50f15')
 ) {
   ns <- NS(id)
