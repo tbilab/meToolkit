@@ -1,6 +1,11 @@
 /*
 Fonts for app
 */
+
+body {
+  --main-text-color: #525252;
+}
+
 body,
 table,
 label,
@@ -10,10 +15,19 @@ svg text {
 }
 
 
-/*
 h1, h2, h3, h4 {
-  font-family: 'Raleway', sans-serif;
-}*/
+  font-weight: 400;
+  color: #252525;
+}
+
+p, span, table, label, button {
+  color: var(--main-text-color);
+}
+
+svg text {
+  fill: var(--main-text-color);
+}
+
 
 
 /* Button Styles */
@@ -36,7 +50,6 @@ button,
   	border:1px solid #dcdcdc;
   	display:inline-block;
   	cursor:pointer;
-  	color:#666666;
   	padding:6px 20px;
   	text-decoration:none;
   	text-shadow:0px 1px 0px #ffffff;

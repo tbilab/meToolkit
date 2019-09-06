@@ -76,7 +76,8 @@ info_panel <- function(
       ),
       css = c(
         system.file("d3/info_panel/info_panel.css", package = "meToolkit"),
-        system.file("d3/helpers.css", package = "meToolkit")
+        system.file("d3/helpers.css", package = "meToolkit"),
+        system.file("css/common.css", package = "meToolkit")
       )
     )
   })

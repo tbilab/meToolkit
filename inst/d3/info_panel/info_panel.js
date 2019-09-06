@@ -15,9 +15,6 @@ const {maf_exome, maf_sel, snp, ...loc_info} = data;
 // Setup the divs for our viz
 div.classed('container', true);
 
-const main_title_color = '#252525';
-const subtitle_color = '#525252';
-
 
 // ================================================================
 // Main layout of panel
@@ -33,8 +30,7 @@ const instructions = div.selectAppend('div.instructions');
 header.selectAppend('h1')
   .style('border-bottom', `1px solid ${options.colors.med_grey}`)
   .style('width', '100%')
-  .text(data.snp)
-  .style('color', main_title_color);
+  .text(data.snp);
 
 
 // ================================================================
@@ -42,8 +38,7 @@ header.selectAppend('h1')
 // ================================================================
 maf_viz.selectAppend('div.header')
   .selectAppend('h2')
-  .text('Minor Allele Frequency')
-  .style('color', subtitle_color);
+  .text('Minor Allele Frequency');
 
 const svg = maf_viz.selectAppend('svg');
 const viz_w = +svg.style('width').replace('px', '') ;
@@ -95,7 +90,6 @@ const draw_lollypop = (maf, name, title, i) => {
     .at({
       x: -x_scale(maf) + x_scale(0),
       y: -stick_size/2 - 3,
-      fill: subtitle_color,
     })
     .text(title);
 };
@@ -109,8 +103,7 @@ draw_lollypop(maf_sel, 'selection_freq', 'Current Selection', 1);
 // ================================================================
 location.selectAppend('div.header')
   .selectAppend('h2')
-  .text('Annotations')
-  .style('color', subtitle_color);
+  .text('Annotations');
 
 const loc_table_body = Object.keys(loc_info)
   .reduce((table, key) =>
@@ -129,7 +122,6 @@ location
 // Instruction text
 // ================================================================
 instructions
-  .style('color', subtitle_color)
   .style('border-top', `1px solid ${options.colors.dark_grey}`)
   .html(options.instructions);
 
