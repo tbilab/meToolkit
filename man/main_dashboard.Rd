@@ -4,7 +4,7 @@
 \alias{main_dashboard}
 \title{Server function of upset module}
 \usage{
-main_dashboard(input, output, session, snp_name, results_data,
+main_dashboard(input, output, session, snp_name, phewas_results,
   individual_data, max_allowed_codes = 40,
   usage_instructions = "default", colors = list(light_grey = "#f7f7f7",
   med_grey = "#d9d9d9", dark_grey = "#bdbdbd", light_red = "#fcbba1",
@@ -15,7 +15,7 @@ main_dashboard(input, output, session, snp_name, results_data,
 
 \item{snp_name}{Character string containing the RSID of the snp you're viewing. Used to find annotation information.}
 
-\item{results_data}{Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.}
+\item{phewas_results}{Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.}
 
 \item{individual_data}{Dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.}
 
@@ -32,5 +32,5 @@ Shiny module of main Multimorbidity Explorer dashboard
 Server function of upset module
 }
 \examples{
-main_dashboard(upset, 'my_app', 'rs12345', my_results_data, my_individual_data, usage_instructions = 'This app is complicated!')
+main_dashboard(upset, 'my_app', 'rs12345', my_phewas_results, my_individual_data, usage_instructions = 'This app is complicated!')
 }

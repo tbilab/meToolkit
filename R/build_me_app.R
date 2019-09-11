@@ -27,7 +27,7 @@ build_me_app <- function(snp_name, results_data, individual_data, max_allowed_co
     shiny::callModule(
       meToolkit::main_dashboard, 'main_app',
       snp_name           = snp_name,
-      results_data       = results_data ,
+      phewas_results     = results_data ,
       individual_data    = individual_data,
       max_allowed_codes  = max_allowed_codes
     )

@@ -34,9 +34,9 @@ run_me <- function(){
       app_data <- loaded_data()
 
       shiny::callModule(
-        main_dashboard, 'main_app',
+        meToolkit::main_dashboard, 'main_app',
         snp_name           = app_data$snp_name,
-        results_data       = app_data$phewas_data,
+        phewas_results     = app_data$phewas_data,
         individual_data    = app_data$individual_data,
         max_allowed_codes  = 45
       )

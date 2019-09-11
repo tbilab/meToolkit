@@ -22,10 +22,7 @@ Imports:
     shiny,
     r2d3,
     jsonlite,
-    rsnps,
     purrr,
-    glue,
-    plotly,
-    DT
+    glue
 Suggests: 
     testthat
