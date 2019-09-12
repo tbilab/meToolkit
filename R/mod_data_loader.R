@@ -148,8 +148,6 @@ data_loader <- function(
       genome  <- app_data$genome_raw
       phewas  <- app_data$phewas_raw
 
-
-
       # first spread the phenome data to a wide format
       shiny::incProgress(2/3, detail = "Processing phenome data")
       individual_data <- meToolkit::mergePhenomeGenome(phenome, genome)

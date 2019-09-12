@@ -7,11 +7,16 @@
 #' combines individual data and checks phewas results along with extracting the
 #' snp name from the column of the genotype file.
 #'
-#' @param phewas_results Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
-#' @param genotypes Dataframe containing columns on \code{IID}, \code{snp}(# copies of allele).
-#' @param phenotypes Dataframe containing column  \code{IID}, and columns for each code included.
+#' @param phewas_results Dataframe containing the results of the phewas study.
+#'   Needs columns \code{p_val}, \code{id}, \code{category}(along with
+#'   accompanying \code{color}), \code{tooltip}.
+#' @param genotypes Dataframe containing columns on \code{IID}, \code{snp}(#
+#'   copies of allele).
+#' @param phenotypes Dataframe containing column  \code{IID}, and columns for
+#'   each code included.
 #'
-#' @return List with `snp_name`, `individual_data`, and `phewas_results` properties for use in ME app.
+#' @return List with `snp_name`, `individual_data`, and `phewas_results`
+#'   properties for use in ME app.
 #'
 #' @examples
 #' reconcile_data(phewas_table, id_to_snp, phenotype_id_pairs)
