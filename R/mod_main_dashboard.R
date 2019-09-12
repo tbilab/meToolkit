@@ -19,7 +19,7 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
       manhattan_plot = meToolkit::manhattan_plot_and_table_UI(ns('manhattan_plot')),
       upset_title = 'Comorbidity Upset Plot',
       upset = meToolkit::upset_UI(ns('upsetPlot')),
-      network_title = 'Individual-Level Network',
+      network_title = 'Subject-Phecode Bipartite Network',
       network = meToolkit::network_plot_UI(ns('network_plot'),
                                  snp_colors = snp_colors
       ),
