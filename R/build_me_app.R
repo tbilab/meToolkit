@@ -33,7 +33,6 @@ build_me_app <- function(phewas_results, genotypes, phenotypes, max_allowed_code
     app_content = meToolkit::main_dashboard_UI("main_app")
   )
 
-
   app_server <- function(input, output, session) {
     shiny::callModule(
       meToolkit::main_dashboard, 'main_app',

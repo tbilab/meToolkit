@@ -30,7 +30,7 @@ server <- function(input, output, session) {
     callModule(
       main_dashboard, 'main_app',
       snp_name           = app_data$snp_name,
-      results_data       = app_data$phewas_data,
+      phewas_results     = app_data$phewas_results,
       individual_data    = app_data$individual_data,
       max_allowed_codes  = 45
     )
