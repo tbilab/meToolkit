@@ -14,5 +14,7 @@ Function to spawn a shiny app instance for Multimorbidity Explorer app with
 data loading screen.
 }
 \examples{
+\dontrun{
 meToolkit::run_me()
+}
 }

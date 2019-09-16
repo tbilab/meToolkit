@@ -36,10 +36,12 @@ entire app. This makes it easy to deploy a custom app with a few lines of
 code.
 }
 \examples{
+\dontrun{
 my_ME_app <- build_me_app(
   phewas_table,
   id_to_snp,
   phenotype_id_pairs
 )
 shinyApp(my_ME_app$ui, my_ME_app$server)
+}
 }

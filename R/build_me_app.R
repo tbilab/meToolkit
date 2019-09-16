@@ -17,12 +17,14 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' my_ME_app <- build_me_app(
 #'   phewas_table,
 #'   id_to_snp,
 #'   phenotype_id_pairs
 #' )
 #' shinyApp(my_ME_app$ui, my_ME_app$server)
+#' }
 build_me_app <- function(phewas_results, genotypes, phenotypes, max_allowed_codes = 45, auto_run = FALSE){
 
   # Setup data in the module-friendly combined format

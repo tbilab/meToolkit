@@ -5,3 +5,4 @@
 module_tests/data/
 raw_data/
 *rsconnect/
+inst/doc
