@@ -8,14 +8,19 @@ return in app-friendly format}
 reconcile_data(phewas_results, genotypes, phenotypes)
 }
 \arguments{
-\item{phewas_results}{Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.}
+\item{phewas_results}{Dataframe containing the results of the phewas study.
+Needs columns \code{p_val}, \code{id}, \code{category}(along with
+accompanying \code{color}), \code{tooltip}.}
 
-\item{genotypes}{Dataframe containing columns on \code{IID}, \code{snp}(# copies of allele).}
+\item{genotypes}{Dataframe containing columns on \code{IID}, \code{snp}(#
+copies of allele).}
 
-\item{phenotypes}{Dataframe containing column  \code{IID}, and columns for each code included.}
+\item{phenotypes}{Dataframe containing column  \code{IID}, and columns for
+each code included.}
 }
 \value{
-List with \code{snp_name}, \code{individual_data}, and \code{phewas_results} properties for use in ME app.
+List with \code{snp_name}, \code{individual_data}, and \code{phewas_results}
+properties for use in ME app.
 }
 \description{
 Helper function used at the begining of a ME app that takes the raw format of
