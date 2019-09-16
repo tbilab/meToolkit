@@ -274,14 +274,6 @@ main_dashboard <- function(
     colors = colors
   )
 
-  ## PheWAS table
-  shiny::callModule(
-    meToolkit::phewas_table, 'phewas_table',
-    results_data = phewas_results,
-    selected_codes = state$selected_codes,
-    action_object = app_interaction
-  )
-
   # SNP info panel
   shiny::callModule(
     info_panel, 'info_panel',
