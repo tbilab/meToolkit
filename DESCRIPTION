@@ -7,7 +7,7 @@ Maintainer: Nick Strayer <nick.strayer@gmail.com>
 Description: The main function in this package spins up a fully contained and self-hosted copy of an ME app for data privacy. 
     In addition to, multiple functions are provided allowing the user to customize their app from pre-loading data to configuring 
     the individual charts included. 
-License: What license is it under?
+License: Apache License (>= 2.0)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
