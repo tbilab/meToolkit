@@ -10,11 +10,10 @@ const selection_height = height/2 - (point_r*1.1);
 const exome_height =     height/2 + (point_r*1.1);
 
 
-const {maf_exome, maf_sel, snp, ...loc_info} = data;
+const {maf_exome, maf_sel, snp, annotations} = data;
 
 // Setup the divs for our viz
 div.classed('container', true);
-
 
 // ================================================================
 // Main layout of panel
@@ -105,11 +104,11 @@ location.selectAppend('div.header')
   .selectAppend('h2')
   .text('Annotations');
 
-const loc_table_body = Object.keys(loc_info)
-  .reduce((table, key) =>
+const loc_table_body = annotations.key
+  .reduce((table, key, i) =>
         table + `<tr>
                   <td style='text-align:right'>${key}</td>
-                  <td style='text-align:left; padding-left: 1rem'>${loc_info[key]}</td>
+                  <td style='text-align:left; padding-left: 1rem'>${annotations.value[i]}</td>
                 </tr>`, '');
 
 location
