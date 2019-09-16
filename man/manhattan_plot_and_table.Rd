@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_manhattan_and_table.R
 \name{manhattan_plot_and_table}
 \alias{manhattan_plot_and_table}
-\title{Server function of manhattan plot module. Returns a reactive variable that dispenses interaction events in the common type, payload format of \code{meToolkit} modules.}
+\title{Server function of manhattan plot module.}
 \usage{
 manhattan_plot_and_table(input, output, session, results_data,
   selected_codes, colors, action_object)
@@ -10,20 +10,31 @@ manhattan_plot_and_table(input, output, session, results_data,
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
 
-\item{results_data}{Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.}
+\item{results_data}{Dataframe containing the results of the phewas study.
+Needs columns \code{p_val}, \code{id}, \code{category}(along with
+accompanying \code{color}), \code{tooltip}.}
 
-\item{selected_codes}{A reactive variable containing array of code \code{id}s that are currently selected in the app.}
+\item{selected_codes}{A reactive variable containing array of code \code{id}s
+that are currently selected in the app.}
 
-\item{colors}{A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.}
+\item{colors}{A list of CSS-valid colors to paint interface in. Needs
+\code{light_grey, med_grey, dark_grey, light_blue}.}
 
-\item{action_object}{A \code{reactiveVal} that will be updated by the module upon selection}
+\item{action_object}{A \code{reactiveVal} that will be updated by the module
+upon selection}
 }
 \value{
-Server component of interactive manhattan plot. Returns type-payload list with the type \code{"selection"} to the passed \code{action_object} for updating app state.
+Server component of interactive manhattan plot. Returns type-payload
+list with the type \code{"selection"} to the passed \code{action_object}
+for updating app state.
 }
 \description{
-Server function of manhattan plot module. Returns a reactive variable that dispenses interaction events in the common type, payload format of \code{meToolkit} modules.
+Draw an interactive manhattan plot and table that can be used to send
+selections for codes to the rest of the app.
 }
 \examples{
 callModule(manhattan_plot_and_table,  'my_mod', selected_codes, app_state$currently_selected)
+}
+\seealso{
+\code{\link{manhattan_plot_and_table}}
 }

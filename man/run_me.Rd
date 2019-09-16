@@ -2,8 +2,7 @@
 % Please edit documentation in R/run_me.R
 \name{run_me}
 \alias{run_me}
-\title{Run ME app locally
-Function to spawn a shiny app instance for Multimorbidity Explorer app with data loading screen.}
+\title{Run ME app locally}
 \usage{
 run_me()
 }
@@ -11,8 +10,8 @@ run_me()
 Shiny app process
 }
 \description{
-Run ME app locally
-Function to spawn a shiny app instance for Multimorbidity Explorer app with data loading screen.
+Function to spawn a shiny app instance for Multimorbidity Explorer app with
+data loading screen.
 }
 \examples{
 meToolkit::run_me()

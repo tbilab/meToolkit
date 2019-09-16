@@ -1,8 +1,16 @@
-#' Interactive manhattan plot and table for selecting codes for further visualization in app.
+#' Interactive manhattan plot and table
 #'
+#' For selecting codes for further visualization in app.
+#'
+#'
+#' @seealso \code{\link{manhattan_plot_and_table}}
 #' @param id String with unique id of module in app
-#' @param height How tall we want this module to be in pixels (defaults to `NULL`). If not provided the div must be styled to have a height using css. (See `div_class` argument for targeting.)
-#' @param div_class A character string containing a class name for the entire plot to be wrapped in. This can then be used to style with external css. Defaults to 'manhattan_plot'.
+#' @param height How tall we want this module to be in pixels (defaults to
+#'   `NULL`). If not provided the div must be styled to have a height using css.
+#'   (See `div_class` argument for targeting.)
+#' @param div_class A character string containing a class name for the entire
+#'   plot to be wrapped in. This can then be used to style with external css.
+#'   Defaults to 'manhattan_plot'.
 #' @return UI component of interactive manhattan plot
 #' @export
 #'
@@ -20,14 +28,26 @@ manhattan_plot_and_table_UI <- function(id, height = NULL, div_class = 'manhatta
   )
 }
 
-#' Server function of manhattan plot module. Returns a reactive variable that dispenses interaction events in the common type, payload format of \code{meToolkit} modules.
+#' Server function of manhattan plot module.
 #'
+#' Draw an interactive manhattan plot and table that can be used to send
+#' selections for codes to the rest of the app.
+#'
+#'
+#' @seealso \code{\link{manhattan_plot_and_table}}
 #' @param input,output,session Auto-filled by callModule | ignore
-#' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
-#' @param selected_codes A reactive variable containing array of code \code{id}s that are currently selected in the app.
-#' @param colors A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.
-#' @param action_object A \code{reactiveVal} that will be updated by the module upon selection
-#' @return Server component of interactive manhattan plot. Returns type-payload list with the type \code{"selection"} to the passed \code{action_object} for updating app state.
+#' @param results_data Dataframe containing the results of the phewas study.
+#'   Needs columns \code{p_val}, \code{id}, \code{category}(along with
+#'   accompanying \code{color}), \code{tooltip}.
+#' @param selected_codes A reactive variable containing array of code \code{id}s
+#'   that are currently selected in the app.
+#' @param colors A list of CSS-valid colors to paint interface in. Needs
+#'   \code{light_grey, med_grey, dark_grey, light_blue}.
+#' @param action_object A \code{reactiveVal} that will be updated by the module
+#'   upon selection
+#' @return Server component of interactive manhattan plot. Returns type-payload
+#'   list with the type \code{"selection"} to the passed \code{action_object}
+#'   for updating app state.
 #' @export
 #'
 #' @examples

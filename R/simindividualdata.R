@@ -1,17 +1,22 @@
-#' Generate sample indivual level data based upon some phewas results
+#' Generate sample individual level data based upon some phewas results
 #'
-#' This function will take the results of a phewas study (most importantly a code, case and control numbers, and an OR) and simulate as many individual
+#' This function will take the results of a phewas study (most importantly a
+#' code, case and control numbers, and an OR) and simulate as many individual
 #' datapoints as you desire.
 #'
-#' @param phewas_results Phewas results. Needs a column \code{code} with the id of a given phecode, \code{code_proportion}: with the proportion of individuals that have the code in the entire population, and \code{OR}: the odds ratio of having a code given having the snp of interest.
+#' @param phewas_results Phewas results. Needs a column \code{code} with the id
+#'   of a given phecode, \code{code_proportion}: with the proportion of
+#'   individuals that have the code in the entire population, and \code{OR}: the
+#'   odds ratio of having a code given having the snp of interest.
 #' @param num_patients How many patients should be simulated.
-#' @param snp_prev The overall population prevalence of the snp you want to simulate.
+#' @param snp_prev The overall population prevalence of the snp you want to
+#'   simulate.
 #'
-#' @return list with following components
-#' \describe{
-#'   \item{snp_status}{tibble with patient \code{ID} and snp status (\code{snp})}
-#'   \item{phenotypes}{wide tibble with an \code{ID} column and a column for each code provided in the \code{phewas_resuts} input. Cell values are if the patient had that given code.}
-#' }
+#' @return list with following components \describe{ \item{snp_status}{tibble
+#'   with patient \code{ID} and snp status (\code{snp})} \item{phenotypes}{wide
+#'   tibble with an \code{ID} column and a column for each code provided in the
+#'   \code{phewas_resuts} input. Cell values are if the patient had that given
+#'   code.} }
 #' @export
 #'
 #' @examples

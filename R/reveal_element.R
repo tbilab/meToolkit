@@ -1,6 +1,12 @@
 #' Use reveal_element function
-#' Function to be included in UI of shiny app that uses \code{reveal_element()} function. Injects javascript into HTML.
-#' @return Injected javascript function in head of HTML that Shiny uses to reveal elements.
+#'
+#' Function to be included in UI of shiny app that uses \code{reveal_element()}
+#' function. Injects javascript into HTML.
+#'
+#' @seealso reveal_element
+#'
+#' @return Injected javascript function in head of HTML that Shiny uses to
+#'   reveal elements.
 #' @export
 #'
 #' @examples
@@ -21,9 +27,14 @@ use_reveal_element <- function(){
 }
 
 #' Reveal hidden element
+#'
 #' Targets a given UI element and toggles it from hidden to visable.
+#'
+#' @seealso use_reveal_element
+#'
 #' @param session The session variable from your server or module function.
-#' @param target_id Unique character string of the id if your element to be revealed.
+#' @param target_id Unique character string of the id if your element to be
+#'   revealed.
 #'
 #' @return Desired element shown in UI of shiny app.
 #' @export

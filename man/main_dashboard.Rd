@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_main_dashboard.R
 \name{main_dashboard}
 \alias{main_dashboard}
-\title{Server function of upset module}
+\title{Main Multimorbidity Explorer Dashboard: Server function}
 \usage{
 main_dashboard(input, output, session, snp_name, phewas_results,
   individual_data, max_allowed_codes = 40,
@@ -13,24 +13,43 @@ main_dashboard(input, output, session, snp_name, phewas_results,
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
 
-\item{snp_name}{Character string containing the RSID of the snp you're viewing. Used to find annotation information.}
+\item{snp_name}{Character string containing the RSID of the snp you're
+viewing. Used to find annotation information.}
 
-\item{phewas_results}{Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.}
+\item{phewas_results}{Dataframe containing the results of the phewas study.
+Needs columns \code{p_val}, \code{id}, \code{category}(along with
+accompanying \code{color}), \code{tooltip}.}
 
-\item{individual_data}{Dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.}
+\item{individual_data}{Dataframe containing columns on \code{IID},
+\code{snp}(# copies of allele), and columns for each code included.}
 
-\item{max_allowed_codes}{How many codes can the app show at any given time. Defaults to 40. (Too many and app may get slow.)}
+\item{max_allowed_codes}{How many codes can the app show at any given time.
+Defaults to 40. (Too many and app may get slow.)}
 
-\item{usage_instructions}{HTML tags corresponding to static content to be displayed in bottom half of info panel. Any html content works. Defaults to light description.}
+\item{usage_instructions}{HTML tags corresponding to static content to be
+displayed in bottom half of info panel. Any html content works. Defaults to
+light description.}
 
-\item{colors}{A list of CSS-valid colors to paint interface in if custom colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue, light_red, dark_red, light_blue, green}.}
+\item{colors}{A list of CSS-valid colors to paint interface in if custom
+colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue,
+  light_red, dark_red, light_blue, green}.}
 }
 \value{
 Shiny module of main Multimorbidity Explorer dashboard
 }
 \description{
-Server function of upset module
+Generates a full dashboard page containing various visualizations for
+investigating comobidity patterns in individual level data and how they
+relate to the results of a phewas analysis.
 }
 \examples{
-main_dashboard(upset, 'my_app', 'rs12345', my_phewas_results, my_individual_data, usage_instructions = 'This app is complicated!')
+callModule(
+  main_dashboard, 'main_dashboard',
+  my_phewas_results,
+  my_individual_data,
+  usage_instructions = 'This app is complicated!'
+)
+}
+\seealso{
+\code{\link{main_dashboard_UI}}
 }

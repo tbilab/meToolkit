@@ -2,23 +2,25 @@
 % Please edit documentation in R/reveal_element.R
 \name{reveal_element}
 \alias{reveal_element}
-\title{Reveal hidden element
-Targets a given UI element and toggles it from hidden to visable.}
+\title{Reveal hidden element}
 \usage{
 reveal_element(session, target_id)
 }
 \arguments{
 \item{session}{The session variable from your server or module function.}
 
-\item{target_id}{Unique character string of the id if your element to be revealed.}
+\item{target_id}{Unique character string of the id if your element to be
+revealed.}
 }
 \value{
 Desired element shown in UI of shiny app.
 }
 \description{
-Reveal hidden element
 Targets a given UI element and toggles it from hidden to visable.
 }
 \examples{
 reveal_element(session, 'hi_message')
+}
+\seealso{
+use_reveal_element
 }

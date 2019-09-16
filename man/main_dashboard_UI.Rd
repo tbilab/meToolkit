@@ -2,21 +2,25 @@
 % Please edit documentation in R/mod_main_dashboard.R
 \name{main_dashboard_UI}
 \alias{main_dashboard_UI}
-\title{UI function of upset module}
+\title{Main Multimorbidity Explorer Dashboard: UI function}
 \usage{
 main_dashboard_UI(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"))
 }
 \arguments{
 \item{id}{String with unique id of module in app}
 
-\item{snp_colors}{Array of css color codes for 0, 1, and 2 copies of the minor allele in network plot.}
+\item{snp_colors}{Array of css color codes for 0, 1, and 2 copies of the
+minor allele in network plot.}
 }
 \value{
 HTML component of shiny module
 }
 \description{
-UI function of upset module
+Main Multimorbidity Explorer Dashboard: UI function
 }
 \examples{
 main_dashboard_UI('my_app')
+}
+\seealso{
+\code{\link{main_dashboard}}
 }

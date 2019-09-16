@@ -1,5 +1,8 @@
 #' Run ME app locally
-#' Function to spawn a shiny app instance for Multimorbidity Explorer app with data loading screen.
+#'
+#' Function to spawn a shiny app instance for Multimorbidity Explorer app with
+#' data loading screen.
+#'
 #' @return Shiny app process
 #' @export
 #'

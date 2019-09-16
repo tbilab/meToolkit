@@ -35,11 +35,14 @@ data_loader_UI <- function(id, app_title = "Multimorbidity Explorer") {
     )
   )
 }
+
 #' Server function of upset module
 #'
 #' @param input,output,session Auto-filled by callModule | ignore
-#' @param preloaded_path File path relative to app that preloaded data is stored. Defaults to \code{NULL}.
-#' @return Reactive object containing the data needed to run the main Multimorbidity Explorer dashboard.
+#' @param preloaded_path File path relative to app that preloaded data is
+#'   stored. Defaults to \code{NULL}.
+#' @return Reactive object containing the data needed to run the main
+#'   Multimorbidity Explorer dashboard.
 #' @export
 #'
 #' @examples

@@ -2,23 +2,24 @@
 % Please edit documentation in R/subsettocodes.R
 \name{subsetToCodes}
 \alias{subsetToCodes}
-\title{Subset phenotype data to a given list of phecodes
-Removes individuals who have none of the requested codes}
+\title{Subset phenotype data to a given list of phecodes}
 \usage{
 subsetToCodes(data, desired_codes, codes_to_invert = c())
 }
 \arguments{
-\item{data}{A wide phenotype file with columns IID, snp, and all the normalized phecode names}
+\item{data}{A wide phenotype file with columns IID, snp, and all the
+normalized phecode names}
 
 \item{desired_codes}{Character vector of the phecodes to be extracted}
 
-\item{codes_to_invert}{Character vector of phecodes that the user has requested be inverted (e.g. not having the code is considered 'having' it.)}
+\item{codes_to_invert}{Character vector of phecodes that the user has
+requested be inverted (e.g. not having the code is considered 'having' it.)}
 }
 \value{
-A wide dataframe with just the columns desired and only rows corresponding to cases with one or more of the desired codes.
+A wide dataframe with just the columns desired and only rows
+corresponding to cases with one or more of the desired codes.
 }
 \description{
-Subset phenotype data to a given list of phecodes
 Removes individuals who have none of the requested codes
 }
 \examples{

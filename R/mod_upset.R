@@ -1,7 +1,11 @@
 #' UI function of upset module
 #'
+#'
+#' @seealso \code{\link{upset}}
 #' @param id String with unique id of module in app
-#' @param div_class A character string containing a class name for the entire plot to be wrapped in. This can then be used to style with external css. Defaults to 'upset_plot'.
+#' @param div_class A character string containing a class name for the entire
+#'   plot to be wrapped in. This can then be used to style with external css.
+#'   Defaults to 'upset_plot'.
 #' @return HTML component of shiny module
 #' @export
 #'
@@ -13,14 +17,29 @@ upset_UI <- function(id, div_class = 'upset_plot') {
     r2d3::d3Output(ns('chart'), height = '100%')
   )
 }
+
 #' Server function of upset module
 #'
+#' Generates an Upset plot to view patterns within comorbidity patterns.
+#' Contains marginal charts on individual code counts, comorbidity counts, along
+#' with relative risks of comorbidity patterns given one or more copies of minor
+#' allele.
+#'
+#' @seealso \code{\link{upset_UI}}
 #' @param input,output,session Auto-filled by callModule | ignore
-#' @param individual_data Reactive object with dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.
-#' @param all_patient_snps dataframe containing two columns \code{IID}, \code{snp} for every case in the population. Used in calculating a overall snp abundence.
-#' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}. (Used to color codes.)
-#' @param colors A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.
-#' @param action_object A \code{reactiveVal} that will be updated by the module upon isolation, deletion, or snp_filtering.
+#' @param individual_data Reactive object with dataframe containing columns on
+#'   \code{IID}, \code{snp}(# copies of allele), and columns for each code
+#'   included.
+#' @param all_patient_snps dataframe containing two columns \code{IID},
+#'   \code{snp} for every case in the population. Used in calculating a overall
+#'   snp abundence.
+#' @param results_data Dataframe containing the results of the phewas study.
+#'   Needs columns \code{p_val}, \code{id}, \code{category}(along with
+#'   accompanying \code{color}), \code{tooltip}. (Used to color codes.)
+#' @param colors A list of CSS-valid colors to paint interface in. Needs
+#'   \code{light_grey, med_grey, dark_grey, light_blue}.
+#' @param action_object A \code{reactiveVal} that will be updated by the module
+#'   upon isolation, deletion, or snp_filtering.
 #' @return Shiny module
 #' @export
 #'
@@ -34,13 +53,10 @@ upset <- function(
   colors,
   action_object = NULL) {
 
-
-
   # What's the MA freq for all the data?
   overall_ma_freq <- mean(all_patient_snps$snp != 0)
 
   output$chart <- r2d3::renderD3({
-
 
     # Turn wide individual data into a tidy list of phenotype presence
     tidy_phenotypes <- individual_data() %>%

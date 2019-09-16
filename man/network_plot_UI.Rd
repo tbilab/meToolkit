@@ -9,7 +9,9 @@ network_plot_UI(id, snp_colors = c("#bdbdbd", "#fcae91", "#a50f15"))
 \arguments{
 \item{id}{Unique id of module}
 
-\item{snp_colors}{A three element array of colors corresponding to the color of patient nodes and their snp status in order of 0,1,2 copies of minor allele.}
+\item{snp_colors}{A three element array of colors corresponding to the color
+of patient nodes and their snp status in order of 0,1,2 copies of minor
+allele.}
 }
 \value{
 HTML tag containing interactive network
@@ -20,4 +22,7 @@ Interactive individual-level data network diagram of patients to codes
 \examples{
 
 network_plot_UI('mycomorbiditynetwork_plot', '100\%')
+}
+\seealso{
+\code{\link{network_plot}}
 }

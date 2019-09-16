@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_manhattan_and_table.R
 \name{manhattan_plot_and_table_UI}
 \alias{manhattan_plot_and_table_UI}
-\title{Interactive manhattan plot and table for selecting codes for further visualization in app.}
+\title{Interactive manhattan plot and table}
 \usage{
 manhattan_plot_and_table_UI(id, height = NULL,
   div_class = "manhattan_plot")
@@ -10,16 +10,23 @@ manhattan_plot_and_table_UI(id, height = NULL,
 \arguments{
 \item{id}{String with unique id of module in app}
 
-\item{height}{How tall we want this module to be in pixels (defaults to \code{NULL}). If not provided the div must be styled to have a height using css. (See \code{div_class} argument for targeting.)}
+\item{height}{How tall we want this module to be in pixels (defaults to
+\code{NULL}). If not provided the div must be styled to have a height using css.
+(See \code{div_class} argument for targeting.)}
 
-\item{div_class}{A character string containing a class name for the entire plot to be wrapped in. This can then be used to style with external css. Defaults to 'manhattan_plot'.}
+\item{div_class}{A character string containing a class name for the entire
+plot to be wrapped in. This can then be used to style with external css.
+Defaults to 'manhattan_plot'.}
 }
 \value{
 UI component of interactive manhattan plot
 }
 \description{
-Interactive manhattan plot and table for selecting codes for further visualization in app.
+For selecting codes for further visualization in app.
 }
 \examples{
 manhattan_plot_and_table_UI('my_mod')
+}
+\seealso{
+\code{\link{manhattan_plot_and_table}}
 }

@@ -10,22 +10,36 @@ upset(input, output, session, individual_data, all_patient_snps,
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
 
-\item{individual_data}{Reactive object with dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.}
+\item{individual_data}{Reactive object with dataframe containing columns on
+\code{IID}, \code{snp}(# copies of allele), and columns for each code
+included.}
 
-\item{all_patient_snps}{dataframe containing two columns \code{IID}, \code{snp} for every case in the population. Used in calculating a overall snp abundence.}
+\item{all_patient_snps}{dataframe containing two columns \code{IID},
+\code{snp} for every case in the population. Used in calculating a overall
+snp abundence.}
 
-\item{results_data}{Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}. (Used to color codes.)}
+\item{results_data}{Dataframe containing the results of the phewas study.
+Needs columns \code{p_val}, \code{id}, \code{category}(along with
+accompanying \code{color}), \code{tooltip}. (Used to color codes.)}
 
-\item{colors}{A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.}
+\item{colors}{A list of CSS-valid colors to paint interface in. Needs
+\code{light_grey, med_grey, dark_grey, light_blue}.}
 
-\item{action_object}{A \code{reactiveVal} that will be updated by the module upon isolation, deletion, or snp_filtering.}
+\item{action_object}{A \code{reactiveVal} that will be updated by the module
+upon isolation, deletion, or snp_filtering.}
 }
 \value{
 Shiny module
 }
 \description{
-Server function of upset module
+Generates an Upset plot to view patterns within comorbidity patterns.
+Contains marginal charts on individual code counts, comorbidity counts, along
+with relative risks of comorbidity patterns given one or more copies of minor
+allele.
 }
 \examples{
 callModule(upset, 'my_mod')
+}
+\seealso{
+\code{\link{upset_UI}}
 }
