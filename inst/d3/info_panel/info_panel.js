@@ -110,13 +110,14 @@ if(annotations === null){
   const loc_table_body = annotations.key
     .reduce((table, key, i) =>
           table + `<tr>
-                    <td style='text-align:right'>${key}</td>
-                    <td style='text-align:left; padding-left: 1rem'>${annotations.value[i]}</td>
+                    <td style='text-align:right; font-weight: 500'>${key}</td>
+                    <td style='text-align:left; padding-left: 1rem; font-weight: 300'>${annotations.value[i]}</td>
                   </tr>`, '');
 
   location
     .selectAppend('div.table_holder')
     .selectAppend('table')
+    .style('font-size', '1rem')
     .html(loc_table_body);
 }
 
