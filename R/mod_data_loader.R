@@ -58,6 +58,7 @@ data_loader <- function(
     genome_raw = NULL,
     phewas_raw = NULL,
     data_loaded = FALSE,         # has the user uploaded all their data and the app processed it?
+    reconciled_data = NULL,
     individual_data = NULL,      # holds big dataframe of individual level data
     phewas_data = NULL,          # dataframe of results of univariate statistical tests
     snp_name = NULL              # Name of the current snp being looked at.
@@ -88,11 +89,8 @@ data_loader <- function(
   shiny::observeEvent(input$genome, {
 
     tryCatch({
-      good_genome_file <- readr::read_csv(input$genome$datapath) %>%
-        meToolkit::checkGenomeFile()
-
-      app_data$snp_name <- good_genome_file$snp_name
-      app_data$genome_raw <- good_genome_file$data
+      app_data$genome_raw <- readr::read_csv(input$genome$datapath) %>%
+        meToolkit::checkGenomeFile(separate = FALSE)
     },
     error = function(message){
       print(message)
@@ -144,27 +142,11 @@ data_loader <- function(
       # read files into R's memory
       shiny::incProgress(1/3, detail = "Reading in uploaded files")
 
-      phenome <- app_data$phenome_raw
-      genome  <- app_data$genome_raw
-      phewas  <- app_data$phewas_raw
-
-      # first spread the phenome data to a wide format
-      shiny::incProgress(2/3, detail = "Processing phenome data")
-      individual_data <- meToolkit::mergePhenomeGenome(phenome, genome)
-
-      # These are codes that are not shared between the phewas and phenome data. We will remove them
-      # from either.
-      phenome_cols <- colnames(individual_data)
-      bad_codes <- setdiff(phenome_cols %>% head(-1) %>% tail(-1), unique(phewas$code))
-
-      app_data$phewas_data <- phewas
-      app_data$individual_data <- individual_data
-
-      # remove bad codes from phewas and individual data if needed
-      if(length(bad_codes) > 0){
-        app_data$phewas_data <- dplyr::filter(app_data$phewas_data, !(code %in% bad_codes))
-        app_data$individual_data <- app_data$individual_data[,-app_data$individual_data(phenome_cols %in% bad_codes)]
-      }
+      app_data$reconciled_data <- meToolkit::reconcile_data(
+        app_data$phewas_raw,
+        app_data$genome_raw,
+        app_data$phenome_raw
+      )
 
       # Sending to app
       shiny::incProgress(3/3, detail = "Sending to application!")
@@ -177,32 +159,23 @@ data_loader <- function(
   shiny::observeEvent(input$preLoadedData,{
     base_dir <- glue::glue('{preloaded_path}/{input$dataset_selection}')
 
-    app_data$phewas_raw <- readr::read_csv(glue::glue('{base_dir}/phewas_results.csv'))
-    app_data$phenome_raw <- readr::read_csv('{preloaded_path}/id_to_code.csv')
-    genome_file <- readr::read_csv( glue::glue('{base_dir}/id_to_snp.csv') ) %>% {
-        this <- .
+    phewas_results <- readr::read_csv(glue::glue('{base_dir}/phewas_results.csv'))
+    phenome <- readr::read_csv(glue::glue('{preloaded_path}/id_to_code.csv'))
+    genome <- readr::read_csv( glue::glue('{base_dir}/id_to_snp.csv') )
 
-        # Hacky fix for having id as both IID and grid in different datasets.
-        if(colnames(this)[1] == 'grid'){
-          colnames(this)[1] = 'IID'
-        }
+    app_data$reconciled_data <- meToolkit::reconcile_data(
+      phewas_results,
+      phenome,
+      genome
+    )
 
-        this
-      } %>%
-      meToolkit::checkGenomeFile()
-    app_data$snp_name <- genome_file$snp_name
-    app_data$genome_raw <- genome_file$data
+    app_data$data_loaded <- TRUE
   })
 
   return(
     shiny::reactive({
       if(app_data$data_loaded){
-        list(
-          individual_data = app_data$individual_data,
-          category_colors = app_data$category_colors,
-          phewas_data = app_data$phewas_data,
-          snp_name = app_data$snp_name
-        )
+        shiny::isolate(app_data$reconciled_data)
       } else {
         NULL
       }

@@ -42,27 +42,16 @@ info_panel <- function(
 
   cohort_maf <- mean(all_individual_data$snp > 0)
 
-  # Grab location info from internal table
-  loc_info <-  dplyr::filter(
-      meToolkit:::all_exome_snps,
-      snp == snp_name | rsid == snp_name
-    )
-  # If we couldn't get anything from internal data let user know
-  if(nrow(loc_info) == 0){
-    loc_info <- dplyr::tibble(
-      chr = 'NA',
-      gene = 'NA'
-    )
-  }
+  # Grab annotation info from internal table
+  annotations <- meToolkit::gather_snp_annotations(snp_name)
 
   output$info_banner <- r2d3::renderD3({
 
-    snp_info = list(
+    snp_info <- list (
       snp = snp_name,
-      chr = loc_info$chr,
-      gene = loc_info$gene,
       maf_exome = cohort_maf,
-      maf_sel =  mean(current_individual_data()$snp > 0) # grab maf of newest subset of cohort
+      maf_sel =  mean(current_individual_data()$snp > 0), # grab maf of newest subset of cohort
+      annotations = annotations
     )
 
     r2d3::r2d3(

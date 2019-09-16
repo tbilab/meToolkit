@@ -19,7 +19,7 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
       manhattan_plot = meToolkit::manhattan_plot_and_table_UI(ns('manhattan_plot')),
       upset_title = 'Comorbidity Upset Plot',
       upset = meToolkit::upset_UI(ns('upsetPlot')),
-      network_title = 'Individual-Level Network',
+      network_title = 'Subject-Phecode Bipartite Network',
       network = meToolkit::network_plot_UI(ns('network_plot'),
                                  snp_colors = snp_colors
       ),
@@ -31,7 +31,7 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
 #'
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param snp_name Character string containing the RSID of the snp you're viewing. Used to find annotation information.
-#' @param results_data Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
+#' @param phewas_results Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
 #' @param individual_data Dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.
 #' @param max_allowed_codes How many codes can the app show at any given time. Defaults to 40. (Too many and app may get slow.)
 #' @param usage_instructions HTML tags corresponding to static content to be displayed in bottom half of info panel. Any html content works. Defaults to light description.
@@ -40,11 +40,11 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
 #' @export
 #'
 #' @examples
-#' main_dashboard(upset, 'my_app', 'rs12345', my_results_data, my_individual_data, usage_instructions = 'This app is complicated!')
+#' main_dashboard(upset, 'my_app', 'rs12345', my_phewas_results, my_individual_data, usage_instructions = 'This app is complicated!')
 main_dashboard <- function(
   input, output, session,
   snp_name,
-  results_data,
+  phewas_results,
   individual_data,
   max_allowed_codes = 40,
   usage_instructions = 'default',
@@ -62,13 +62,13 @@ main_dashboard <- function(
   if(usage_instructions == 'default'){
     app_instructions <- div(
       h2('How To Use'),
-      h3("Manhattan Plot"),
+      h3('Interactive Phewas Manhattan Plot'),
       p("Use the Manhattan plot to select your codes of interest by dragging a box on main plot or searching/selecting with the table."),
       p("Once you have your desired codes selected press 'Update Network' button at top of pane to update the network data with individuals possessing the selected codes."),
-      h3("Upset Plot"),
+      h3('Comorbidity Upset Plot'),
       p("The upset plot allows you to see basic statistics about comorbidity patterns in the selected subset of codes, such as number of patients with a pattern and the risk of that pattern occuring in individuals with at least one copy of the minor allele."),
       p("Clicking on a given pattern in the upset plot will highlight the patients with that pattern in the below network plot."),
-      h3("Network Plot"),
+      h3('Subject-Phecode Bipartite Network'),
       p("The network plot provides a direct look at the individual-level data. You can click on codes to select them for isolation or deletion from the current selection.")
     )
   } else {
@@ -76,10 +76,10 @@ main_dashboard <- function(
   }
 
   # Add colors to codes in results data.
-  results_data <- meToolkit::buildColorPalette(results_data, category)
+  phewas_results <- meToolkit::buildColorPalette(phewas_results, category)
 
   # Get available codes sorted by p-value
-  available_codes <- results_data %>%
+  available_codes <- phewas_results %>%
     dplyr::arrange(p_val) %>%
     dplyr::pull(code)
 
@@ -141,7 +141,7 @@ main_dashboard <- function(
   curr_network_data <- shiny::reactive({
     meToolkit::makeNetworkData(
       data = curr_ind_data(),
-      phecode_info = results_data,
+      phecode_info = phewas_results,
       inverted_codes = state$inverted_codes(),
       no_copies = colors$dark_grey,
       one_copy = colors$light_red,
@@ -260,7 +260,7 @@ main_dashboard <- function(
     meToolkit::upset, 'upsetPlot',
     individual_data = curr_ind_data,
     all_patient_snps = dplyr::select(individual_data, IID, snp),
-    results_data = results_data,
+    results_data = phewas_results,
     colors = colors,
     app_interaction
   )
@@ -268,7 +268,7 @@ main_dashboard <- function(
   ## Manhattan plot
   shiny::callModule(
     meToolkit::manhattan_plot_and_table, 'manhattan_plot',
-    results_data = results_data,
+    results_data = phewas_results,
     selected_codes = state$selected_codes,
     action_object = app_interaction,
     colors = colors
@@ -277,7 +277,7 @@ main_dashboard <- function(
   ## PheWAS table
   shiny::callModule(
     meToolkit::phewas_table, 'phewas_table',
-    results_data = results_data,
+    results_data = phewas_results,
     selected_codes = state$selected_codes,
     action_object = app_interaction
   )

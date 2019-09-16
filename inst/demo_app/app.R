@@ -3,11 +3,14 @@ library(shiny)
 library(meToolkit)
 library(readr)
 
+phewas_results <- readr::read_csv(here::here('inst/sample_data/phewas_results.csv'))
+id_to_snp <- readr::read_csv(here::here('inst/sample_data/id_to_snp.csv'))
+id_to_phenome <- readr::read_csv(here::here('inst/sample_data/id_to_phenome.csv'))
 
 my_ME_app <- build_me_app(
-  snp_name        = 'rs13283456',
-  results_data    = read_rds('data/simulated_phewas_results.rds'),
-  individual_data = read_rds('data/simulated_ind_data.rds')
+  phewas_results,
+  id_to_snp,
+  id_to_phenome
 )
 
 shinyApp(my_ME_app$ui, my_ME_app$server)

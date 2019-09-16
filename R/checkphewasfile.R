@@ -21,13 +21,5 @@ checkPhewasFile <- function(phewas){
   has_pval <- 'p_val' %in% columns
   if(!has_pval) stop("Missing P Value column (p_val)", call. = FALSE)
 
-  # Do we have a supplied tooltip already or should we make one from the left over
-  # columns?
-  has_tooltip <- 'tooltip' %in% columns
-
-  if(!has_tooltip){
-    phewas <- phewas %>% meToolkit::makeTooltips()
-  }
-
   phewas
 }

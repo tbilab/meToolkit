@@ -4,10 +4,12 @@
 \alias{checkGenomeFile}
 \title{Checks genome input dataframe for correct form}
 \usage{
-checkGenomeFile(genome)
+checkGenomeFile(genome, separate = TRUE)
 }
 \arguments{
 \item{genome}{Tibble loaded from supplied file.}
+
+\item{separate}{Return a list with snp name and data? Defaults to \code{TRUE}.}
 }
 \value{
 A list of the genome data with the snp column renamed \code{snp} and the snp name saved as \code{snp_name}.

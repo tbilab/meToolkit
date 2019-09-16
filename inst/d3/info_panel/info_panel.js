@@ -9,12 +9,10 @@ const point_r = 20;
 const selection_height = height/2 - (point_r*1.1);
 const exome_height =     height/2 + (point_r*1.1);
 
-
-const {maf_exome, maf_sel, snp, ...loc_info} = data;
+const {maf_exome, maf_sel, snp, annotations} = data;
 
 // Setup the divs for our viz
 div.classed('container', true);
-
 
 // ================================================================
 // Main layout of panel
@@ -80,8 +78,8 @@ const draw_lollypop = (maf, name, title, i) => {
       textAnchor: 'end',
       alignmentBaseline: 'middle',
       dominantBaseline: 'middle',
-      fill: 'white',
     })
+    .style('fill', 'white')
     .text(toPercent(maf));
 
   // Bar title
@@ -105,18 +103,23 @@ location.selectAppend('div.header')
   .selectAppend('h2')
   .text('Annotations');
 
-const loc_table_body = Object.keys(loc_info)
-  .reduce((table, key) =>
-        table + `<tr>
-                  <td style='text-align:right'>${key}</td>
-                  <td style='text-align:left; padding-left: 1rem'>${loc_info[key]}</td>
-                </tr>`, '');
+if(annotations === null){
+  location.selectAppend('p')
+    .text('No annotations could be found for the SNP being investigated.');
+} else {
+  const loc_table_body = annotations.key
+    .reduce((table, key, i) =>
+          table + `<tr>
+                    <td style='text-align:right; font-weight: 500'>${key}</td>
+                    <td style='text-align:left; padding-left: 1rem; font-weight: 300'>${annotations.value[i]}</td>
+                  </tr>`, '');
 
-location
-  .selectAppend('div.table_holder')
-  .selectAppend('table')
-  .html(loc_table_body);
-
+  location
+    .selectAppend('div.table_holder')
+    .selectAppend('table')
+    .style('font-size', '1rem')
+    .html(loc_table_body);
+}
 
 // ================================================================
 // Instruction text
