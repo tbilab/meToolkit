@@ -6,3 +6,4 @@ module_tests/data/
 raw_data/
 *rsconnect/
 inst/doc
+inst/build_and_deploy_pkgdown.R
