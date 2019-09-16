@@ -35,11 +35,11 @@ snp_annotations <- read_csv(
   ) %>%
   separate(
     ExAC_MAF,
-    into = c('minor_allele', 'maf'),
+    into = c('minor_allele', 'ExAC_maf'),
     sep = ":"
   ) %>%
   mutate(
-    maf = str_remove_all(maf, '&[A,T,C,G,U]+'),
+    ExAC_maf = str_remove_all(ExAC_maf, '&[A,T,C,G,U]+'),
     clinical_sig = clean_text_field(clinical_sig),
     consequence = clean_text_field(consequence),
     impact = clean_text_field(impact)
@@ -50,15 +50,14 @@ snp_annotations <- read_csv(
     chr,
     gene,
     minor_allele,
-    maf,
+    ExAC_maf,
     clinical_sig,
     consequence,
     impact,
     symbol,
     gene_id,
-    HGVSp,
-    existing_variant
+    HGVSp
   )
 
 
-usethis::use_data(snp_annotations)
+usethis::use_data(snp_annotations, overwrite = TRUE)
