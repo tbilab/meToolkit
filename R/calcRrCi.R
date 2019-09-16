@@ -1,5 +1,8 @@
 #' Calculate risk ratio confidence interval
-#' Calculates a risk ratio confidence interval given a pattern and snp count
+#'
+#' Calculates a risk ratio confidence interval given a pattern and snp count.
+#' Uses the Fisher exact test from the the epitools package
+#' \code{epitools::riskratio.small}.
 #'
 #' @param pattern_n Number of cases with pattern
 #' @param pattern_snp Number of cases with pattern and SNP minor allele
@@ -7,7 +10,8 @@
 #' @param other_snp Number of cases without pattern and with SNP minor allele
 #' @param CI_size Size of CI in proportion (default 0.95 = 95 percent interval)
 #'
-#' @return List with three entries: PE or RR point estimate, lower and upper for RR lower and upper bounds given interval size.
+#' @return List with three entries: PE or RR point estimate, lower and upper for
+#'   RR lower and upper bounds given interval size.
 #' @export
 #'
 #' @examples
@@ -23,7 +27,7 @@ calcRrCi <- function(pattern_n, pattern_snp, other_n, other_snp, CI_size = 0.95)
     byrow = TRUE
   )
 
-  RR_estimates <- suppressWarnings(epitools::riskratio.small(cont_table, rev = "b", conf.level = CI_size)$measure[2,])
+  RR_estimates <- suppressWarnings(epitools::riskratio.small(cont_table, rev = "b", conf.level = CI_size)$measure[2, ])
 
   list(
     PE = RR_estimates[1],

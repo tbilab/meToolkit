@@ -9,7 +9,8 @@ isolateCodes(codes_to_isolate, current_codes)
 \arguments{
 \item{codes_to_isolate}{Character vector of codes ids to isolate}
 
-\item{current_codes}{Dataframe with column \code{code} which will be filtered to just rows for requested codes.}
+\item{current_codes}{Dataframe with column \code{code} which will be filtered
+to just rows for requested codes.}
 }
 \value{
 Filtered current codes dataframe.

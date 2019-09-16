@@ -3,7 +3,8 @@
 #' @param genome Tibble loaded from supplied file.
 #' @param separate Return a list with snp name and data? Defaults to `TRUE`.
 #'
-#' @return A list of the genome data with the snp column renamed \code{snp} and the snp name saved as \code{snp_name}.
+#' @return A list of the genome data with the snp column renamed \code{snp} and
+#'   the snp name saved as \code{snp_name}.
 #' @export
 #'
 #' @examples

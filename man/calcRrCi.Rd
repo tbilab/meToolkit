@@ -2,8 +2,7 @@
 % Please edit documentation in R/calcRrCi.R
 \name{calcRrCi}
 \alias{calcRrCi}
-\title{Calculate risk ratio confidence interval
-Calculates a risk ratio confidence interval given a pattern and snp count}
+\title{Calculate risk ratio confidence interval}
 \usage{
 calcRrCi(pattern_n, pattern_snp, other_n, other_snp, CI_size = 0.95)
 }
@@ -19,11 +18,13 @@ calcRrCi(pattern_n, pattern_snp, other_n, other_snp, CI_size = 0.95)
 \item{CI_size}{Size of CI in proportion (default 0.95 = 95 percent interval)}
 }
 \value{
-List with three entries: PE or RR point estimate, lower and upper for RR lower and upper bounds given interval size.
+List with three entries: PE or RR point estimate, lower and upper for
+RR lower and upper bounds given interval size.
 }
 \description{
-Calculate risk ratio confidence interval
-Calculates a risk ratio confidence interval given a pattern and snp count
+Calculates a risk ratio confidence interval given a pattern and snp count.
+Uses the Fisher exact test from the the epitools package
+\code{epitools::riskratio.small}.
 }
 \examples{
 calcRrCi(pattern_n=120, pattern_snp=5, other_n=2000, other_snp=56, CI_size = 0.95 )

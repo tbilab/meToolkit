@@ -21,19 +21,19 @@ each code included.}
 \item{max_allowed_codes}{How many codes can the app show at any given time.
 Defaults to 40. (Too many and app may get slow.)}
 
-\item{auto_run}{Do you want the app to run immediately or do you want the ui and
-server components of the app to run later? Defaults to \code{TRUE}.}
+\item{auto_run}{Do you want the app to run immediately or do you want the ui
+and server components of the app to run later? Defaults to \code{TRUE}.}
 }
 \value{
-If \code{auto_run = TRUE}, starts an ME app with your data, otherwise returns a
-list containing elements: \code{ui} for the shiny app ui function, and \code{server}
-for the server component of app.
+If \code{auto_run = TRUE}, starts an ME app with your data, otherwise
+returns a list containing elements: \code{ui} for the shiny app ui function, and
+\code{server} for the server component of app.
 }
 \description{
-Takes as input the three basic components of an ME app
-and either runs an ME app immediately or returns a list containing the ui and
-server parts of an entire app. This makes it easy to deploy a custom app with
-a few lines of code.
+Takes as input the three basic components of an ME app and either runs an ME
+app immediately or returns a list containing the ui and server parts of an
+entire app. This makes it easy to deploy a custom app with a few lines of
+code.
 }
 \examples{
 my_ME_app <- build_me_app(

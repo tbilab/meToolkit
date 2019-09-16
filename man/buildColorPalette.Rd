@@ -2,22 +2,23 @@
 % Please edit documentation in R/buildColorpalette.R
 \name{buildColorPalette}
 \alias{buildColorPalette}
-\title{Build Color Palette
-Takes a dataframe and a column to build a color palette for and returns the dataframe with a \code{color} column added with a unique color for each category.}
+\title{Build Color Palette}
 \usage{
 buildColorPalette(df, indexCol)
 }
 \arguments{
 \item{df}{Dataframe of rows to be colored.}
 
-\item{indexCol}{Unquoted name of column to be used for deciding each row's color.}
+\item{indexCol}{Unquoted name of column to be used for deciding each row's
+color.}
 }
 \value{
 \code{df} with an added \code{color} column.
 }
 \description{
-Build Color Palette
-Takes a dataframe and a column to build a color palette for and returns the dataframe with a \code{color} column added with a unique color for each category.
+Takes a dataframe and a column to build a color palette for and returns the
+dataframe with a \code{color} column added with a unique color for each
+category.
 }
 \examples{
 df \%>\% buildColorPalette(Category)
