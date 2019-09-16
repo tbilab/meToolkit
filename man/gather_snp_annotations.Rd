@@ -10,7 +10,7 @@ gather_snp_annotations(snp_id)
 \item{snp_id}{Rsid or name for the SNP}
 }
 \value{
-A two column tibble containing a series of annotation-value pairs for
+Two column tibble containing a series of annotation-value pairs for
 snp.
 }
 \description{
