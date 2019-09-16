@@ -9,7 +9,9 @@ upset_UI(id, div_class = "upset_plot")
 \arguments{
 \item{id}{String with unique id of module in app}
 
-\item{div_class}{A character string containing a class name for the entire plot to be wrapped in. This can then be used to style with external css. Defaults to 'upset_plot'.}
+\item{div_class}{A character string containing a class name for the entire
+plot to be wrapped in. This can then be used to style with external css.
+Defaults to 'upset_plot'.}
 }
 \value{
 HTML component of shiny module
@@ -19,4 +21,7 @@ UI function of upset module
 }
 \examples{
 upset_UI('my_mod')
+}
+\seealso{
+\code{\link{upset}}
 }

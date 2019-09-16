@@ -1,4 +1,4 @@
-#' SNP information panel module
+#' SNP info panel: UI function
 #'
 #' @param id Unique id of module
 #'
@@ -17,14 +17,18 @@ info_panel_UI <- function(id) {
   )
 }
 
-#' Server function of snp info panel
+#' SNP info panel: Server function
 #'
-#' @param input,output,session Auto-filled by callModule | ignore
+#' @inheritParams main_dashboard
 #' @param snp_name String of the snp name
-#' @param all_individual_data Individual level data for all patients inc urrent cohort, needs to contain column \code{snp} containing copies of MA.
-#' @param instructions HTML tags corresponding to static content to be displayed in bottom half of info panel.
-#' @param colors A list of CSS-valid colors to paint interface in. Needs \code{light_grey, med_grey, dark_grey, light_blue}.
-#' @param current_individual_data Reactive individual level data for the currently viewed subset of the cohort, again needs a \code{snp} column.
+#' @param all_individual_data Individual level data for all patients inc urrent
+#'   cohort, needs to contain column \code{snp} containing copies of MA.
+#' @param instructions HTML tags corresponding to static content to be displayed
+#'   in bottom half of info panel.
+#' @param colors A list of CSS-valid colors to paint interface in. Needs
+#'   \code{light_grey, med_grey, dark_grey, light_blue}.
+#' @param current_individual_data Reactive individual level data for the
+#'   currently viewed subset of the cohort, again needs a \code{snp} column.
 #'
 #' @return Server component of info panel module
 #' @export

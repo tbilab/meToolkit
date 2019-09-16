@@ -1,6 +1,11 @@
 #' Use pretty popup function
-#' Function to be included in UI of shiny app that uses \code{pretty_popup()} function. Injects javascript into HTML.
-#' @return Injected javascript function in head of HTML that Shiny uses to send popup messages to browser.
+#'
+#' Function to be included in UI of shiny app that uses \code{\link{pretty_popup}}
+#' function. Injects javascript into HTML.
+#'
+#' @seealso \code{\link{pretty_popup}}
+#' @return Injected javascript function in head of HTML that Shiny uses to send
+#'   popup messages to browser.
 #' @export
 #'
 #' @examples
@@ -25,8 +30,12 @@ use_pretty_popup <- function(){
 }
 
 #' Reveal hidden element
+#'
 #' Targets a given UI element and toggles it from hidden to visable.
-#' @param session The session variable from your server or module function.
+#'
+#' @seealso \code{\link{use_pretty_popup}}
+#'
+#' @inheritParams reveal_element
 #' @param title Character string containing the main title of popup.
 #' @param body Character string containing the body of popup message.
 #'

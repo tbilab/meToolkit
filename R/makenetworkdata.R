@@ -1,23 +1,37 @@
-# Helper functions related to the networks module
-# takes a subset of the individual data along with phewas results
-# and returns a set of network data in the form of edges and vertices
-# as required by network3d
-#' Convert phenotype dataframe to a data list that works with network plotting functions
+#' Convert phenotype dataframe to a data list that works with network plotting
+#' functions
+#'
+#' Helper functions related to the networks module Takes a subset of the
+#' individual data along with phewas results and returns a set of network data
+#' in the form of edges and vertices as required by \code{\link{network_plot}}.
 #'
 #'
-#' @param data A phenome dataframe with phecodes as columns and also with an \code{IID} column and a \code{snp} status column
-#' @param phecode_info Information about each codes results in phewas study in form of columns: \code{code}, \code{category}, \code{color}, \code{tooltip}.
-#' @param inverted_codes An array of codes that are inverted. Note that if a code is inverted that should also be reflected in \code{data}. This is only for visual modifications.
+#'
+#' @param data A phenome dataframe with phecodes as columns and also with an
+#'   \code{IID} column and a \code{snp} status column
+#' @param phecode_info Information about each codes results in phewas study in
+#'   form of columns: \code{code}, \code{category}, \code{color},
+#'   \code{tooltip}.
+#' @param inverted_codes An array of codes that are inverted. Note that if a
+#'   code is inverted that should also be reflected in \code{data}. This is only
+#'   for visual modifications.
 #' @param case_size Size of nodes drawn for cases (default of 0.1)
 #' @param code_size Size of nodes drawn for phecodes (default of 0.3)
-#' @param no_copies Color of cases nodes with no minor allele copy (default grey)
-#' @param one_copy Color of cases nodes with one minor allele copy (default orangered)
-#' @param two_copies Color of cases nodes with two minor allele copies (default redish)
+#' @param no_copies Color of cases nodes with no minor allele copy (default
+#'   grey)
+#' @param one_copy Color of cases nodes with one minor allele copy (default
+#'   orangered)
+#' @param two_copies Color of cases nodes with two minor allele copies (default
+#'   redish)
 #'
-#' @return A list containing two dataframes:
-#' \code{vertices} a dataframe containing each unique node in network (all unique IIDs and Phecodes) along with columns
-#' \code{snp_status}, \code{name}, \code{color}, \code{size}, \code{selectable}, \code{id}, \code{tooltip} which are all attributes used by the various network plotting functions included in library
-#' \code{edges}: a dataframe with columns \code{source} and \code{target} corresponding to the edges between each vertices according to the assigned interger \code{id}.
+#' @return A list containing two dataframes: \code{vertices} a dataframe
+#'   containing each unique node in network (all unique IIDs and Phecodes) along
+#'   with columns \code{snp_status}, \code{name}, \code{color}, \code{size},
+#'   \code{selectable}, \code{id}, \code{tooltip} which are all attributes used
+#'   by the various network plotting functions included in library \code{edges}:
+#'   a dataframe with columns \code{source} and \code{target} corresponding to
+#'   the edges between each vertices according to the assigned interger
+#'   \code{id}.
 #' @export
 #'
 #' @examples

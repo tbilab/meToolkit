@@ -1,8 +1,12 @@
 #' Build Color Palette
-#' Takes a dataframe and a column to build a color palette for and returns the dataframe with a \code{color} column added with a unique color for each category.
+#'
+#' Takes a dataframe and a column to build a color palette for and returns the
+#' dataframe with a \code{color} column added with a unique color for each
+#' category.
 #'
 #' @param df Dataframe of rows to be colored.
-#' @param indexCol Unquoted name of column to be used for deciding each row's color.
+#' @param indexCol Unquoted name of column to be used for deciding each row's
+#'   color.
 #'
 #' @return \code{df} with an added \code{color} column.
 #' @export

@@ -1,6 +1,6 @@
-#' Invert currently selected codes
-#'     Only inverts codes that were not preivously inverted. If a code is 'inverted' after it's already
-#'     inverted it simple reverts back to normal.
+#' Invert currently selected codes Only inverts codes that were not preivously
+#' inverted. If a code is 'inverted' after it's already inverted it simple
+#' reverts back to normal.
 #'
 #' @param codes_to_invert Character vector of codes you wish to invert
 #' @param currently_inverted_codes Character vector of currently inverted codes

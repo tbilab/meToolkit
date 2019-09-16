@@ -1,10 +1,14 @@
-# Make a standardized color pallete for the phenotype categories
 #' Create Description Color Palette
 #'
-#' @param phecode_info Dataframe of phecodes included in the current view of the application
-#' @param color_palette Character vector of hex codes to be mapped to the descriptions in first come first filled order.
+#' Make a standardized color pallete for the phenotype categories
 #'
-#' @return A list containing a palette dataframe and a named array both containing mappings from description character string to hex code.
+#' @param phecode_info Dataframe of phecodes included in the current view of the
+#'   application. Must include the column `category`.
+#' @param color_palette Character vector of hex codes to be mapped to the
+#'   descriptions in first come first filled order.
+#'
+#' @return A list containing a palette dataframe and a named array both
+#'   containing mappings from description character string to hex code.
 #' @export
 #'
 #' @examples

@@ -1,16 +1,25 @@
 #' Simulate PheWAS results
-#' Produces a dataframe that can be used for testing out functions in package on simulated data. Usually paired with \code{meToolkit::simIndividualData()}.
+#'
+#' Produces a dataframe that can be used for testing out
+#' functions in package on simulated data. Usually paired with
+#' \code{meToolkit::simIndividualData()}.
+#'
 #'
 #' @param n_codes How many phecodes should be simulated for the results?
-#' @param n_categories How many categories should the phecodes be grouped into? Can't be more than 26.
+#' @param n_categories How many categories should the phecodes be grouped into?
+#'   Can't be more than 26.
 #'
-#' @return A dataframe with columns: \code{code}: a unique phecode id (numbers of the form x.00), \code{p_val}: P-value drawn from a beta distribution peaked near zero,
-#' \code{category}: A simulated category (just a letter currently) that fills in order with last group category having less codes in it if there is not an even division of codes to categories.
-#' \code{tooltip}: Simple two line html tooltip of the code name and simulated p-value.
-#' @export
+#' @return A dataframe with columns: \code{code}: a unique phecode id (numbers
+#'   of the form x.00), \code{p_val}: P-value drawn from a beta distribution
+#'   peaked near zero, \code{category}: A simulated category (just a letter
+#'   currently) that fills in order with last group category having less codes
+#'   in it if there is not an even division of codes to categories.
+#'   \code{tooltip}: Simple two line html tooltip of the code name and simulated
+#'   p-value.
 #'
 #' @examples
 #' simPhewasResults(n_codes = 100, n_categories = 11)
+ #' @export
 simPhewasResults <- function(n_codes, n_categories){
 
   # Parameters used in generating p-values from a beta distribution.

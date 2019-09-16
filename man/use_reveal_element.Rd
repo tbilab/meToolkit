@@ -2,18 +2,21 @@
 % Please edit documentation in R/reveal_element.R
 \name{use_reveal_element}
 \alias{use_reveal_element}
-\title{Use reveal_element function
-Function to be included in UI of shiny app that uses \code{reveal_element()} function. Injects javascript into HTML.}
+\title{Use reveal_element function}
 \usage{
 use_reveal_element()
 }
 \value{
-Injected javascript function in head of HTML that Shiny uses to reveal elements.
+Injected javascript function in head of HTML that Shiny uses to
+reveal elements.
 }
 \description{
-Use reveal_element function
-Function to be included in UI of shiny app that uses \code{reveal_element()} function. Injects javascript into HTML.
+Function to be included in UI of shiny app that uses \code{reveal_element()}
+function. Injects javascript into HTML.
 }
 \examples{
 shiny::tagList(use_reveal_element(),h1('Hi there', id = 'hi_message', class = 'hidden'))
+}
+\seealso{
+reveal_element
 }

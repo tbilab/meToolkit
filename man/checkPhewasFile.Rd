@@ -10,7 +10,8 @@ checkPhewasFile(phewas)
 \item{phewas}{Dataframe from uploaded phewas csv}
 }
 \value{
-Supplied dataframe with a tooltip column added if it wasn't originally present.
+Supplied dataframe with a tooltip column added if it wasn't
+originally present.
 }
 \description{
 Check uploaded phewas file for correctness

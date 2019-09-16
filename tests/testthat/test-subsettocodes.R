@@ -14,7 +14,7 @@ sample_phenotypes <- as_tibble(matrix(c(
   0, 0, 0, 0, 1,
   0, 1, 0, 0, 0,
   0, 0, 0, 0, 1,
-  0, 1, 1, 1, 0 ), ncol = 5, byrow = TRUE ) )
+  0, 1, 1, 1, 0 ), ncol = 5, byrow = TRUE ),.name_repair = 'minimal')
 
 colnames(sample_phenotypes) <- c('001.00', '002.00', '003.00', '004.00', '005.00')
 sample_phenotypes['IID'] <- letters[1:10]

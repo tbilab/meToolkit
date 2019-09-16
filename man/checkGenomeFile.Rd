@@ -12,7 +12,8 @@ checkGenomeFile(genome, separate = TRUE)
 \item{separate}{Return a list with snp name and data? Defaults to \code{TRUE}.}
 }
 \value{
-A list of the genome data with the snp column renamed \code{snp} and the snp name saved as \code{snp_name}.
+A list of the genome data with the snp column renamed \code{snp} and
+the snp name saved as \code{snp_name}.
 }
 \description{
 Checks genome input dataframe for correct form

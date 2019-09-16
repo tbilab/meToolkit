@@ -2,20 +2,26 @@
 % Please edit documentation in R/mergephenomegenome.R
 \name{mergePhenomeGenome}
 \alias{mergePhenomeGenome}
-\title{Merge a tidy phenome dataframe with a tidy genome(single snp) genome dataframe.}
+\title{Merge a tidy phenome dataframe with a tidy genome(single snp) genome
+dataframe.}
 \usage{
 mergePhenomeGenome(phenome_data, genome_data)
 }
 \arguments{
-\item{phenome_data}{Dataframe with columns \code{IID} and \code{code} corresponding to all pairs of case and phenotypes}
+\item{phenome_data}{Dataframe with columns \code{IID} and \code{code}
+corresponding to all pairs of case and phenotypes}
 
-\item{genome_data}{Dataframe with columns \code{IID} and \code{snp} corresponding to all pairs of case and snp MA status for a given individual snp}
+\item{genome_data}{Dataframe with columns \code{IID} and \code{snp}
+corresponding to all pairs of case and snp MA status for a given individual
+snp}
 }
 \value{
-A wide dataframe with columns \code{IID}, \code{snp}, and all the unique phecodes.
+A wide dataframe with columns \code{IID}, \code{snp}, and all the
+unique phecodes.
 }
 \description{
-Merge a tidy phenome dataframe with a tidy genome(single snp) genome dataframe.
+Merge a tidy phenome dataframe with a tidy genome(single snp) genome
+dataframe.
 }
 \examples{
 margePhenomeGenome(tidyPhenome, tidyGenome)

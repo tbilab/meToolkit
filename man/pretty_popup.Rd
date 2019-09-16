@@ -2,8 +2,7 @@
 % Please edit documentation in R/pretty_popup.R
 \name{pretty_popup}
 \alias{pretty_popup}
-\title{Reveal hidden element
-Targets a given UI element and toggles it from hidden to visable.}
+\title{Reveal hidden element}
 \usage{
 pretty_popup(session, title, body)
 }
@@ -18,9 +17,11 @@ pretty_popup(session, title, body)
 A popup over the main UI of your shiny app with desired message.
 }
 \description{
-Reveal hidden element
 Targets a given UI element and toggles it from hidden to visable.
 }
 \examples{
 pretty_popup(session, "Oh no", 'You got an error. It was probably because of X,Y, and Z.')
+}
+\seealso{
+\code{\link{use_pretty_popup}}
 }

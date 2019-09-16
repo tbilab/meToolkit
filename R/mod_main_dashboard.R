@@ -1,7 +1,10 @@
-#' UI function of upset module
+#' Main Multimorbidity Explorer Dashboard: UI function
 #'
+#'
+#' @seealso \code{\link{main_dashboard}}
 #' @param id String with unique id of module in app
-#' @param snp_colors Array of css color codes for 0, 1, and 2 copies of the minor allele in network plot.
+#' @param snp_colors Array of css color codes for 0, 1, and 2 copies of the
+#'   minor allele in network plot.
 #' @return HTML component of shiny module
 #' @export
 #'
@@ -27,20 +30,41 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
     )
   )
 }
-#' Server function of upset module
+
+#' Main Multimorbidity Explorer Dashboard: Server function
 #'
+#' Generates a full dashboard page containing various visualizations for
+#' investigating comobidity patterns in individual level data and how they
+#' relate to the results of a phewas analysis.
+#'
+#'
+#' @seealso \code{\link{main_dashboard_UI}}
 #' @param input,output,session Auto-filled by callModule | ignore
-#' @param snp_name Character string containing the RSID of the snp you're viewing. Used to find annotation information.
-#' @param phewas_results Dataframe containing the results of the phewas study. Needs columns \code{p_val}, \code{id}, \code{category}(along with accompanying \code{color}), \code{tooltip}.
-#' @param individual_data Dataframe containing columns on \code{IID}, \code{snp}(# copies of allele), and columns for each code included.
-#' @param max_allowed_codes How many codes can the app show at any given time. Defaults to 40. (Too many and app may get slow.)
-#' @param usage_instructions HTML tags corresponding to static content to be displayed in bottom half of info panel. Any html content works. Defaults to light description.
-#' @param colors A list of CSS-valid colors to paint interface in if custom colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue, light_red, dark_red, light_blue, green}.
+#' @param snp_name Character string containing the RSID of the snp you're
+#'   viewing. Used to find annotation information.
+#' @param phewas_results Dataframe containing the results of the phewas study.
+#'   Needs columns \code{p_val}, \code{id}, \code{category}(along with
+#'   accompanying \code{color}), \code{tooltip}.
+#' @param individual_data Dataframe containing columns on \code{IID},
+#'   \code{snp}(# copies of allele), and columns for each code included.
+#' @param max_allowed_codes How many codes can the app show at any given time.
+#'   Defaults to 40. (Too many and app may get slow.)
+#' @param usage_instructions HTML tags corresponding to static content to be
+#'   displayed in bottom half of info panel. Any html content works. Defaults to
+#'   light description.
+#' @param colors A list of CSS-valid colors to paint interface in if custom
+#'   colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue,
+#'   light_red, dark_red, light_blue, green}.
 #' @return Shiny module of main Multimorbidity Explorer dashboard
 #' @export
 #'
 #' @examples
-#' main_dashboard(upset, 'my_app', 'rs12345', my_phewas_results, my_individual_data, usage_instructions = 'This app is complicated!')
+#' callModule(
+#'   main_dashboard, 'main_dashboard',
+#'   my_phewas_results,
+#'   my_individual_data,
+#'   usage_instructions = 'This app is complicated!'
+#' )
 main_dashboard <- function(
   input, output, session,
   snp_name,

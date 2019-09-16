@@ -9,10 +9,12 @@ data_loader(input, output, session, preloaded_path = NULL)
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
 
-\item{preloaded_path}{File path relative to app that preloaded data is stored. Defaults to \code{NULL}.}
+\item{preloaded_path}{File path relative to app that preloaded data is
+stored. Defaults to \code{NULL}.}
 }
 \value{
-Reactive object containing the data needed to run the main Multimorbidity Explorer dashboard.
+Reactive object containing the data needed to run the main
+Multimorbidity Explorer dashboard.
 }
 \description{
 Server function of upset module

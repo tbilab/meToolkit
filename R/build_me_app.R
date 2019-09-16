@@ -1,19 +1,19 @@
 #' Build ME app from data
 #'
-#' Takes as input the three basic components of an ME app
-#' and either runs an ME app immediately or returns a list containing the ui and
-#' server parts of an entire app. This makes it easy to deploy a custom app with
-#' a few lines of code.
+#' Takes as input the three basic components of an ME app and either runs an ME
+#' app immediately or returns a list containing the ui and server parts of an
+#' entire app. This makes it easy to deploy a custom app with a few lines of
+#' code.
 #'
 #' @inheritParams reconcile_data
 #' @param max_allowed_codes How many codes can the app show at any given time.
 #'   Defaults to 40. (Too many and app may get slow.)
-#' @param auto_run Do you want the app to run immediately or do you want the ui and
-#'   server components of the app to run later? Defaults to `TRUE`.
+#' @param auto_run Do you want the app to run immediately or do you want the ui
+#'   and server components of the app to run later? Defaults to `TRUE`.
 #'
-#' @return If `auto_run = TRUE`, starts an ME app with your data, otherwise returns a
-#'   list containing elements: `ui` for the shiny app ui function, and `server`
-#'   for the server component of app.
+#' @return If `auto_run = TRUE`, starts an ME app with your data, otherwise
+#'   returns a list containing elements: `ui` for the shiny app ui function, and
+#'   `server` for the server component of app.
 #' @export
 #'
 #' @examples

@@ -1,15 +1,19 @@
 #' Subset phenotype data to a given list of phecodes
-#'    Removes individuals who have none of the requested codes
 #'
-#' @param data A wide phenotype file with columns IID, snp, and all the normalized phecode names
+#' Removes individuals who have none of the requested codes
+#'
+#' @param data A wide phenotype file with columns IID, snp, and all the
+#'   normalized phecode names
 #' @param desired_codes Character vector of the phecodes to be extracted
-#' @param codes_to_invert Character vector of phecodes that the user has requested be inverted (e.g. not having the code is considered 'having' it.)
+#' @param codes_to_invert Character vector of phecodes that the user has
+#'   requested be inverted (e.g. not having the code is considered 'having' it.)
 #'
-#' @return A wide dataframe with just the columns desired and only rows corresponding to cases with one or more of the desired codes.
-#' @export
+#' @return A wide dataframe with just the columns desired and only rows
+#'   corresponding to cases with one or more of the desired codes.
 #'
 #' @examples
 #' subsetToCodes(myPhenotypes, c('001.00', '002.00'), codes_to_invert = c('001.00'))
+#' @export
 subsetToCodes <- function(data, desired_codes, codes_to_invert = c()) {
     # Normalize phecodes in case it hasn't been done already
     desired_codes <- desired_codes %>% meToolkit::normalizePhecode()
