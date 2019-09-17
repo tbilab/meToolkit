@@ -274,7 +274,7 @@ function draw_upset(){
     const num_patterns_shown = sorted_sizes.findIndex(d => d < viz_options.min_set_size);
 
     // If the viz is only showing 2 or fewer patterns adjust min size to show at least 2.
-    const starting_min_size = num_patterns_shown < 2 ? sorted_sizes[2]: viz_options.min_set_size;
+    const starting_min_size = num_patterns_shown < 2 ? sorted_sizes[1]: viz_options.min_set_size;
 
     // Setup the size slider
     const set_size_slider =  g.selectAppend('g.set_size_slider')
