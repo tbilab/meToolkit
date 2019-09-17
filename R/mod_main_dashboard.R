@@ -17,7 +17,7 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
     shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
     shiny::htmlTemplate(
       system.file("html_templates/main_dashboard.html", package = "meToolkit"),
-      app_title = 'Multimorbidity Explorer',
+      app_title = 'Phewas Multimorbidity Explorer',
       manhattan_plot_title = 'Interactive Phewas Manhattan Plot',
       manhattan_plot = meToolkit::manhattan_plot_and_table_UI(ns('manhattan_plot_main_dashboard')),
       upset_title = 'Comorbidity Upset Plot',
