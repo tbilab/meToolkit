@@ -6,3 +6,9 @@ library(shinytest)
 # Create test recording for main app.
 recordTest('inst/demo_app/')
 
+appdir <- system.file(package = "meToolkit", "demo_app")
+
+testApp(
+  appdir,
+  "mytest"
+)

@@ -8,7 +8,8 @@ main_dashboard(input, output, session, snp_name, phewas_results,
   individual_data, max_allowed_codes = 40,
   usage_instructions = "default", colors = list(light_grey = "#f7f7f7",
   med_grey = "#d9d9d9", dark_grey = "#bdbdbd", light_red = "#fcbba1",
-  dark_red = "#ef3b2c", light_blue = "#4292c6", green = "#74c476"))
+  dark_red = "#ef3b2c", light_blue = "#4292c6", green = "#74c476"),
+  debug_mode = FALSE)
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
@@ -33,6 +34,9 @@ light description.}
 \item{colors}{A list of CSS-valid colors to paint interface in if custom
 colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue,
   light_red, dark_red, light_blue, green}.}
+
+\item{debug_mode}{Boolean controlling if changes in app state should be
+recorded in logs. Defaults to off.}
 }
 \value{
 Shiny module of main Multimorbidity Explorer dashboard

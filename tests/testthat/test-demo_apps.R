@@ -11,7 +11,11 @@ test_that("Main dashboard app works", {
   # which runs on Linux.
   appdir <- system.file(package = "meToolkit", "demo_app")
   expect_pass(
-    testApp(appdir, "mytest")
+    testApp(
+      appdir,
+      "mytest",
+      quiet = TRUE
+    )
   )
 })
 
