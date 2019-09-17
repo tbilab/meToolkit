@@ -25,7 +25,13 @@ use_pretty_popup <- function(){
         }
         ));
       });"
-    )
+    ),
+    # Make sure the button text can actually be seen.
+    shiny::tags$style("
+      .swal-button {
+       color: dimgrey !important;
+      }
+    ")
   )
 }
 
