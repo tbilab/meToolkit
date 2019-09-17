@@ -6,6 +6,8 @@ let viz_data = data,
     viz_width = width,
     viz_height = height;
 
+let highlighted_pattern;
+
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
 
@@ -184,16 +186,17 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       d3.select(this).attr('opacity', 0);
   },
     click: function(d){
-      // Flip highlighted status
-      d.highlighted = (!d.highlighted || false);
+      const already_highlighted = highlighted_pattern === d.pattern;
 
-      const codes_in_pattern = d.pattern.split('-');
-
-      // Send message to shiny about the highlighted pattern
-      if(d.highlighted){
-        send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
-      } else {
+      if(already_highlighted){
+        // Unhighlight and send to shiny
+        highlighted_pattern = null;
         send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
+      } else {
+        // Otherwise, parse the pattern and send to shiny
+        highlighted_pattern = d.pattern;
+        const codes_in_pattern = d.pattern.split('-');
+        send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
       }
 
     }
@@ -219,15 +222,16 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       d3.select(this).attr('opacity', 0);
     },
     click: function(d){
-     // Flip highlighted status
-     d.highlighted = (!d.highlighted || false);
 
-   // Send message to shiny about the highlighted pattern
-     if(d.highlighted){
-       send_to_shiny('code_highlight', [d.code], viz_options.msg_loc || 'no_shiny');
-     } else {
-       send_to_shiny('code_highlight', [], viz_options.msg_loc || 'no_shiny');
-     }
+      const already_highlighted = highlighted_pattern === d.code;
+
+      if(already_highlighted){
+        highlighted_pattern = null;
+        send_to_shiny('code_highlight', [], viz_options.msg_loc || 'no_shiny');
+      } else {
+        highlighted_pattern = d.code;
+        send_to_shiny('code_highlight', [d.code], viz_options.msg_loc || 'no_shiny');
+      }
     }
   };
 
