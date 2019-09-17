@@ -23,6 +23,9 @@ Imports:
     r2d3,
     jsonlite,
     purrr,
-    glue
+    glue,
+    shinytest (>= 1.3.1.9999)
 Suggests: 
     testthat (>= 2.1.0)
+Remotes:  
+    rstudio/shinytest
