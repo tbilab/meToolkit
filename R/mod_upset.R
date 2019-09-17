@@ -14,7 +14,7 @@
 upset_UI <- function(id, div_class = 'upset_plot') {
   ns <- NS(id)
   tagList(
-    r2d3::d3Output(ns('chart'), height = '100%')
+    r2d3::d3Output(ns('upset_plot'), height = '100%')
   )
 }
 
@@ -53,10 +53,13 @@ upset <- function(
   colors,
   action_object = NULL) {
 
+  message_path <- 'message_upset_plot'
+
+
   # What's the MA freq for all the data?
   overall_ma_freq <- mean(all_patient_snps$snp != 0)
 
-  output$chart <- r2d3::renderD3({
+  output$upset_plot <- r2d3::renderD3({
 
     # Turn wide individual data into a tidy list of phenotype presence
     tidy_phenotypes <- individual_data() %>%
@@ -153,7 +156,7 @@ upset <- function(
         overallMaRate = overall_ma_freq,
         code_to_color = code_to_color,
         min_set_size = 20,
-        msg_loc = session$ns('message'),
+        msg_loc = session$ns(message_path),
         colors = colors
       ),
       script = system.file("d3/upset/upset.js", package = "meToolkit"),
@@ -172,9 +175,9 @@ upset <- function(
 
 
   if(!is.null(action_object)){
-    observeEvent(input$message, {
-      validate(need(input$message, message = FALSE))
-      action_object(input$message)
+    observeEvent(input[[message_path]], {
+      validate(need(input[[message_path]], message = FALSE))
+      action_object(input[[message_path]])
     })
   }
 }

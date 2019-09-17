@@ -123,7 +123,7 @@ const histogram_scales = {
 
 // Quadtree
 // ================================================================
-const main_quadtree = d3.quadtree();
+let main_quadtree = d3.quadtree();
 
 
 // ================================================================
@@ -263,7 +263,6 @@ function new_state(state){
     size_viz(state.get('sizes'));
 
     reset_scales(viz_data, state.get('sizes'));
-    setup_quadtree(viz_data, manhattan_scales);
 
     manhattan_plot = draw_manhattan(viz_data);
     // Make sure to respect or bounds in drawn plot
@@ -661,7 +660,10 @@ function process_new_data(data){
 
 function initialize_manhattan_brush(data){
   // Initialize a quadtree to help us filter through the manhattan points much faster
-  const main_quadtree = d3.quadtree()
+  // Remove any old data if it exists
+  main_quadtree.removeAll(main_quadtree.data());
+
+  main_quadtree = main_quadtree
     .x(d => manhattan_scales.x(d.index))
     .y(d => manhattan_scales.y(d.log_pval))
     .addAll(data);
@@ -779,21 +781,8 @@ function initialize_histogram_brush(data, initial_position = null){
 }
 
 
-function setup_quadtree(tree_data){
-  if(tree_data === null) return;
-  // generate a quadtree for faster lookups for brushing
-  // Rebuild the quadtree with new positions
-  main_quadtree.removeAll(main_quadtree.data());
-
-  main_quadtree
-    .x(d => manhattan_scales.x(d.index))
-    .y(d => manhattan_scales.y(d.log_pval))
-    .addAll(tree_data);
-}
-
 
 function manhattan_filter(or_bounds, selection){
-  //const {or_bounds} = state;
 
   // begin an array to collect the brushed nodes
   const selected_codes = [];

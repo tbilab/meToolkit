@@ -5,7 +5,7 @@
 \title{Build ME app from data}
 \usage{
 build_me_app(phewas_results, genotypes, phenotypes,
-  max_allowed_codes = 45, auto_run = FALSE)
+  max_allowed_codes = 45, auto_run = FALSE, debug_mode = FALSE)
 }
 \arguments{
 \item{phewas_results}{Dataframe containing the results of the phewas study.
@@ -23,6 +23,9 @@ Defaults to 40. (Too many and app may get slow.)}
 
 \item{auto_run}{Do you want the app to run immediately or do you want the ui
 and server components of the app to run later? Defaults to \code{TRUE}.}
+
+\item{debug_mode}{Boolean controlling if changes in app state should be
+recorded in logs. Defaults to off.}
 }
 \value{
 If \code{auto_run = TRUE}, starts an ME app with your data, otherwise
