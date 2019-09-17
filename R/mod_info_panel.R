@@ -13,7 +13,7 @@ info_panel_UI <- function(id) {
   ns <- NS(id)
 
   shiny::tagList(
-    r2d3::d3Output(ns("info_banner"), height = '100%')
+    r2d3::d3Output(ns("info_banner_metoolkit"), height = '100%')
   )
 }
 
@@ -49,7 +49,7 @@ info_panel <- function(
   # Grab annotation info from internal table
   annotations <- meToolkit::gather_snp_annotations(snp_name)
 
-  output$info_banner <- r2d3::renderD3({
+  output$info_banner_metoolkit <- r2d3::renderD3({
 
     snp_info <- list (
       snp = snp_name,

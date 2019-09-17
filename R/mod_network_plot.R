@@ -79,7 +79,7 @@ network_plot_UI <- function(
       ),
       div(
         class = 'me-network_holder',
-        r2d3::d3Output(ns("plot"), height = "100%")
+        r2d3::d3Output(ns("network_plot"), height = "100%")
       )
     )
   )
@@ -121,8 +121,11 @@ network_plot <- function(
   update_freq = 15,
   action_object ) {
 
+  message_path <- 'message_network_plot'
+
+
   # send data and options to the 2d plot
-  output$plot <- r2d3::renderD3({
+  output$network_plot <- r2d3::renderD3({
     validate(need(network_data(), message = FALSE))
     json_for_network <- jsonlite::toJSON(network_data());
 
@@ -142,7 +145,7 @@ network_plot <- function(
       ),
       options = list(
         just_snp = snp_filter(),
-        msg_loc = session$ns('message'),
+        msg_loc = session$ns(message_path),
         highlighted_pattern = highlighted_codes(),
         viz_type = viz_type,
         update_freq = update_freq
@@ -158,9 +161,9 @@ network_plot <- function(
 
   # If we've received a message from the network viz package
   # it into the returned reactive value
-  observeEvent(input$message, {
-    validate(need(input$message, message = FALSE))
-    action_object(input$message)
+  observeEvent(input[[message_path]], {
+    validate(need(input[[message_path]], message = FALSE))
+    action_object(input[[message_path]])
   })
 
   # If the snp filter toggle has been changed, send the message

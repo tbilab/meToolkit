@@ -8,15 +8,12 @@
 #' @param height How tall we want this module to be in pixels (defaults to
 #'   `NULL`). If not provided the div must be styled to have a height using css.
 #'   (See `div_class` argument for targeting.)
-#' @param div_class A character string containing a class name for the entire
-#'   plot to be wrapped in. This can then be used to style with external css.
-#'   Defaults to 'manhattan_plot'.
 #' @return UI component of interactive manhattan plot
 #' @export
 #'
 #' @examples
 #' manhattan_plot_and_table_UI('my_mod')
-manhattan_plot_and_table_UI <- function(id, height = NULL, div_class = 'manhattan_plot') {
+manhattan_plot_and_table_UI <- function(id, height = NULL) {
   ns <- NS(id)
 
   wrapper_height <- ''
@@ -24,7 +21,7 @@ manhattan_plot_and_table_UI <- function(id, height = NULL, div_class = 'manhatta
     wrapper_height <- glue::glue('height: {height}px')
   }
   tagList(
-    r2d3::d3Output(ns('plot'), height = '100%')
+    r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%')
   )
 }
 
@@ -59,8 +56,10 @@ manhattan_plot_and_table <- function(
   colors,
   action_object ) {
 
+  message_path <- 'message_manhattan_plot_and_table'
+
   # send data and options to the 2d plot
-  output$plot <- r2d3::renderD3({
+  output$manhattan_plot_and_table <- r2d3::renderD3({
 
     r2d3::r2d3(
       data = results_data,
@@ -77,7 +76,7 @@ manhattan_plot_and_table <- function(
         system.file("css/common.css", package = "meToolkit")
       ),
       options = list(
-        msg_loc = session$ns('message'),
+        msg_loc = session$ns(message_path),
         selected = selected_codes(),
         colors = colors
       )
@@ -85,9 +84,9 @@ manhattan_plot_and_table <- function(
   })
 
   # If we've received a message, package it into the returned reactive value
-  observeEvent(input$message, {
-    validate(need(input$message, message = FALSE))
-    action_object(input$message)
+  observeEvent(input[[message_path]], {
+    validate(need(input[[message_path]], message = FALSE))
+    action_object(input[[message_path]])
   })
 
 }

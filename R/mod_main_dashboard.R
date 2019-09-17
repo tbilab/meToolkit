@@ -19,14 +19,14 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
       system.file("html_templates/main_dashboard.html", package = "meToolkit"),
       app_title = 'Multimorbidity Explorer',
       manhattan_plot_title = 'Interactive Phewas Manhattan Plot',
-      manhattan_plot = meToolkit::manhattan_plot_and_table_UI(ns('manhattan_plot')),
+      manhattan_plot = meToolkit::manhattan_plot_and_table_UI(ns('manhattan_plot_main_dashboard')),
       upset_title = 'Comorbidity Upset Plot',
-      upset = meToolkit::upset_UI(ns('upsetPlot')),
+      upset = meToolkit::upset_UI(ns('upset_plot_main_dashboard')),
       network_title = 'Subject-Phecode Bipartite Network',
-      network = meToolkit::network_plot_UI(ns('network_plot'),
+      network = meToolkit::network_plot_UI(ns('network_plot_main_dashboard'),
                                  snp_colors = snp_colors
       ),
-      info_panel = meToolkit::info_panel_UI(ns('info_panel'))
+      info_panel = meToolkit::info_panel_UI(ns('info_panel_main_dashboard'))
     )
   )
 }
@@ -279,7 +279,7 @@ main_dashboard <- function(
   #----------------------------------------------------------------
   ## Network plot
   shiny::callModule(
-    meToolkit::network_plot, 'network_plot',
+    meToolkit::network_plot, 'network_plot_main_dashboard',
     network_data = curr_network_data,
     highlighted_codes = state$highlighted_pattern,
     snp_filter = state$snp_filter,
@@ -290,7 +290,7 @@ main_dashboard <- function(
 
   ## Upset plot
   shiny::callModule(
-    meToolkit::upset, 'upsetPlot',
+    meToolkit::upset, 'upset_plot_main_dashboard',
     individual_data = curr_ind_data,
     all_patient_snps = dplyr::select(individual_data, IID, snp),
     results_data = phewas_results,
@@ -300,7 +300,7 @@ main_dashboard <- function(
 
   ## Manhattan plot
   shiny::callModule(
-    meToolkit::manhattan_plot_and_table, 'manhattan_plot',
+    meToolkit::manhattan_plot_and_table, 'manhattan_plot_main_dashboard',
     results_data = phewas_results,
     selected_codes = state$selected_codes,
     action_object = app_interaction,
@@ -309,7 +309,7 @@ main_dashboard <- function(
 
   # SNP info panel
   shiny::callModule(
-    info_panel, 'info_panel',
+    info_panel, 'info_panel_main_dashboard',
     snp_name = snp_name,
     all_individual_data = individual_data,
     instructions = app_instructions,
