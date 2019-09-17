@@ -55,6 +55,8 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
 #' @param colors A list of CSS-valid colors to paint interface in if custom
 #'   colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue,
 #'   light_red, dark_red, light_blue, green}.
+#' @param debug_mode Boolean controlling if changes in app state should be
+#'   recorded in logs. Defaults to off.
 #' @return Shiny module of main Multimorbidity Explorer dashboard
 #' @export
 #'
@@ -80,7 +82,8 @@ main_dashboard <- function(
     dark_red   = "#ef3b2c",
     light_blue = "#4292c6",
     green      = "#74c476"
-  )
+  ),
+  debug_mode = FALSE
  ) {
 
   if(usage_instructions == 'default'){
@@ -188,6 +191,12 @@ main_dashboard <- function(
   shiny::observeEvent(app_interaction(),{
     action_type <- app_interaction()[['type']]
     action_payload <- app_interaction()[['payload']]
+
+    if(debug_mode){
+      print(glue::glue("========================
+                       Action:{action_type}
+                       Payload:{jsonlite::toJSON(action_payload)}"))
+    }
 
     bad_request_msg <- function(num_requested = 1){
       if(num_requested < 2){
