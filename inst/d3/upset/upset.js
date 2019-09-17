@@ -22,13 +22,17 @@ const colors = {
 };
 
 const interaction_box_styles = {
-  opacity: 0,
-  fillOpacity:0,
+  opacity: 0.8,
+  fillOpacity: 0,
   rx: 5,
   stroke: 'grey',
-  strokeWidth: 1
+  strokeWidth: 0
 };
 
+const selected_interaction_box = {
+  fillOpacity: 0.5,
+  fill: 'grey',
+};
 
 // Function to generate all scales from data and a given size plot
 function setup_scales(patterns, marginal, sizes, set_size_x){
@@ -160,6 +164,14 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
     'right'
   );
 
+  const reset_and_highlight = function(node_to_highlight, already_highlighted){
+    // Reset all boxes
+    svg.selectAll('rect.interaction_box').at(interaction_box_styles)
+    if(!already_highlighted){
+      node_to_highlight.at(selected_interaction_box);
+    }
+  }
+
   const pattern_callbacks = {
     mouseover: function(d){
       const line_height = 22;
@@ -178,16 +190,16 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       left_info_panel.update(size_message).show();
 
       // highlight pattern
-      d3.select(this).attr('opacity', 0.7);
+      d3.select(this).attr('stroke-width', 0.8);
     },
     mouseout: function(d){
       right_info_panel.hide();
       left_info_panel.hide();
-      d3.select(this).attr('opacity', 0);
+      d3.select(this).attr('stroke-width', 0);
   },
     click: function(d){
       const already_highlighted = highlighted_pattern === d.pattern;
-
+      reset_and_highlight(d3.select(this), already_highlighted);
       if(already_highlighted){
         // Unhighlight and send to shiny
         highlighted_pattern = null;
@@ -198,7 +210,6 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
         const codes_in_pattern = d.pattern.split('-');
         send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
       }
-
     }
   };
 
@@ -214,17 +225,20 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       ).show();
 
       // highlight
-      d3.select(this).attr('opacity', 0.7);
+      d3.select(this).attr('stroke-width', 0.8);
     },
     mouseout: function(d){
       left_info_panel.hide();
       right_info_panel.hide();
-      d3.select(this).attr('opacity', 0);
+      d3.select(this).attr('stroke-width', 0);
     },
     click: function(d){
 
       const already_highlighted = highlighted_pattern === d.code;
 
+      reset_and_highlight(d3.select(this), already_highlighted);
+
+      // Reset all boxes
       if(already_highlighted){
         highlighted_pattern = null;
         send_to_shiny('code_highlight', [], viz_options.msg_loc || 'no_shiny');

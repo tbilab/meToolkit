@@ -350,6 +350,7 @@ function create_pattern_interaction_layer(g, patterns, scales, sizes, callbacks)
     .enter().append('g.pattern_row')
     .translate((d,i) => [-sizes.padding, scales.pattern_y(i)] )
     .selectAppend('rect')
+      .classed('interaction_box', true)
       .at({
         width: sizes.w + 2*sizes.padding,
         height: scales.matrix_row_height,
@@ -372,6 +373,7 @@ function create_code_interaction_layer(g, marginals, scales, sizes, callbacks){
     .enter().append('g.code_col')
     .translate((d,i) => [scales.matrix_width_scale(d.code), -sizes.padding])
     .selectAppend('rect')
+      .classed('interaction_box', true)
       .at({
         width: scales.matrix_column_width,
         height: sizes.h + sizes.margin.bottom + sizes.padding

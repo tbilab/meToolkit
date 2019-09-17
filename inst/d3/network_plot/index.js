@@ -140,46 +140,59 @@ function setup_network_viz(dom_elements, on_node_click){
     };
   };
 
-  const draw = function(){
-    // Update scales with the zoom if we have any
-    update_scales();
-
-    // Draw svg nodes of network
-    const on_mouseover_callback = d => highlight({type: 'code', codes: d.name});
-
-    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, on_mouseover_callback);
-
-    draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
-  };
 
   const new_patterns = function(patterns){
     patient_patterns = patterns;
   };
 
-  const highlight = function({type, codes}){
+  const draw_subjects_w_highlight = function({type, codes}){
     if(layout_data){
 
-      let to_highlight;
+      let to_highlight = [];
 
-      if(type === 'code'){
-        to_highlight = patient_patterns
-          .filter(d => d.pattern.includes(codes))
-          .map(d => d.name);
-      } else {
-        const single_code = typeof codes === 'string';
+      // If we have a null code dump, nothing gets highlighted.
+      if(codes !== null){
+        if(type === 'code'){
+          to_highlight = patient_patterns
+            .filter(d => d.pattern.includes(codes))
+            .map(d => d.name);
+        } else {
+          const single_code = typeof codes === 'string';
 
-        // Find the patient nodes who have the pattern we want to highlight
-        to_highlight = patient_patterns
-          .filter(d => arrays_equal(d.pattern, single_code ? [codes] : codes))
-          .map(d => d.name);
+          // Find the patient nodes who have the pattern we want to highlight
+          to_highlight = patient_patterns
+            .filter(d => arrays_equal(d.pattern, single_code ? [codes] : codes))
+            .map(d => d.name);
+        }
+
+        // Make sure scales are update width current zoom
+        update_scales();
       }
-
-      // Make sure scales are update width current zoom
-      update_scales();
 
       // Update the canvas to highlight these nodes
       draw_canvas_portion(layout_data, scales, dom_elements, C, to_highlight);
     }
+  };
+
+  const default_highlight = function(){
+    // Resets highlight to the last app-sent pattern
+    draw_subjects_w_highlight(viz.options.highlighted_pattern)
+  }
+
+  const draw = function(){
+    // Update scales with the zoom if we have any
+    update_scales();
+
+    // Draw svg nodes of network
+    const node_callbacks = {
+      mouseover: d => draw_subjects_w_highlight({type: 'code', codes: d.name}),
+      mouseout: d => default_highlight(),
+    };
+
+    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, node_callbacks);
+
+    default_highlight();
+    //draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
   };
 
   dom_elements.svg.call(
@@ -194,7 +207,7 @@ function setup_network_viz(dom_elements, on_node_click){
     })
   );
 
-  return {new_data, resize, new_patterns, highlight};
+  return {new_data, resize, new_patterns, default_highlight};
 };
 
 
@@ -231,6 +244,7 @@ const webworker = setup_webworker(C);
 // This is code that runs whenever new data is received by the
 // visualization.
 r2d3.onRender(function(data, div, width, height, options){
+  viz.options = options;
 
   const new_data = is_new_data(viz.data, data);
 
@@ -240,10 +254,9 @@ r2d3.onRender(function(data, div, width, height, options){
     // Reset selected codes
     selected_codes = [];
   } else {
-    network_viz.highlight(options.highlighted_pattern);
+    network_viz.default_highlight();
   }
 
-  viz.options = options;
 
   if(new_data){
     // Build a patient pattern array and send to network viz
@@ -296,7 +309,7 @@ function size_viz(width, height){
 
 
 // Function to draw svg parts of network
-function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click, on_mouseover){
+function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click, node_callbacks){
 
   // Make sure we have node positions provided by the webworker before we try and draw
   if(nodes[0].x === undefined) return;
@@ -373,13 +386,13 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
   // Add mouseover behavior for nodes that are selectable
   all_nodes
     .on('mouseover', function(d){
-      on_mouseover(d);
+      node_callbacks.mouseover(d);
       tooltip.show(d, [d3.event.clientX, d3.event.clientY]);
     })
     .on('mouseout', function(d){
       tooltip.hide();
       // Reset nodes that may have been highlighted
-      draw_canvas_portion({nodes, links}, scales, {canvas, context}, C);
+      node_callbacks.mouseout(d);
     })
     .on('click', on_click);
 
