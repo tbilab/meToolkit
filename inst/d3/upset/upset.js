@@ -6,6 +6,8 @@ let viz_data = data,
     viz_width = width,
     viz_height = height;
 
+let highlighted_pattern;
+
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
 
@@ -20,13 +22,17 @@ const colors = {
 };
 
 const interaction_box_styles = {
-  opacity: 0,
-  fillOpacity:0,
+  opacity: 0.8,
+  fillOpacity: 0,
   rx: 5,
   stroke: 'grey',
-  strokeWidth: 1
+  strokeWidth: 0
 };
 
+const selected_interaction_box = {
+  fillOpacity: 0.5,
+  fill: 'grey',
+};
 
 // Function to generate all scales from data and a given size plot
 function setup_scales(patterns, marginal, sizes, set_size_x){
@@ -158,6 +164,14 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
     'right'
   );
 
+  const reset_and_highlight = function(node_to_highlight, already_highlighted){
+    // Reset all boxes
+    svg.selectAll('rect.interaction_box').at(interaction_box_styles)
+    if(!already_highlighted){
+      node_to_highlight.at(selected_interaction_box);
+    }
+  }
+
   const pattern_callbacks = {
     mouseover: function(d){
       const line_height = 22;
@@ -176,26 +190,26 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       left_info_panel.update(size_message).show();
 
       // highlight pattern
-      d3.select(this).attr('opacity', 0.7);
+      d3.select(this).attr('stroke-width', 0.8);
     },
     mouseout: function(d){
       right_info_panel.hide();
       left_info_panel.hide();
-      d3.select(this).attr('opacity', 0);
+      d3.select(this).attr('stroke-width', 0);
   },
     click: function(d){
-      // Flip highlighted status
-      d.highlighted = (!d.highlighted || false);
-
-      const codes_in_pattern = d.pattern.split('-');
-
-      // Send message to shiny about the highlighted pattern
-      if(d.highlighted){
-        send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
-      } else {
+      const already_highlighted = highlighted_pattern === d.pattern;
+      reset_and_highlight(d3.select(this), already_highlighted);
+      if(already_highlighted){
+        // Unhighlight and send to shiny
+        highlighted_pattern = null;
         send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
+      } else {
+        // Otherwise, parse the pattern and send to shiny
+        highlighted_pattern = d.pattern;
+        const codes_in_pattern = d.pattern.split('-');
+        send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
       }
-
     }
   };
 
@@ -211,23 +225,27 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       ).show();
 
       // highlight
-      d3.select(this).attr('opacity', 0.7);
+      d3.select(this).attr('stroke-width', 0.8);
     },
     mouseout: function(d){
       left_info_panel.hide();
       right_info_panel.hide();
-      d3.select(this).attr('opacity', 0);
+      d3.select(this).attr('stroke-width', 0);
     },
     click: function(d){
-     // Flip highlighted status
-     d.highlighted = (!d.highlighted || false);
 
-   // Send message to shiny about the highlighted pattern
-     if(d.highlighted){
-       send_to_shiny('code_highlight', [d.code], viz_options.msg_loc || 'no_shiny');
-     } else {
-       send_to_shiny('code_highlight', [], viz_options.msg_loc || 'no_shiny');
-     }
+      const already_highlighted = highlighted_pattern === d.code;
+
+      reset_and_highlight(d3.select(this), already_highlighted);
+
+      // Reset all boxes
+      if(already_highlighted){
+        highlighted_pattern = null;
+        send_to_shiny('code_highlight', [], viz_options.msg_loc || 'no_shiny');
+      } else {
+        highlighted_pattern = d.code;
+        send_to_shiny('code_highlight', [d.code], viz_options.msg_loc || 'no_shiny');
+      }
     }
   };
 
@@ -274,7 +292,7 @@ function draw_upset(){
     const num_patterns_shown = sorted_sizes.findIndex(d => d < viz_options.min_set_size);
 
     // If the viz is only showing 2 or fewer patterns adjust min size to show at least 2.
-    const starting_min_size = num_patterns_shown < 2 ? sorted_sizes[2]: viz_options.min_set_size;
+    const starting_min_size = num_patterns_shown < 2 ? sorted_sizes[1]: viz_options.min_set_size;
 
     // Setup the size slider
     const set_size_slider =  g.selectAppend('g.set_size_slider')

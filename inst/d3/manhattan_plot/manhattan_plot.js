@@ -368,23 +368,21 @@ function draw_manhattan(data){
 
   const default_point = {
     r: d => point_size - (d.log_or > 0 ? 0: outline/2),
-    opacity: 0.8,
+    opacity: 0.85,
     fill: d => d.log_or > 0 ? d.unselected_color: 'white',
     stroke: d => d.unselected_color,
-    strokeWidth: d => d.log_or > 0 ? 0 : outline,
   };
 
   const selected_point = {
     r: d => point_size*1.5 - (d.log_or > 0 ? 0: outline/2),
-    fillOpacity: 1,
+    opacity: 0.95,
     fill: d => d.log_or > 0 ? d.color: 'white',
     stroke: d => d.color,
-    strokeWidth: d => d.log_or > 0 ? 0 : outline,
   };
 
   const disabled_point = {
-    r: point_size/3,
-    opacity: 0.1,
+    r: point_size/2,
+    opacity: 0.2,
     fill: options.colors.med_grey,
     stroke: options.colors.med_grey,
   };
@@ -396,8 +394,11 @@ function draw_manhattan(data){
     .append('circle')
     .attr('class', 'manhattan_points')
     .merge(manhattan_points)
-    .attr('cx', d => manhattan_scales.x(d.index))
-    .attr('cy', d => manhattan_scales.y(d.log_pval))
+    .at({
+      cx: d => manhattan_scales.x(d.index),
+      cy: d => manhattan_scales.y(d.log_pval),
+      strokeWidth: d => d.log_or > 0 ? 0 : outline,
+    })
     .at(default_point)
     .on('mouseover', function(d){
       if(d.disabled) return;

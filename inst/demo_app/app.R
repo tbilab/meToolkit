@@ -11,7 +11,8 @@ id_to_phenome <-  readr::read_csv('data/id_to_phenome.csv')
 my_ME_app <- build_me_app(
   phewas_results,
   id_to_snp,
-  id_to_phenome
+  id_to_phenome,
+  debug_mode = TRUE
 )
 
 shinyApp(my_ME_app$ui, my_ME_app$server)
