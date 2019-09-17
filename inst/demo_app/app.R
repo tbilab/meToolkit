@@ -1,7 +1,8 @@
 # testing main app module in own shiny app.
 library(shiny)
 library(readr)
-devtools::load_all('../')
+library(meToolkit)
+# devtools::load_all('../')
 
 phewas_results <- readr::read_csv('data/phewas_results.csv')
 id_to_snp <-      readr::read_csv('data/id_to_snp.csv')
