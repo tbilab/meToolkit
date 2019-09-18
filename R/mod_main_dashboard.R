@@ -266,6 +266,13 @@ main_dashboard <- function(
         stop("Unknown input")
       )
 
+    # make sure the code highlights are reset when the code selections change.
+    if (action_type %in% c('delete', 'isolate', 'selection', 'invert')){
+      state$highlighted_pattern(
+        list(type = 'pattern', codes = c())
+      )
+    }
+
      # Update the URL of the app so user's can return to point easily
     saved_codes <- state$selected_codes() %>%
       stringr::str_remove('\\.') %>%
