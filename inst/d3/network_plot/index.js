@@ -140,7 +140,6 @@ function setup_network_viz(dom_elements, on_node_click){
     };
   };
 
-
   const new_patterns = function(patterns){
     patient_patterns = patterns;
   };
@@ -290,10 +289,11 @@ r2d3.onRender(function(data, div, width, height, options){
 
 
 // Tell r2d3 what to do when we resize the viz
-r2d3.onResize((width, height) => {
+r2d3.onResize((new_width, new_height) => {
+
   // Update the global viz info object
-  viz.width = width;
-  viz.height = height;
+  viz.width = new_width;
+  viz.height = new_height;
 
   size_viz(viz.width, viz.height);
 });

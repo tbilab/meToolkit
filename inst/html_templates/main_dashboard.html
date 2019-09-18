@@ -9,8 +9,6 @@
     --app-header-height: 2.5rem;
   }
 
-
-
   .app-header {
     height: var(--app-header-height);
   }
@@ -22,7 +20,7 @@
     line-height: var(--app-header-height);
   }
 
-  .section {
+  .template-section {
     background-color: white;
     box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.49);
     border-radius: 4px;
@@ -30,7 +28,7 @@
     --section-title-height: 2.3rem;
   }
 
-  .parent {
+  .template-parent {
     height: calc(100vh - 2px - var(--app-header-height));
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -39,12 +37,12 @@
     grid-row-gap: 15px;
   }
 
-  .info-panel { grid-area: 1 / 1 / 5 / 2; }
-  .manhattan-plot { grid-area: 1 / 2 / 5 / 4; }
-  .upset-plot { grid-area: 1 / 4 / 3 / 6; }
-  .network-plot { grid-area: 3 / 4 / 5 / 6; }
+  .template-info-panel     { grid-area: 1 / 1 / 5 / 2; }
+  .template-manhattan-plot { grid-area: 1 / 2 / 5 / 4; }
+  .template-upset-plot     { grid-area: 1 / 4 / 3 / 6; }
+  .template-network-plot   { grid-area: 3 / 4 / 5 / 6; }
 
-  .section-title {
+  .template-section-title {
     height: var(--section-title-height);
     margin-top: 0;
     margin-bottom: 0;
@@ -53,7 +51,7 @@
     border-bottom: 1px solid dimgrey;
   }
 
-  .section-body {
+  .template-section-body {
     height: calc(100% - var(--section-title-height));
   }
 
@@ -62,25 +60,25 @@
 <div class = 'app-header'>
   <h2 class = 'app-title'> {{ app_title }} </h2>
 </div>
-<div class = 'parent'>
-  <div class = 'info-panel section'>
+<div class = 'template-parent'>
+  <div class = 'template-info-panel template-section'>
     {{ info_panel }}
   </div>
-  <div class = 'manhattan-plot section'>
-    <h3 class = 'section-title'>{{ manhattan_plot_title }}</h3>
-    <div class = 'section-body'>
+  <div class = 'template-manhattan-plot template-section'>
+    <h3 class = 'template-section-title'>{{ manhattan_plot_title }}</h3>
+    <div class = 'template-section-body'>
       {{ manhattan_plot }}
     </div>
   </div>
-  <div class = 'upset-plot section'>
-     <h3 class = 'section-title'>{{ upset_title }}</h3>
-     <div class = 'section-body'>
+  <div class = 'template-upset-plot template-section'>
+     <h3 class = 'template-section-title'>{{ upset_title }}</h3>
+     <div class = 'template-section-body'>
       {{ upset }}
      </div>
   </div>
-  <div class = 'network-plot section'>
-    <h3 class = 'section-title'>{{ network_title }}</h3>
-    <div class = 'section-body'>
+  <div class = 'template-network-plot template-section'>
+    <h3 class = 'template-section-title'>{{ network_title }}</h3>
+    <div class = 'template-section-body'>
       {{ network }}
     </div>
   </div>

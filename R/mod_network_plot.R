@@ -19,7 +19,7 @@ network_plot_UI <- function(
   ns <- NS(id)
 
   module_css <- "
-    .me-network-plot {
+    .network_module-network-plot {
       height: 100%;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -27,6 +27,7 @@ network_plot_UI <- function(
       grid-column-gap: 0px;
       grid-row-gap: 0px;
       align-content: end;
+      justify-items: stretch;
     }
 
     .minor-allele-checkbox {
@@ -39,15 +40,16 @@ network_plot_UI <- function(
       text-align: right;
     }
 
-    .me-network-controls {
+    .network_module-network-controls {
       padding: 0.25rem;;
       border-bottom: 1px solid #e4e0e0;
       align-self: center;
     }
 
-    .me-network_holder {
-      position: relative;
+    .network_module-network_holder {
       grid-area: 2 / 1 / 3 / 3;
+      min-height: 0;
+      max-height: 100%;
     }
     "
 
@@ -59,28 +61,26 @@ network_plot_UI <- function(
       background: {color};")
   }
 
-  tagList(
+  div(class = 'network_module-network-plot',
     shiny::tags$style(module_css),
-    div(class = 'me-network-plot',
-      div(
-        class = 'me-network-controls minor-allele-checkbox',
-        checkboxInput(
-          ns("snp_filter"),
-          label = "Just minor-allele carriers",
-          value = FALSE
-        )
-      ),
-      div(
-        class = 'me-network-controls minor-allele-legend',
-        span('Copies of minor allele:'),
-        span(style=rounded_span(snp_colors[1]), "0"),
-        span(style=rounded_span(snp_colors[2]), "1"),
-        span(style=rounded_span(snp_colors[3]), "2")
-      ),
-      div(
-        class = 'me-network_holder',
-        r2d3::d3Output(ns("network_plot"), height = "100%")
+    div(
+      class = 'network_module-network-controls minor-allele-checkbox',
+      checkboxInput(
+        ns("snp_filter"),
+        label = "Just minor-allele carriers",
+        value = FALSE
       )
+    ),
+    div(
+      class = 'network_module-network-controls minor-allele-legend',
+      span('Copies of minor allele:'),
+      span(style=rounded_span(snp_colors[1]), "0"),
+      span(style=rounded_span(snp_colors[2]), "1"),
+      span(style=rounded_span(snp_colors[3]), "2")
+    ),
+    div(
+      class = 'network_module-network_holder',
+      r2d3::d3Output(ns("plot"), height = '100%')
     )
   )
 }
@@ -123,9 +123,8 @@ network_plot <- function(
 
   message_path <- 'message_network_plot'
 
-
   # send data and options to the 2d plot
-  output$network_plot <- r2d3::renderD3({
+  output$plot <- r2d3::renderD3({
     validate(need(network_data(), message = FALSE))
     json_for_network <- jsonlite::toJSON(network_data());
 
