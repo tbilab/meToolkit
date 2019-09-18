@@ -12,6 +12,18 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+embed_png <- function(path, dpi = NULL) {
+  full_path <- paste0('', path)
+  meta <- attr(png::readPNG(full_path, native = TRUE, info = TRUE), "info")
+  if (!is.null(dpi)) meta$dpi <- rep(dpi, 2)
+  knitr::asis_output(paste0(
+    "<img src='", full_path, "'",
+    " width=100%",
+    " />"
+  ))
+}
+
 library(meToolkit)
 ```
 
@@ -39,6 +51,11 @@ Any other columns included will be displayed in the app as additional informatio
 
 
 ## Data Loading Screen
+
+```{r, echo = FALSE}
+embed_png("loading_page.png")
+```
+
 
 When the app is first loaded the user is greeted by the data-loading screen. In this screen the user is prompted to provide the three previously described datasets as CSV's or use preloaded data (see next section for how to prepare this data.)
 
@@ -91,8 +108,17 @@ For further information on customizing applications read the packages documentat
 
 # Main App
 
+```{r, echo = FALSE}
+embed_png("main_dashboard.png")
+```
+
+
 ## Interactive Phewas Manhattan Plot
 
+
+```{r, echo = FALSE}
+embed_png("manhattan_plot.png")
+```
 
 ### Purpose
 Visualizing results of entire Phewas analysis in graphical and table format and select codes to investigate comorbidities. 
@@ -130,6 +156,10 @@ Once a selection of codes has been made, pressing the 'Update Network' button in
 
 ## Comorbidity Upset Plot
 
+```{r, echo = FALSE}
+embed_png("upset_plot.png")
+```
+
 
 ### Purpose 
 To visualize unique comorbidity patterns in currently selected Phecodes, along with association with the SNP of interest. 
@@ -162,6 +192,11 @@ Highlights for both codes and patterns are reset when either another pattern is 
 
 ## Info Panel
 
+```{r, echo = FALSE}
+embed_png("info_panel.png")
+```
+
+
 ### Purpose
 Show basic information about the current SNP of Interest including minor allele frequency and basic annotations, along with basic usage instructions for application. 
 
@@ -180,6 +215,11 @@ __Instructions__
 This panel contains basic instructions on how to use the application. 
 
 ## Subject-Phecode Bipartite Network
+
+
+```{r, echo = FALSE}
+embed_png("network_plot.png")
+```
 
 ### Purpose 
 Provide a direct look at individual-level data, showing connections between subjects and their phecodes along with the status for the SNP of interest. 
