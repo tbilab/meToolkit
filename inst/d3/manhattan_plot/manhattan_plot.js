@@ -114,16 +114,10 @@ const manhattan_scales = {
   y: d3.scaleLinear(),
 };
 
-
 const histogram_scales = {
   x: d3.scaleLinear(),
   y: d3.scaleLinear(),
 };
-
-
-// Quadtree
-// ================================================================
-let main_quadtree = d3.quadtree();
 
 
 // ================================================================
@@ -185,7 +179,7 @@ class App_State{
         this.modify_property('sizes', payload);
         break;
       case 'manhattan_brush':
-        const newly_selected = manhattan_filter(this.get('or_bounds'), payload);
+        const newly_selected = payload;
         this.modify_property('selected_codes', newly_selected);
         break;
       case 'manhattan_brush_add':
@@ -193,13 +187,13 @@ class App_State{
         this.modify_property(
           'selected_codes',
           [...this.get('selected_codes'),
-          ...manhattan_filter(this.get('or_bounds'), payload)
+          ...payload
           ]
         );
         break;
       case 'manhattan_brush_delete':
         // Only keep codes that are not contained in the dragged box.
-        const codes_to_delete = manhattan_filter(this.get('or_bounds'), payload);
+        const codes_to_delete = payload;
         this.modify_property(
           'selected_codes',
           this.get('selected_codes').filter(code => !codes_to_delete.includes(code))
@@ -660,19 +654,17 @@ function process_new_data(data){
 
 function initialize_manhattan_brush(data){
   // Initialize a quadtree to help us filter through the manhattan points much faster
-  // Remove any old data if it exists
-  main_quadtree.removeAll(main_quadtree.data());
-
-  main_quadtree = main_quadtree
+  const main_quadtree = d3.quadtree()
     .x(d => manhattan_scales.x(d.index))
     .y(d => manhattan_scales.y(d.log_pval))
     .addAll(data);
 
   const manhattan_brush = d3.brush()
-    .on('end', on_manhattan_brush)
     .on("start.nokey", function() {
-      d3.select(window).on("keydown.brush keyup.brush", null);
-    });
+      d3.select(window)
+        .on("keydown.brush keyup.brush", null);
+    })
+    .on('end', on_manhattan_brush);
 
   // Add a g element and call the brush on it.
   const manhattan_brush_g = main_viz
@@ -702,14 +694,51 @@ function initialize_manhattan_brush(data){
 
     manhattan_brush_g.call(manhattan_brush.move, null);
 
-    if(a_pressed){
-      app_state.pass_action('manhattan_brush_add', selection);
-    } else if (d_pressed){
-      app_state.pass_action('manhattan_brush_delete', selection);
-    } else {
-      app_state.pass_action('manhattan_brush', selection);
-    }
+    // Find what codes intersect the selection
+    const overlapped_codes = scan_tree_for_selection(main_quadtree, selection, app_state.get('or_bounds'))
+
+    const action_type = a_pressed ?
+      'manhattan_brush_add':
+      d_pressed ?
+      'manhattan_brush_delete' :
+      'manhattan_brush';
+
+    app_state.pass_action(action_type, overlapped_codes);
   }
+}
+
+function scan_tree_for_selection(quadtree, selection, or_bounds){
+  // begin an array to collect the brushed nodes
+  const selected_codes = [];
+
+  // traverse all branches of the quad tree
+  quadtree.visit((node, x1, y1, x2, y2) => {
+
+    const overlaps_selection = selection_contains(
+      selection, x1, y1, x2, y2
+    );
+
+    // skip if it doesn't overlap the brush
+    if(!overlaps_selection) return true;
+
+    // If we have overlap and we're a leaf node, investigate
+    if (!node.length) {
+      const d = node.data;
+      const dx = manhattan_scales.x(d.index);
+      const dy = manhattan_scales.y(d.log_pval);
+      if (selection_contains(selection, dx, dy)) {
+        const in_or_bounds = (d.log_or > or_bounds[0]) && (d.log_or < or_bounds[1]);
+        if(in_or_bounds){
+          selected_codes.push(d.code);
+        }
+      }
+    }
+
+    // return false so that we traverse into branch (only useful for non-leaf nodes)
+    return false;
+  });
+
+  return selected_codes;
 }
 
 
@@ -780,45 +809,6 @@ function initialize_histogram_brush(data, initial_position = null){
   };
 }
 
-
-
-function manhattan_filter(or_bounds, selection){
-
-  // begin an array to collect the brushed nodes
-  const selected_codes = [];
-
-  // traverse all branches of the quad tree
-  main_quadtree.visit((node, x1, y1, x2, y2) => {
-
-    const overlaps_selection = selection_contains(
-      selection, x1, y1, x2, y2
-    );
-
-     // skip if it doesn't overlap the brush
-    if(!overlaps_selection){
-      return true;
-    }
-
-    // If we have overlap and we're a leaf node, investigate
-    if (!node.length) {
-      const d = node.data;
-      const dx = manhattan_scales.x(d.index);
-      const dy = manhattan_scales.y(d.log_pval);
-      if (selection_contains(selection, dx, dy)) {
-
-        const in_or_bounds = (d.log_or > or_bounds[0]) && (d.log_or < or_bounds[1]);
-        if(in_or_bounds){
-          selected_codes.push(d.code);
-        }
-      }
-    }
-
-    // return false so that we traverse into branch (only useful for non-leaf nodes)
-    return false;
-  });
-
-  return selected_codes;
-}
 
 
 function reset_scales(data, sizes){
