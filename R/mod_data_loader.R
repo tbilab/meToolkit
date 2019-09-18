@@ -146,9 +146,9 @@ data_loader <- function(
       shiny::incProgress(1/3, detail = "Reading in uploaded files")
 
       app_data$reconciled_data <- meToolkit::reconcile_data(
-        app_data$phewas_raw,
-        app_data$genome_raw,
-        app_data$phenome_raw
+        phewas_results = app_data$phewas_raw,
+        id_to_snp = app_data$genome_raw,
+        id_to_code = app_data$phenome_raw
       )
 
       # Sending to app
@@ -160,16 +160,16 @@ data_loader <- function(
 
 
   shiny::observeEvent(input$preLoadedData,{
-    base_dir <- glue::glue('{preloaded_path}/{input$dataset_selection}')
 
+    base_dir <- glue::glue('{preloaded_path}/{input$dataset_selection}')
     phewas_results <- readr::read_csv(glue::glue('{base_dir}/phewas_results.csv'))
     phenome <- readr::read_csv(glue::glue('{preloaded_path}/id_to_code.csv'))
     genome <- readr::read_csv( glue::glue('{base_dir}/id_to_snp.csv') )
 
     app_data$reconciled_data <- meToolkit::reconcile_data(
-      phewas_results,
-      phenome,
-      genome
+      phewas_results =  phewas_results,
+      id_to_snp = genome,
+      id_to_code = phenome
     )
 
     app_data$data_loaded <- TRUE

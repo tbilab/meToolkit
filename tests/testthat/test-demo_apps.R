@@ -35,6 +35,19 @@ test_that("Data loading app landing looks right", {
   )
 })
 
+test_that("Data loading app can use preloaded data", {
+  # Don't run these tests on the CRAN build servers
+  skip_on_cran()
+
+  expect_pass(
+    testApp(
+      loading_app_dir,
+      testnames = 'preloaded_data',
+      quiet = TRUE
+    )
+  )
+})
+
 test_that("Data loading app processes input data properly", {
   # Don't run these tests on the CRAN build servers
   skip_on_cran()

@@ -15,10 +15,10 @@ devtools::load_all(".")
 dashboard_demo <- system.file(package = "meToolkit", "demo_app")
 
 # Create test recording for main app.
-recordTest(dashboard_demo)
+# recordTest(dashboard_demo)
 
 # Run test
-testApp(appdir)
+testApp(dashboard_demo)
 
 
 
@@ -27,10 +27,10 @@ testApp(appdir)
 # ======================================================================
 dataloading_demo <- system.file(package = "meToolkit", "data_loading_app")
 
-# recordTest(dataloading_demo)
+recordTest(dataloading_demo)
 
 # This test just loads the app and snapshots
-testApp(dataloading_demo, testnames = 'basic_no_preloaded')
+# testApp(dataloading_demo, testnames = 'basic_no_preloaded')
 
 # This test loads the app and inputs all the needed csvs and lets the app
 # proceed to the main screen

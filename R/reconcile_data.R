@@ -10,9 +10,9 @@
 #' @param phewas_results Dataframe containing the results of the phewas study.
 #'   Needs columns \code{p_val}, \code{id}, \code{category}(along with
 #'   accompanying \code{color}), \code{tooltip}.
-#' @param genotypes Dataframe containing columns on \code{IID}, \code{snp}(#
+#' @param id_to_snp Dataframe containing columns on \code{IID}, \code{snp}(#
 #'   copies of allele).
-#' @param phenotypes Dataframe containing column  \code{IID}, and columns for
+#' @param id_to_code Dataframe containing column  \code{IID}, and columns for
 #'   each code included.
 #'
 #' @return List with `snp_name`, `individual_data`, and `phewas_results`
@@ -21,14 +21,14 @@
 #' @examples
 #' reconcile_data(phewas_table, id_to_snp, phenotype_id_pairs)
 #' @export
-reconcile_data <- function(phewas_results, genotypes, phenotypes) {
+reconcile_data <- function(phewas_results, id_to_snp, id_to_code) {
 
   phewas_checked <- meToolkit::checkPhewasFile(phewas_results)
-  genotypes_checked <- meToolkit::checkGenomeFile(genotypes)
-  phenotypes_checked <- meToolkit::checkPhenomeFile(phenotypes)
+  id_to_snp_checked <- meToolkit::checkGenomeFile(id_to_snp)
+  id_to_code_checked <- meToolkit::checkPhenomeFile(id_to_code)
 
   # first spread the phenome data to a wide format
-  individual_data <- meToolkit::mergePhenomeGenome(phenotypes_checked, genotypes_checked$data)
+  individual_data <- meToolkit::mergePhenomeGenome(id_to_code_checked, id_to_snp_checked$data)
 
   # These are codes that are not shared between the phewas and phenome data. We will remove them
   phenome_cols <- colnames(individual_data)
@@ -47,7 +47,7 @@ reconcile_data <- function(phewas_results, genotypes, phenotypes) {
   }
 
   list(
-    snp_name = genotypes_checked$snp_name,
+    snp_name = id_to_snp_checked$snp_name,
     individual_data = individual_data,
     phewas_results = phewas_checked
   )

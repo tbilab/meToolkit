@@ -10,7 +10,6 @@
 #' @examples
 #' checkGenomeFile(uploadedGenomeData)
 checkGenomeFile <- function(genome, separate = TRUE){
-
   columns <- colnames(genome)
 
   has_IID <- 'IID' %in% columns

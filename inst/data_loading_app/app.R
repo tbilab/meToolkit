@@ -14,7 +14,10 @@ server <- function(input, output, session) {
 
   # Shows preloaded data if provided a good path
   # loaded_data <- callModule(data_loader, 'data_loader', 'sample_data/')
-  loaded_data <- callModule(data_loader, 'data_loader')
+  loaded_data <- callModule(
+    data_loader,
+    'data_loader',
+    preloaded_path = 'preloaded_data')
 
   output$ui <- renderUI({
     no_data <- is.null(loaded_data())
