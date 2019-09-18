@@ -7,7 +7,9 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' meToolkit::run_me()
+#' }
 run_me <- function(){
 
   app_ui <- shiny::htmlTemplate(

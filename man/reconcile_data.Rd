@@ -5,17 +5,17 @@
 \title{Combine and reconcile the three main data components needed for ME app and
 return in app-friendly format}
 \usage{
-reconcile_data(phewas_results, genotypes, phenotypes)
+reconcile_data(phewas_results, id_to_snp, id_to_code)
 }
 \arguments{
 \item{phewas_results}{Dataframe containing the results of the phewas study.
 Needs columns \code{p_val}, \code{id}, \code{category}(along with
 accompanying \code{color}), \code{tooltip}.}
 
-\item{genotypes}{Dataframe containing columns on \code{IID}, \code{snp}(#
+\item{id_to_snp}{Dataframe containing columns on \code{IID}, \code{snp}(#
 copies of allele).}
 
-\item{phenotypes}{Dataframe containing column  \code{IID}, and columns for
+\item{id_to_code}{Dataframe containing column  \code{IID}, and columns for
 each code included.}
 }
 \value{

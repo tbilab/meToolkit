@@ -12,12 +12,6 @@ build_me_app(phewas_results, genotypes, phenotypes,
 Needs columns \code{p_val}, \code{id}, \code{category}(along with
 accompanying \code{color}), \code{tooltip}.}
 
-\item{genotypes}{Dataframe containing columns on \code{IID}, \code{snp}(#
-copies of allele).}
-
-\item{phenotypes}{Dataframe containing column  \code{IID}, and columns for
-each code included.}
-
 \item{max_allowed_codes}{How many codes can the app show at any given time.
 Defaults to 40. (Too many and app may get slow.)}
 

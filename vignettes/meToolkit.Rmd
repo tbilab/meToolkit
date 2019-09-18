@@ -1,0 +1,214 @@
+---
+title: "Multimorbidity Explorer Manual"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{meToolkit}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(meToolkit)
+```
+
+
+# Data
+
+In order to use the app you will need three sets of data. Two sets of individual-level data and one model results table. 
+
+__Individual phenomes__
+The first set of individual data you will need is a table containing pairs of patient-id to phecode-id (or ICD9/ICD10). This table is just two columns, so a patient `p1` with phecodes `a`, `b`, and `c` would  have three lines in the table, `p1, a`, `p1, b`, and `p1, c`. 
+
+__Individual SNP info__
+The next set of individual data comes in the form of presence of the minor allele for each patient. Again the table is two columns, with the first being patient-id and the second being the integer (`0,1`, or `2`) corresponding to how many copies of the minor allele the patient had. (Note that it is possible to omit rows for patients with no copies of the minor allele and the application will assume those patients had zero copies. The title of the second column will be used to infer the SNP id in the app. 
+
+__PheWas results__
+The last set of data needed is the results of the PheWas study you wish to analyze. This takes the form of a table with the following columns. 
+- `code`: PheCode, ICD9, or ICD10 code 
+- `OR`: Odds ratio for test with SNP
+- `p_val`: P-Value for significance of code's association
+- `description`: The plain text description of the code
+- `category`: Plain text description of code's broad-level category. 
+
+Any other columns included will be displayed in the app as additional information when investigating a single SNP but is not necessary. 
+
+
+
+## Data Loading Screen
+
+When the app is first loaded the user is greeted by the data-loading screen. In this screen the user is prompted to provide the three previously described datasets as CSV's or use preloaded data (see next section for how to prepare this data.)
+
+As each file is uploaded via the prompts the app will check to make sure the files match the required format and inform the user of malformed data if it is uploaded. 
+
+Once all data is loaded, the user can proceed to the main dashboard. 
+
+
+
+## Preloading data
+
+If a set of results is going to be repeatedly visited in the app, the data for the results can be preloaded to save time. Once data is preloaded it populates a dropdown menu on the data-loading screen that can be used to select the desired dataset. 
+
+To do this the data must be loaded into a path (relative to the main app working directory) provided to `run_data_loader()` in the `preloaded_data_path` argument . The patient phenome file must be stored at `preloaded_data_loc/id_to_code.csv`, and each invidiual SNP's patient to snp and phewas results stored in `preloaded_data_loc/<SNP_ID>/id_to_snp.csv` and `preloaded_data_loc/<SNP_ID>/phewas_results.csv` respectively. 
+
+Note that due to sharing the same phenome mappings, all preloaded phewas results must be done on the same population. 
+
+
+# Accessing app
+
+__Hosted__
+There are two ways to access Multimorbidity Explorer. The first is to go to the hosted example at prod.tbilab.org/multimorbidity_explorer. Here you can run the app on preloaded simulated data or upload your own data. 
+
+__Self-Hosting__
+If data privacy is a concern the app can be run entirely locally on a computer with R installed and the ability to install packages. To run locally install the `meToolkit` package from github using the `devtools` package...
+```r
+devtools::install_github('tbilab/meToolkit')
+```
+
+Once the package is installed the app can be launched with the command
+```r
+meToolkit::run_me()
+```
+
+__Customizing__
+The `meToolkit` package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function `meToolkit::build_me_app()`.
+
+```r
+my_ME_app <- build_me_app(
+  phewas_table,
+  id_to_snp,
+  phenotype_id_pairs
+)
+```
+The data format for `phewas_table`, `id_to_snp`, and `phenotype_id_pairs` follows exactly from the required input files as outlined in [the Data section](#Data)
+
+For further information on customizing applications read the packages documentation at prod.tbilab.org/meToolkit. 
+
+
+
+# Main App
+
+## Interactive Phewas Manhattan Plot
+
+
+### Purpose
+Visualizing results of entire Phewas analysis in graphical and table format and select codes to investigate comorbidities. 
+
+
+### What's Shown
+__Manhattan Plot__
+The Interactive Phewas Manhattan plot contains a standard manhattan plot, which is a scatter plot with the x-axis containing each phecode tested for association with the SNP of interest, and the y-axis representing the p-value of the association (on the negative log base-10 scale.) 
+
+The points are colored according to their broad phecode `category`. 
+
+The plot contains a few features not normally found on manhattan plots. First the points themselves are either hollow or solid, corresponding to a negative association (`OR` < 1) or positive association (`OR` > 1) respectively.  This allows the viewer to get an idea of general trends in association by category and subcodes. 
+
+Hovering over a given Phecode in the plot will show a tooltip containing all the information passed to the app in the Phewas results data (Odds ratio, p-value, ect.). 
+
+__Odds Ratio Histogram__
+In addition to showing positive and negative association in point shape, a histogram of the log-odds ratio of all tests is provided below the manhattan plot. In addition to showing the viewer if phecodes are generally positively or negatively associated with the SNP of interest, it contains a range selector that can be dragged to control which points are drawn to the manhattan plot based upon their odds ratio. E.g. if the histogram upper range is reduced to a log odds ratio of 0, only phecodes that had a negative association would be plotted on the manhattan plot. This allows the viewer to target only phecodes that had strong effects sizes. 
+
+__Phewas Table__
+Below the manhattan plot and odds ratio histogram is a table corresponding to all the results. This table contains columns for the code name,  odds ratio, p-value, code description, and code category.  The table can be sorted by all column values in addition to being searched for both code name and description. 
+
+
+### Filtering codes
+__Manhattan Plot__
+Codes can be selected in a variety of ways. The main method of interaction involves dragging a box around a region of codes on the manhattan plot. A common case is to select the top most significant codes by dragging a box across the upper portion of the plot. In addition to standard dragging to select there are two keyboard shortcuts that can modify selection. First, if the 'a' key is held down (for __a__dd) and a box is drawn the selection from the box is added to any previously selected codes. Second, if the 'd' key is held down (for __d__elete), and a box is drawn, any selected codes contained within the drawn box will be unselected.
+
+Any codes outside of the current odds ratio bounds set by the histogram range-slider will not be selected. 
+
+__Phewas Table__
+ Codes can be either added or removed from the selection by clicking or tapping on their row in the Phewas table. Codes that are currently selected are colored orange. 
+
+
+### App Interaction
+Once a selection of codes has been made, pressing the 'Update Network' button in the upper right of the panel will update the rest of the app with the current selection of codes.  
+
+## Comorbidity Upset Plot
+
+
+### Purpose 
+To visualize unique comorbidity patterns in currently selected Phecodes, along with association with the SNP of interest. 
+
+### What's Shown
+The Comorbidity Upset Plot is an [Upset plot](https://caleydo.org/tools/upset/) that visualizes unique combinations of Phecodes seen in the subjects. The center of the visualization contains a matrix with the currently selected phecodes as columns and each row represents a pattern of phecodes seen in the individual-level data. A pattern is shown by a dot being filled in at each column corresponding to a code in the pattern. 
+
+__Marginal Counts__
+At the top of each Phecode column in the plot is a bar representing how many subjects had that code in the data. These bars can be hovered over to get a text-summary. 
+
+__Pattern Counts__
+At the left side of each pattern row, another bar is drawn corresponding to how many patients had the specific pattern in the data. (Note that if a pattern is a subset of another the bar represents that subjects that only had exactly the smaller pattern.)  Below the x-axis of the pattern-counts bars is a handle that can be moved to change the threshold for minimum number of times seen needed for a pattern to be plotted.  This is helpful when there are a large number of unique patterns but only ones with large sample sizes are of interest. Like with the marginal bars, more info is available in text form on hover over the patterns. 
+
+__Relative Risk Estimates__
+To the right of each pattern's row is a point estimate and 95% confidence band of the relative risk of that pattern occurring given presence of at least one copy of the SNP of interest. This is estimated using the small sample adjustment for both point estimate and confidence interval, via the function `riskratio.small` in the [`epitools` package](https://cran.r-project.org/web/packages/epitools/epitools.pdf).
+
+Again, hovering over the interval shows details of plot in text format. 
+
+### App Interaction
+
+The upset plot can highlight individual-level data in the network plot. There are two forms this highlighting takes. 
+
+__Code Highlighting__
+By clicking on a column corresponding to a given code all subjects that have that code present in their phenomes will be highlighted on the network plot. This means if subject A had a phenome with codes _i_ and _j_, and subject B had a phenome with codes  _i_, _j_, and _k_, both would be highlighted when code i or j's columns were selected. 
+
+__Pattern Highlighting__
+By clicking on a row corresponding to a given comorbidity pattern of codes, all subjects who possess that _exact_ pattern in their phenomes will be selected. Returning to the example in the 'Code Highlighting' section, this means if the pattern of phecodes (_i_, _j_) was selected _only_ subject A would be highlighted.   
+   
+Highlights for both codes and patterns are reset when either another pattern is selected of the column/row is selected again. 
+
+## Info Panel
+
+### Purpose
+Show basic information about the current SNP of Interest including minor allele frequency and basic annotations, along with basic usage instructions for application. 
+
+### What's Shown
+
+The info panel is broken into three main sections...
+
+__Minor Allele Frequencies__
+The top of the panel shows two measures of the minor allele frequency (MAF) for the current SNP of interest. The first of two bars shows the MAF for the entire dataset provided for the app. I.e. what proportion of all subjects provided have at least one copy of the minor allele.  The second bar shows the MAF for the subjects who have at least one of the currently selected phecodes. 
+
+__SNP Annotations__
+
+Below the MAF chart is a table containing annotations about the current SNP. Currently these include the chromosome and gene the SNP resides in for all SNPs on the [Illumina Exome chip](https://www.illumina.com/products/by-type/microarray-kits/infinium-exome.html). 
+
+__Instructions__
+This panel contains basic instructions on how to use the application. 
+
+## Subject-Phecode Bipartite Network
+
+### Purpose 
+Provide a direct look at individual-level data, showing connections between subjects and their phecodes along with the status for the SNP of interest. 
+
+### What's shown
+
+__The Network Components__
+The network is bipartite, with two different node types. The larger nodes correspond to the currently selected Phecodes, colored by their category as in the Manhattan and Upset plots. The smaller nodes represent individual subjects, colored by their number of copies of the minor allele for the SNP of interest.  Edges are drawn from each subject to all the Phecodes present in their Phenome. 
+
+__Layout__
+The layout of the network is calculated in real time using a basic physics simulation that treats the edges of the network as springs and tries to find the layout with the lowest total tension in the system. This serves to place similar patients and phecodes near each other and acts as a psuedo-dimensionality-reduction technique. 
+
+__Interaction__
+The network can be panned and zoomed to focus on subsections or to zoom out for a broader picture.  A small toggle is provided draw the network with only subjects possessing at least one copy of the minor allele, as a way to access potential differences in overall vs SNP-driven structure.  
+
+Like in the Interactive Phewas Manhattan plot, by mousing over a phecode's node a tooltip is revealed with all the supplied information from supplied Phewas results data. 
+
+__Export Mode__
+The network plot can be exported to a SVG format for use in vector-editing software such as Adobe Illustrator or Inkscape to prepare for publication. 
+
+Export is enabled by clicking the 'Export mode' button in the bottom right of the plot. This re-renders the plot in vector format and also provides the option to add callouts labeling each Phecode by ID. These callouts are able to be positioned by dragging for further customization. 
+
+Once the plot is how it is desired the download icon is pressed and an SVG of the current view is downloaded to the user's computer.
+
+Due to the computational overhead of rendering the network in vector format, it is recommended that export mode is kept off until is needed to avoid slowing down the app.  
+
+### App Interaction
+The network plot can be used to fine-tune the app-wide selected Phecodes. This is done by clicking or tapping on a Phecode node in the network to select it. Once at least one node is selected an action menu appears in the lower left of the plot. Here the user can choose to remove the selected code(s), to isolate a pattern of selected codes, or to 'invert' a code.  
+
+__Code Inversion__
+When a code is inverted a subject is considered to 'have' the code if it is absent in their phenome. Visually in the network this is represented as a hollow node. By inverting a code you can frame questions in terms of negative relationships, potentially uncovering previously unseen relationships. 
+ 
