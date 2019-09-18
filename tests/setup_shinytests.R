@@ -15,7 +15,7 @@ devtools::load_all(".")
 dashboard_demo <- system.file(package = "meToolkit", "demo_app")
 
 # Create test recording for main app.
-# recordTest(dashboard_demo)
+recordTest(dashboard_demo)
 
 # Run test
 testApp(appdir)
