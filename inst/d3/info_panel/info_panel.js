@@ -13,6 +13,7 @@ const {maf_exome, maf_sel, snp, annotations} = data;
 
 // Setup the divs for our viz
 div.classed('container', true);
+div.classed('info_panel_widget', true);
 
 // ================================================================
 // Main layout of panel
