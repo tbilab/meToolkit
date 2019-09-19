@@ -2,49 +2,10 @@
   "input": {
     "data_loader-dataset_selection": "rs13283456",
     "data_loader-dataset_selection-selectized": "",
-    "data_loader-genome": {
-      "name": [
-        "id_to_snp.csv"
-      ],
-      "size": [
-        6908
-      ],
-      "type": [
-        "text/csv"
-      ],
-      "datapath": [
-        "0.csv"
-      ]
-    },
-    "data_loader-phenome": {
-      "name": [
-        "id_to_phenome.csv"
-      ],
-      "size": [
-        515206
-      ],
-      "type": [
-        "text/csv"
-      ],
-      "datapath": [
-        "0.csv"
-      ]
-    },
-    "data_loader-phewas": {
-      "name": [
-        "phewas_results.csv"
-      ],
-      "size": [
-        142700
-      ],
-      "type": [
-        "text/csv"
-      ],
-      "datapath": [
-        "0.csv"
-      ]
-    },
-    "data_loader-preLoadedData": 0,
+    "data_loader-genome": null,
+    "data_loader-phenome": null,
+    "data_loader-phewas": null,
+    "data_loader-preLoadedData": 1,
     "main_app-network_plot_main_dashboard-snp_filter": false
   },
   "output": {
