@@ -1,4 +1,4 @@
-// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_plot_zero_ors.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
+// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
 //Test data path 'data/manhattan_test_data.rds'
 //bad or data path 'data/manhattan_plot_zero_ors.rds'
 // ===============================================================
@@ -312,6 +312,8 @@ function new_state(state){
     // Check if the vis was just reset.
     if(tuples_equal(state.get('or_bounds'), [-Infinity, Infinity])){
       hist_brush.reset();
+      // Un-disable all the points
+      state.get('data').forEach(d => d.disabled = false);
     }
   }
 
