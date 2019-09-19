@@ -193,11 +193,9 @@ class App_State{
         break;
       case 'manhattan_brush_add':
         // User has held a while dragging so we just need to append new selection
-        this.modify_property(
+       this.modify_property(
           'selected_codes',
-          [...this.get('selected_codes'),
-          ...payload
-          ]
+          unique([...this.get('selected_codes'),...payload])
         );
         break;
       case 'manhattan_brush_delete':
