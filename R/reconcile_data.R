@@ -10,9 +10,9 @@
 #' @param phewas_results Dataframe containing the results of the phewas study.
 #'   Needs columns \code{p_val}, \code{id}, \code{category}(along with
 #'   accompanying \code{color}), \code{tooltip}.
-#' @param id_to_snp Dataframe containing columns on \code{IID}, \code{snp}(#
+#' @param id_to_snp Dataframe containing columns on \code{id}, \code{snp}(#
 #'   copies of allele).
-#' @param id_to_code Dataframe containing column  \code{IID}, and columns for
+#' @param id_to_code Dataframe containing column \code{id}, and columns for
 #'   each code included.
 #'
 #' @return List with `snp_name`, `individual_data`, and `phewas_results`
@@ -46,9 +46,11 @@ reconcile_data <- function(phewas_results, id_to_snp, id_to_code) {
     individual_data <- individual_data[, -individual_data(phenome_cols %in% bad_codes)]
   }
 
+  # The rest of the package is built on the assumption of
+  # the ID column being IID so here we sub it in for the validated data's id.
   list(
     snp_name = id_to_snp_checked$snp_name,
-    individual_data = individual_data,
+    individual_data = individual_data %>% dplyr::rename(IID = id),
     phewas_results = phewas_checked
   )
 }
