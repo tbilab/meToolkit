@@ -1,7 +1,10 @@
-// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
+// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_plot_zero_ors.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
+//Test data path 'data/manhattan_test_data.rds'
+//bad or data path 'data/manhattan_plot_zero_ors.rds'
 // ===============================================================
 // Initialization
 // ===============================================================
+
 let viz_width = width,
     viz_height = height,
     viz_data = data,
@@ -122,7 +125,7 @@ const manhattan_scales = {
 
 const histogram_scales = {
   x: d3.scaleLinear(),
-  y: d3.scaleLinear(),
+  y: d3.scaleSqrt(),
 };
 
 
@@ -402,7 +405,6 @@ function draw_manhattan(data){
     .on('mouseover', function(d){
       if(d.disabled) return;
 
-      //debugger;
       tooltip.show(d, d3.event);
     })
     .on('mouseout', function(d){
@@ -653,12 +655,26 @@ function size_viz([width, height]){
 
 
 function process_new_data(data){
+  // Keep track of ORs to deal with zeros.
+  let min_seen_or = 1;
+  let max_seen_or = 0;
+
   // Add a log_pval and log_or field to all points and keep track of extents
   data.forEach((d,i) => {
     d.log_pval = -Math.log10(d.p_val);
-    d.log_or = Math.log(d.OR);
+
+    if((d.OR < min_seen_or) && (d.OR !== 0)) min_seen_or = d.OR;
+    if(d.OR > max_seen_or) max_seen_or = d.OR;
+
     d.unselected_color = d3.interpolateLab(d.color, "white")(0.66);
     d.index = i;
+  });
+
+  // Place OR = 0 values to a value 10% or the or range below lowest seen value
+  const filler_log_or = Math.log(min_seen_or*0.9);
+
+  data.forEach((d, i) => {
+     d.log_or = d.OR > 0 ? Math.log(d.OR): filler_log_or;
   });
 }
 // ================================================================
@@ -852,19 +868,33 @@ function reset_scales(data, sizes){
   // ===============================================================
   const hist_height = size_props.histogram*height;
   const log_ors = data.map(d => d.log_or);
+  const [log_or_min, log_or_max] = d3.extent(log_ors);
+  const x_domain_buffer = (log_or_max - log_or_min)*0.01;
 
   histogram_scales.x
     .range([0, width - margin.left - margin.right])
-    .domain(d3.extent(log_ors)).nice();
+    .domain([log_or_min - x_domain_buffer, log_or_max + x_domain_buffer]);
 
   or_bins = d3.histogram()
     .domain(histogram_scales.x.domain())
     .thresholds(histogram_scales.x.ticks(num_hist_bins))
     (log_ors);
 
+  // If we have one bin that is way larger than the others,
+  // switch to using a sqrt scale.
+  const bin_sizes = or_bins.map(d => d.length).sort((a,b) => b - a);
+  const largest_bin = bin_sizes[0];
+  const big_bin_variance = largest_bin > bin_sizes[1]*2;
+
+  if(big_bin_variance){
+    histogram_scales.y = d3.scaleSqrt();
+  } else {
+    histogram_scales.y = d3.scaleLinear();
+  }
+
   histogram_scales.y
     .range([hist_height - margin.top - margin.bottom, 0])
-    .domain([0, d3.max(or_bins, d => d.length)]).nice();
+    .domain([0, largest_bin]).nice();
 }
 
 
