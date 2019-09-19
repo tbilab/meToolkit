@@ -79,16 +79,21 @@ function send_to_shiny(type, codes, C){
 // Function to setup overlaid canvas and svg
 function setup_dom_elements(div, C, on_message){
   // Make div relatively positioned so we can overlay svg and canvas
-  div.style('position', 'relative');
+  div
+    .style('height', '100%');
+
+  // Append the canvas
+  const canvas = div.selectAppend('canvas')
+    .style('position', 'absolute')
+    .style('bottom', 0);
+
+  const context = canvas.node().getContext('2d');
 
   // Append the svg and padded g element
   const svg = div.selectAppend('svg')
     .html('') // wipe svg content if need be
-    .style('position', 'absolute');
-
-  // Append the canvas
-  const canvas = div.selectAppend('canvas');
-  const context = canvas.node().getContext('2d');
+    .style('position', 'absolute')
+    .style('bottom', 0);
 
   const tooltip = setup_tooltip(div, C.fields_to_show);
 

@@ -99,10 +99,12 @@ function setup_tooltip(dom_target, fields_to_show = ['code','OR']){
 
       const tooltip_content = `<table> ${table_body} </table>`;
 
-      const parent_width = +tooltip.parent().style('width').replace('px', '');
-      const parent_height = +tooltip.parent().style('height').replace('px', '');
+      const parent = tooltip.parent();
 
-      //debugger;
+      // Prefer the style width over the attr but take attr if style isn't available.
+      const parent_width = +parent.style('width').replace('px', '') ||  +parent.attr('width');
+      const parent_height = +parent.style('height').replace('px', '') || +parent.attr('height');
+
       const [event_x, event_y] = d3.clientPoint(tooltip.parent().node(), mouse_event);
 
       const on_left_half = event_x < parent_width/2;

@@ -50,6 +50,8 @@ network_plot_UI <- function(
       grid-area: 2 / 1 / 3 / 3;
       min-height: 0;
       max-height: 100%;
+      height: 100%;
+      position: relative;
     }
     "
 
