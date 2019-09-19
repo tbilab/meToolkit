@@ -58,7 +58,12 @@ const reset_button = buttons.append('button')
   .style('margin-left', '0.5rem')
   .on('click', () => app_state.pass_action('reset_button', null));
 
-const main_svg = div.append('svg')
+const manhattan_viz = div
+  .selectAppend('div.viz_holder')
+  .style('position', 'relative');
+
+const main_svg = manhattan_viz
+  .append('svg')
   .attr('id', 'main_viz');
 
 const or_svg = div.append('svg')
@@ -83,7 +88,7 @@ const my_table = setup_table(
   .set_selection_callback(send_table_selection);
 
 // Setup tooltip to show same info as table.
-const tooltip = setup_tooltip(div, columns_to_show.map(d => d.id));
+const tooltip = setup_tooltip(manhattan_viz, columns_to_show.map(d => d.id));
 
 
 // Then we append a g element that has padding added to it to those svgs
@@ -395,7 +400,9 @@ function draw_manhattan(data){
     .at(default_point)
     .on('mouseover', function(d){
       if(d.disabled) return;
-      tooltip.show(d, [d3.event.clientX, d3.event.clientY]);
+
+      //debugger;
+      tooltip.show(d, d3.event);
     })
     .on('mouseout', function(d){
       if(d.disabled) return;
@@ -626,6 +633,11 @@ function send_table_selection(selected_codes){
 // ================================================================
 
 function size_viz([width, height]){
+
+  manhattan_viz
+    .style('height', `${height*size_props.manhattan}px`)
+    .style('width', `${width}px`);
+
   // Adjust the sizes of the svgs
   main_svg
     .attr('height', height*size_props.manhattan)
@@ -707,7 +719,11 @@ function initialize_manhattan_brush(data){
   }
 }
 
+
 function scan_tree_for_selection(quadtree, selection, or_bounds){
+  // Scans passed quadtree for points in a given range, excludes them if they fall out of
+  // the or bounds.
+
   // begin an array to collect the brushed nodes
   const selected_codes = [];
 
@@ -808,7 +824,6 @@ function initialize_histogram_brush(data, initial_position = null){
     reset: () => set_brush_pos(histogram_scales.x.range()),
   };
 }
-
 
 
 function reset_scales(data, sizes){

@@ -387,7 +387,7 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
   all_nodes
     .on('mouseover', function(d){
       node_callbacks.mouseover(d);
-      tooltip.show(d, [d3.event.clientX, d3.event.clientY]);
+      tooltip.show(d, d3.event);
     })
     .on('mouseout', function(d){
       tooltip.hide();

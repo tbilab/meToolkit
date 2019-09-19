@@ -74,7 +74,7 @@ function setup_tooltip(dom_target, fields_to_show = ['code','OR']){
   const tooltip = dom_target.selectAppend('div.tooltip')
     .st({
       background:'rgba(255,255,255,0.8)',
-      position:'fixed',
+      position:'absolute',
       padding: '0.25rem',
       fontSize: 18,
       border: '1px solid grey',
@@ -86,7 +86,7 @@ function setup_tooltip(dom_target, fields_to_show = ['code','OR']){
   const santatize_value = val => typeof(val) === 'number' ? format_val(val): val;
 
 
-  const show = function(d, loc){
+  const show = function(d, mouse_event){
     // By filtering I avoid errors caused by not having data for something
     const table_body = Object.keys(d)
       .filter(key => fields_to_show.includes(key))
@@ -99,12 +99,41 @@ function setup_tooltip(dom_target, fields_to_show = ['code','OR']){
 
       const tooltip_content = `<table> ${table_body} </table>`;
 
+      const parent_width = +tooltip.parent().style('width').replace('px', '');
+      const parent_height = +tooltip.parent().style('height').replace('px', '');
+
+      //debugger;
+      const [event_x, event_y] = d3.clientPoint(tooltip.parent().node(), mouse_event);
+
+      const on_left_half = event_x < parent_width/2;
+      const on_upper_half = event_y < parent_height/2;
+
+      const offset = 5;
+
+      const style_positioning = {
+         display: 'block',
+       };
+
+      if(on_left_half){
+        style_positioning.left = event_x + offset;
+        style_positioning.right = 'auto';
+      } else {
+        style_positioning.right = parent_width - event_x + 2*offset;
+        style_positioning.left = 'auto';
+      }
+
+      if(on_upper_half){
+        style_positioning.top = event_y + offset;
+        style_positioning.bottom = 'auto';
+      } else {
+        style_positioning.bottom = parent_height - event_y + 2*offset;
+        style_positioning.top = 'auto';
+      }
+
+
+      //debugger;
       tooltip
-       .st({
-         left: loc[0] + 10,
-         top:  loc[1] + 10,
-         display: 'block'
-       })
+       .st(style_positioning)
        .html(tooltip_content);
   };
 
