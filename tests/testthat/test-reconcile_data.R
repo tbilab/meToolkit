@@ -71,3 +71,31 @@ test_that("Is robust to id column changes", {
     desired_results
   )
 })
+
+test_that("Warns and removes when there are mismatched codes in individual and phewas data", {
+
+  expect_warning(
+    meToolkit::reconcile_data(
+      phewas_results,
+      genome_data,
+      phenome_data %>% dplyr::filter(code != '0.03')
+    ),
+    '1 codes removed from data due to mismatch between individual data and phewas results.'
+  )
+
+  expect_equal(
+    suppressWarnings({
+      meToolkit::reconcile_data(
+        phewas_results,
+        genome_data,
+        phenome_data %>% dplyr::filter(code != '0.03')
+      )
+    }),
+    list(
+      snp_name = 'rs1234',
+      individual_data = desired_ind_data %>% select(-`0.03`),
+      phewas_results = phewas_results %>% filter(code != '0.03')
+    )
+  )
+
+})

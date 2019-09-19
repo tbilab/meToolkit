@@ -16,7 +16,7 @@ A list of the genome data with the snp column renamed \code{snp} and
 the snp name saved as \code{snp_name}.
 }
 \description{
-Checks genome input dataframe for correct form
+This function will lowercase all columns.
 }
 \examples{
 checkGenomeFile(uploadedGenomeData)

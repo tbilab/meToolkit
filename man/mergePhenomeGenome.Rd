@@ -8,15 +8,15 @@ dataframe.}
 mergePhenomeGenome(phenome_data, genome_data)
 }
 \arguments{
-\item{phenome_data}{Dataframe with columns \code{IID} and \code{code}
+\item{phenome_data}{Dataframe with columns \code{id} and \code{code}
 corresponding to all pairs of case and phenotypes}
 
-\item{genome_data}{Dataframe with columns \code{IID} and \code{snp}
+\item{genome_data}{Dataframe with columns \code{id} and \code{snp}
 corresponding to all pairs of case and snp MA status for a given individual
 snp}
 }
 \value{
-A wide dataframe with columns \code{IID}, \code{snp}, and all the
+A wide dataframe with columns \code{id}, \code{snp}, and all the
 unique phecodes.
 }
 \description{

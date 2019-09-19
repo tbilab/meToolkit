@@ -32,18 +32,24 @@ reconcile_data <- function(phewas_results, id_to_snp, id_to_code) {
 
   # These are codes that are not shared between the phewas and phenome data. We will remove them
   phenome_cols <- colnames(individual_data)
-  bad_codes <- setdiff(phenome_cols %>% head(-1) %>% tail(-1),
-                       unique(phewas_checked$code))
+
+  codes_in_phenome <- phenome_cols %>% head(-1) %>% tail(-1)
+  codes_in_phewas <- unique(phewas_checked$code)
+
+  in_phewas_not_in_phenome <- setdiff(codes_in_phewas, codes_in_phenome)
+  in_phenome_not_in_phewas <- setdiff(codes_in_phenome, codes_in_phewas)
+
+  total_mismatched <- length(in_phewas_not_in_phenome) + length(in_phenome_not_in_phewas)
 
   # remove bad codes from phewas and individual data if needed
-  if (length(bad_codes) > 0) {
+  if (total_mismatched > 0) {
     warning(
       glue::glue(
-        '{length(bad_codes)} codes removed from data due to mismatch between individual data and phewas results.'
+        '{total_mismatched} codes removed from data due to mismatch between individual data and phewas results.'
       )
     )
-    phewas_checked <- dplyr::filter(phewas_checked,!(code %in% bad_codes))
-    individual_data <- individual_data[, -individual_data(phenome_cols %in% bad_codes)]
+    phewas_checked <- dplyr::filter(phewas_checked,!(code %in% in_phewas_not_in_phenome))
+    individual_data <- individual_data[, !(phenome_cols %in% in_phenome_not_in_phewas)]
   }
 
   # The rest of the package is built on the assumption of
@@ -54,3 +60,9 @@ reconcile_data <- function(phewas_results, id_to_snp, id_to_code) {
     phewas_results = phewas_checked
   )
 }
+
+set_1 <- c('a', 'b', 'c')
+set_2 <- c('b', 'c')
+setdiff(set_1, set_2)
+setdiff(set_2, set_1)
+

@@ -12,10 +12,10 @@ reconcile_data(phewas_results, id_to_snp, id_to_code)
 Needs columns \code{p_val}, \code{id}, \code{category}(along with
 accompanying \code{color}), \code{tooltip}.}
 
-\item{id_to_snp}{Dataframe containing columns on \code{IID}, \code{snp}(#
+\item{id_to_snp}{Dataframe containing columns on \code{id}, \code{snp}(#
 copies of allele).}
 
-\item{id_to_code}{Dataframe containing column  \code{IID}, and columns for
+\item{id_to_code}{Dataframe containing column \code{id}, and columns for
 each code included.}
 }
 \value{
