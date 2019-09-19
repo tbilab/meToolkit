@@ -37,6 +37,10 @@ div.st({
   position: 'relative',
 });
 
+const manhattan_viz = div
+  .selectAppend('div.viz_holder')
+  .style('position', 'relative');
+
 const buttons = div.append('div.buttons')
   .st({
      textAlign: 'center',
@@ -58,9 +62,6 @@ const reset_button = buttons.append('button')
   .style('margin-left', '0.5rem')
   .on('click', () => app_state.pass_action('reset_button', null));
 
-const manhattan_viz = div
-  .selectAppend('div.viz_holder')
-  .style('position', 'relative');
 
 const main_svg = manhattan_viz
   .append('svg')
