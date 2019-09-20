@@ -278,13 +278,16 @@ function draw_upset(){
   // Check if we have enough data to make a meaningful upset chart
   if(viz_data.length < 2){
     const lead_message = viz_data.length === 1 ? "Only one group meets" : "No groups meet";
-    svg.append('text')
+    svg.selectAppend('text.threshold_warning_message')
       .attr('text-anchor', 'middle')
       .tspans([`${lead_message} filter size threshold`, 'Adjust threshold down to see groups.'])
       .attr('x', viz_width/2)
       .attr('y', viz_height/2);
 
   } else {
+    // Make sure no warning messages are left over.
+    svg.select('text.threshold_warning_message').remove();
+
     // Figure out starting min_set_size.
     const sorted_sizes = viz_data.map(d => d.count).sort((a,b) => b - a);
 
