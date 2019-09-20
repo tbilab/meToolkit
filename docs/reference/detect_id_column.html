@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simulate PheWAS results — simPhewasResults • meToolkit</title>
+<title>Detect Id column in data — detect_id_column • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,10 @@
 
 
 
-<meta property="og:title" content="Simulate PheWAS results — simPhewasResults" />
-<meta property="og:description" content="Produces a dataframe that can be used for testing out
-functions in package on simulated data. Usually paired with
-meToolkit::simIndividualData()." />
+<meta property="og:title" content="Detect Id column in data — detect_id_column" />
+<meta property="og:description" content="Takes input data and makes sure that an id column has been provided in proper
+format. Used to validate data using checkGenome, and
+checkPhenome." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -105,64 +105,63 @@ meToolkit::simIndividualData()." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Simulate PheWAS results</h1>
+    <h1>Detect Id column in data</h1>
     
-    <div class="hidden name"><code>simPhewasResults.Rd</code></div>
+    <div class="hidden name"><code>detect_id_column.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Produces a dataframe that can be used for testing out
-functions in package on simulated data. Usually paired with
-<code><a href='simIndividualData.html'>meToolkit::simIndividualData()</a></code>.</p>
+    <p>Takes input data and makes sure that an id column has been provided in proper
+format. Used to validate data using <code>checkGenome</code>, and
+<code>checkPhenome</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simPhewasResults</span>(<span class='no'>n_codes</span>, <span class='no'>n_categories</span>)</pre>
+    <pre class="usage"><span class='fu'>detect_id_column</span>(<span class='no'>data</span>, <span class='kw'>possible_id_cols</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"iid"</span>, <span class='st'>"id"</span>, <span class='st'>"grid"</span>),
+  <span class='kw'>final_id_name</span> <span class='kw'>=</span> <span class='st'>"id"</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>n_codes</th>
-      <td><p>How many phecodes should be simulated for the results?</p></td>
+      <th>data</th>
+      <td><p>Dataframe that should have id column</p></td>
     </tr>
     <tr>
-      <th>n_categories</th>
-      <td><p>How many categories should the phecodes be grouped into?
-Can't be more than 26.</p></td>
+      <th>possible_id_cols</th>
+      <td><p>List of possible columns that are acceptable ids.</p></td>
+    </tr>
+    <tr>
+      <th>final_id_name</th>
+      <td><p>Name of final column that is returned if no errors are
+detected.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A dataframe with columns: <code>code</code>: a unique phecode id (numbers
-of the form x.00), <code>p_val</code>: P-value drawn from a beta distribution
-peaked near zero, <code>category</code>: A simulated category (just a letter
-currently) that fills in order with last group category having less codes
-in it if there is not an even division of codes to categories.
-<code>tooltip</code>: Simple two line html tooltip of the code name and simulated
-p-value.</p>
+    <p>Dataframe with a column with name <code>final_id_name</code> contained,</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code>checkGenome</code>, <code>checkPhenome</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>simPhewasResults</span>(<span class='kw'>n_codes</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>n_categories</span> <span class='kw'>=</span> <span class='fl'>11</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 100 x 4</span><span>
-#&gt;    code   p_val category tooltip                                                
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;glue&gt;</span><span>                                                 
-#&gt; </span><span style='color: #555555;'> 1</span><span> 1.00  0.084</span><span style='text-decoration: underline;'>1</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 1.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'> 2</span><span> 2.00  0.268  a        &lt;strong&gt; Code: &lt;/strong&gt; 2.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'> 3</span><span> 3.00  0.087</span><span style='text-decoration: underline;'>6</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 3.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'> 4</span><span> 4.00  0.067</span><span style='text-decoration: underline;'>9</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 4.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'> 5</span><span> 5.00  0.014</span><span style='text-decoration: underline;'>7</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 5.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'> 6</span><span> 6.00  0.019</span><span style='text-decoration: underline;'>2</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 6.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'> 7</span><span> 7.00  0.037</span><span style='text-decoration: underline;'>7</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 7.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'> 8</span><span> 8.00  0.109  a        &lt;strong&gt; Code: &lt;/strong&gt; 8.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'> 9</span><span> 9.00  0.025</span><span style='text-decoration: underline;'>5</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 9.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
-#&gt; </span><span style='color: #555555;'>10</span><span> 10.00 0.170  a        &lt;strong&gt; Code: &lt;/strong&gt; 10.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/…
-#&gt; </span><span style='color: #555555;'># … with 90 more rows</span><span></div></span></pre>
+    <pre class="examples"><div class='input'><span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tibble</a></span>(
+  <span class='kw'>grid</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'a'</span>, <span class='st'>'b'</span>, <span class='st'>'c'</span>),
+  <span class='kw'>snp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>3</span>)
+) <span class='kw'>%&gt;%</span> <span class='fu'>detect_id_column</span>()</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 3 x 2</span><span>
+#&gt;   id      snp
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> a         1
+#&gt; </span><span style='color: #555555;'>2</span><span> b         2
+#&gt; </span><span style='color: #555555;'>3</span><span> c         3</div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
