@@ -2,9 +2,9 @@
 % Please edit documentation in R/invertcodes.R
 \name{invertCodes}
 \alias{invertCodes}
-\title{Invert currently selected codes
-Only inverts codes that were not preivously inverted. If a code is 'inverted' after it's already
-inverted it simple reverts back to normal.}
+\title{Invert currently selected codes Only inverts codes that were not preivously
+inverted. If a code is 'inverted' after it's already inverted it simple
+reverts back to normal.}
 \usage{
 invertCodes(codes_to_invert, currently_inverted_codes)
 }
@@ -17,9 +17,9 @@ invertCodes(codes_to_invert, currently_inverted_codes)
 Vector of codes that are currently inverted
 }
 \description{
-Invert currently selected codes
-Only inverts codes that were not preivously inverted. If a code is 'inverted' after it's already
-inverted it simple reverts back to normal.
+Invert currently selected codes Only inverts codes that were not preivously
+inverted. If a code is 'inverted' after it's already inverted it simple
+reverts back to normal.
 }
 \examples{
 invertCodes(c('001.00', '002.00'), c('001.00', '005.00'))

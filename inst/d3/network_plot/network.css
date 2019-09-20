@@ -1,0 +1,35 @@
+.hidden {
+  display: none;
+}
+
+button {
+  font-size: 0.8rem;
+}
+
+.message_holders,
+.settings_menu {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  bottom: 0.5rem;
+}
+
+.message_holders {
+  flex-direction: row;
+  left: 0.3rem;
+}
+
+.settings_menu {
+  right: 0.3rem;
+  flex-direction: column;
+}
+
+.button_span {
+  border: 1px solid black;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: black 1px 1px 0px;
+  background: lightyellow;
+  cursor: pointer;
+  padding-right: 5px;
+}

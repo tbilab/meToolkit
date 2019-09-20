@@ -2,27 +2,22 @@
 
 ## Intro: 
 
-This package provides a series of widgets to wire together to create Shiny apps for explore multimorbidity patterns. 
+A package to build Phewas Multimorbidity Explorer (ME) apps. 
 
-## Basic Setup: 
+The main function in this package `meToolkit::run_me()` spins up a fully contained and self-hosted copy of an ME app for data privacy. 
 
-A multimorbidity explorer app contains three sources of data. 
+In addition to, multiple functions are provided allowing the user to customize their app from pre-loading data to configuring the individual charts included. 
 
-### Individual-level data: 
-A dataframe the following columns: 
+## How to use: 
 
-- `IID`: a unique string id.
-- `snp`: number of copies of the current snp's minor allele.
-- Phecodes...: a series of columns corresponding to the phecodes of interest and if the occurred (`1`) or if they didn't (`0`). 
+For general information on controlling the app see the user's manual at prod.tbilab.org/meToolkit/getting_started.
 
-### Phewas Results: 
-A dataframe containing the results of the to-be-investigated phewas study. Contains at least the following columns:
+Alternatively run the command `vignette('metoolkit', 'meToolkit')` in your r console after installing the package. 
 
-- `code`: A phecode ID (matching the individual data's column titles).
-- `category`: String of the phecode's broad descriptive category. E.g. "infectious diseases".
-- `p_val`: The P-Value for the current phecode's association with the study's SNP.
-- `tooltip`: Html formatted text shown on hover over a phecode in manhattan or network plot. 
-- `color`: CSS compliant color string for encoding each phecode in plots. 
+## Installing:
 
-### SNP Name: 
-A simple string containing the name of the SNP investigated in study.
+Currently this package is not on CRAN. To install use the `devtools` package: 
+
+```r
+devtools::install_github('tbilab/meToolkit')
+```

@@ -1,7 +1,8 @@
 #' Delete Phecodes from a selected phecodes list with warning.
 #'
 #' @param codes_to_delete Character vector of codes to delete
-#' @param current_codes Dataframe containing currently viewed codes with column \code{code} corresponding to the phecode id.
+#' @param current_codes Dataframe containing currently viewed codes with column
+#'   \code{code} corresponding to the phecode id.
 #'
 #' @return Filtered currently viewing codes dataframe.
 #' @export

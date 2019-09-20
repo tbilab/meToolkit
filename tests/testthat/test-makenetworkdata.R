@@ -12,7 +12,6 @@ df <- tibble(
 phecode_info <- tibble(
   code     = c(  'p1',    'p2',    'p3'),
   category = c(  'Z' ,     'Y',     'X'),
-  tooltip  = c(  'hi', 'there',     '!'),
   color    = c('pink',  'blue', 'green')
 )
 
@@ -25,8 +24,8 @@ edges <- tibble(
 vertices <- tibble(
   snp_status = c(        0,        0,          1,          1,        2,      0,       0,       0),
   name       = c( 'case 1', 'case 2',   'case 3',   'case 4', 'case 5',   'p1',    'p2',    'p3'),
-  tooltip    = c(       NA,       NA,         NA,         NA,       NA,   'hi', 'there',     '!'),
   color      = c('#bdbdbd','#bdbdbd','orangered','orangered',    'red', 'pink',  'blue', 'green'),
+  category   = c(       NA,       NA,         NA,         NA,       NA,    'Z',     'Y',     'X'),
   size       = c(      0.1,      0.1,        0.1,        0.1,      0.1,    0.3,     0.3,     0.3),
   selectable = c(    FALSE,    FALSE,      FALSE,      FALSE,    FALSE,   TRUE,    TRUE,    TRUE),
   id         = c(        1,        2,          3,          4,        5,      6,       7,       8) %>% as.integer(),

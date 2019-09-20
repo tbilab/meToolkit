@@ -2,37 +2,53 @@
 % Please edit documentation in R/makenetworkdata.R
 \name{makeNetworkData}
 \alias{makeNetworkData}
-\title{Convert phenotype dataframe to a data list that works with network plotting functions}
+\title{Convert phenotype dataframe to a data list that works with network plotting
+functions}
 \usage{
-makeNetworkData(data, phecode_info, inverted_codes = c(), color_palette,
+makeNetworkData(data, phecode_info, inverted_codes = c(),
   case_size = 0.1, code_size = 0.3, no_copies = "#bdbdbd",
   one_copy = "orangered", two_copies = "red")
 }
 \arguments{
-\item{data}{A phenome dataframe with phecodes as columns and also with an \code{IID} column and a \code{snp} status column}
+\item{data}{A phenome dataframe with phecodes as columns and also with an
+\code{IID} column and a \code{snp} status column}
 
-\item{phecode_info}{Information about each codes results in phewas study in form of columns: \code{code}, \code{category}, \code{color}, \code{tooltip}.}
+\item{phecode_info}{Information about each codes results in phewas study in
+form of columns: \code{code}, \code{category}, \code{color},
+\code{tooltip}.}
 
-\item{inverted_codes}{An array of codes that are inverted. Note that if a code is inverted that should also be reflected in \code{data}. This is only for visual modifications.}
-
-\item{color_palette}{Dataframe with columns of phecode description (category) and a mapped a color for node coloring.}
+\item{inverted_codes}{An array of codes that are inverted. Note that if a
+code is inverted that should also be reflected in \code{data}. This is only
+for visual modifications.}
 
 \item{case_size}{Size of nodes drawn for cases (default of 0.1)}
 
 \item{code_size}{Size of nodes drawn for phecodes (default of 0.3)}
 
-\item{no_copies}{Color of cases nodes with no minor allele copy (default grey)}
+\item{no_copies}{Color of cases nodes with no minor allele copy (default
+grey)}
 
-\item{one_copy}{Color of cases nodes with one minor allele copy (default orangered)}
+\item{one_copy}{Color of cases nodes with one minor allele copy (default
+orangered)}
 
-\item{two_copies}{Color of cases nodes with two minor allele copies (default redish)}
+\item{two_copies}{Color of cases nodes with two minor allele copies (default
+redish)}
 }
 \value{
-A list containing two dataframes:
-\code{vertices} a dataframe containing each unique node in network (all unique IIDs and Phecodes) along with columns
-\code{snp_status}, \code{name}, \code{color}, \code{size}, \code{selectable}, \code{id}, \code{tooltip} which are all attributes used by the various network plotting functions included in library
-\code{edges}: a dataframe with columns \code{source} and \code{target} corresponding to the edges between each vertices according to the assigned interger \code{id}.
+A list containing two dataframes: \code{vertices} a dataframe
+containing each unique node in network (all unique IIDs and Phecodes) along
+with columns \code{snp_status}, \code{name}, \code{color}, \code{size},
+\code{selectable}, \code{id}, \code{tooltip} which are all attributes used
+by the various network plotting functions included in library \code{edges}:
+a dataframe with columns \code{source} and \code{target} corresponding to
+the edges between each vertices according to the assigned interger
+\code{id}.
 }
 \description{
-Convert phenotype dataframe to a data list that works with network plotting functions
+Helper functions related to the networks module Takes a subset of the
+individual data along with phewas results and returns a set of network data
+in the form of edges and vertices as required by \code{\link{network_plot}}.
+}
+\examples{
+makeNetworkData(data, phewas_results)
 }

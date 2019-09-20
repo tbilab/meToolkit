@@ -1,9 +1,14 @@
-
 #' Filter codes.
 #'
-#' @param type Character of 'delete' or 'isolate' deciding which type of filtering is desired
-#' @param code_list Character vector containing code ids that need to be filtered
-#' @param current_codes Dataframe with currently selected codes that will be filtered.
+#' Either removes or isolates codes from a list of phecodes based upon the
+#' `type` requested.
+#'
+#' @param type Character of 'delete' or 'isolate' deciding which type of
+#'   filtering is desired
+#' @param code_list Character vector containing code ids that need to be
+#'   filtered
+#' @param current_codes Dataframe with currently selected codes that will be
+#'   filtered.
 #'
 #' @return Filtered currently selected codes dataframe.
 #' @export

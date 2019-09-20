@@ -9,7 +9,8 @@ deleteCodes(codes_to_delete, current_codes)
 \arguments{
 \item{codes_to_delete}{Character vector of codes to delete}
 
-\item{current_codes}{Dataframe containing currently viewed codes with column \code{code} corresponding to the phecode id.}
+\item{current_codes}{Dataframe containing currently viewed codes with column
+\code{code} corresponding to the phecode id.}
 }
 \value{
 Filtered currently viewing codes dataframe.

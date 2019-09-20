@@ -1,54 +1,56 @@
 library(shiny)
 library(shinydashboard)
 library(magrittr)
+library(tidyverse)
+library(meToolkit)
 
 upsetData <- here::here('module_tests/data/upset_data.rds') %>%
   readr::read_rds()
 
-codeData <- upsetData$codeData
-snpData <- upsetData$snpData
-
-currentSnp <- 'rs5908'
-
+individual_data <- upsetData$codeData
+all_snp_data <- upsetData$snpData %>% select(IID, snp)
 
 ui <- shinyUI(
-  dashboardPage(
-    dashboardHeader(
-      title = "Multimorbidity Explorer",
-      titleWidth = 300
-    ),
-    dashboardSidebar(disable = TRUE),
-    dashboardBody(
-      includeCSS(here::here("module_tests/custom.css")),
-      checkboxInput(
-        "snp_filter",
-        label = "Just minor-allele carriers",
-        value = FALSE
-      ),
-      meToolkit::upset_UI('upsetPlotV2', size_max = 750)
-    ),
-    skin = 'black'
+  tagList(
+    h1('Upset module test'),
+    tags$style(HTML("
+      .my_upset {height: calc(85vh) !important;}
+    ")),
+    actionButton('toggle_snp', 'Toggle SNPs'),
+    upset_UI('upsetPlot', div_class = 'my_upset')
   )
 )
 
-
 server <- function(input, output, session) {
-  observe({
 
-    codeFiltered <- codeData %>% {
-      this <- .
+  snp_filter <- reactiveVal(FALSE)
+  action_object <- reactiveVal()
 
-      if(input$snp_filter) this <- this %>% dplyr::filter(snp > 0)
+  upset_data <- reactive({
+    data <- individual_data
 
-      this
+    if(snp_filter()){
+     return(data %>% filter(snp > 0))
+    } else {
+      return(data)
     }
-
-    print('running module!')
-
-    callModule(meToolkit::upset, 'upsetPlotV2',
-               codeData = codeFiltered,
-               snpData = snpData)
   })
+
+  observeEvent(input$toggle_snp,{
+    snp_filter(!snp_filter())
+  })
+
+  observeEvent(action_object(),{
+    print("we have a message from the plot!")
+    print(action_object()$payload)
+  })
+
+  upsetPlot <- callModule(
+    upset, 'upsetPlot',
+    upset_data,
+    all_snp_data,
+    colors = list(light_grey = "#f7f7f7",med_grey = "#d9d9d9",dark_grey = "#bdbdbd",light_blue = "#4292c6"),
+    action_object )
 
 }
 

@@ -1,0 +1,115 @@
+.table_holder {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.control_panel{
+  height: 50px;
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: .2rem;
+}
+
+.phewas_table {
+  width: 100%;
+}
+
+/* ================================================== */
+/* Table */
+/* ================================================== */
+
+div.table {
+  overflow-x: scroll;
+}
+/* Table-body style */
+tbody.phewas_table{
+  width: 100%;
+  margin-top: -6px; /*Fixes gap between header and table */
+}
+
+
+tr div {
+  height: var(--row-height);
+  text-align: left;
+  overflow-x: auto;
+  width: 100%;
+  font-size: 0.8em;
+}
+
+/* Give text a bit of breathing room */
+tr div span {
+  padding-left: 0.2rem;
+}
+
+
+/* ================================================== */
+/* Buttons */
+/* ================================================== */
+/*
+button.raise_selected {
+  width: 120px;
+  padding:6px 15px;
+}*/
+
+button.clear_search {
+  padding: 5px 3px;
+}
+
+
+
+
+input[type=text], textarea {
+  height: 2em;
+  -webkit-transition: all 0.30s ease-in-out;
+  -moz-transition: all 0.30s ease-in-out;
+  -ms-transition: all 0.30s ease-in-out;
+  -o-transition: all 0.30s ease-in-out;
+  outline: none;
+  padding: 3px 0px 3px 3px;
+  margin: 5px 2px 3px 2px;
+  border: 1px solid #DDDDDD;
+}
+
+/* Style the found results from the search to match the search bar for visual continuity */
+input[type=text]:focus,
+textarea:focus,
+.found_in_search {
+  box-shadow: 0 0 5px #2ca25f;
+  border: 1px solid #2ca25f;
+}
+
+.search_box {
+  display: inline-block;
+  padding-right: 1rem;
+  --fade-length: 0.5s;
+}
+
+
+.search_box button.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity var(--fade-length) linear;
+}
+
+.search_box button.hidden {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s var(--fade-length), opacity var(--fade-length) linear;
+}
+
+
+/* ================================================== */
+/* Histogram titles */
+/* ================================================== */
+svg .main-title {
+  font-size: 1rem;
+}
+
+svg .sub-title {
+  font-style: italic;
+  opacity: 0.75;
+  font-size: 0.8rem;
+}

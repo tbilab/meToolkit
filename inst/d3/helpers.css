@@ -1,0 +1,85 @@
+/*@import url('https://fonts.googleapis.com/css?family=Maven+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400|Raleway&display=swap');
+*/
+
+
+/* ================================================== */
+/* Table */
+/* ================================================== */
+
+
+/* ================================================== */
+/* Table-wide style */
+table {
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+/*Individual cells for header and body */
+td, th {
+	padding: 3px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+/* ================================================== */
+/* Table-body style */
+tbody{
+  display: block;
+  overflow: auto;
+}
+
+/* ================================================== */
+/* Header styling */
+
+/* Everything that composes the header */
+thead {
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+/* Entire row of the header */
+thead tr {
+   display: block;
+}
+
+/*Individual header cells */
+th {
+  background-color: #d9d9d9;
+}
+
+/* ================================================== */
+/* Row styling */
+
+tbody tr {
+  --row-height: 30px;
+  height: var(--row-height);
+}
+
+/* Zebra striping */
+tr:nth-of-type(even) {
+	background: #f0f0f0;
+}
+
+/* Rows that have been selected */
+tr.selected{
+  background: #ff7f00;
+}
+
+tr.disabled{
+  opacity: 0.5;
+}
+
+tr div {
+  height: var(--row-height);
+  text-align: left;
+  overflow-x: auto;
+  width: 100%;
+  font-size: 0.8em;
+}
+
+/* Give text a bit of breathing room */
+tr div span {
+  padding-left: 0.2rem;
+}
+

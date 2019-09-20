@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- template.html -->
+
+<style>
+  body {
+    box-sizing: border-box;
+    margin: 0 2px;
+    background-color: #bdbdbd;
+    --app-header-height: 2.5rem;
+  }
+
+  .app-header {
+    height: var(--app-header-height);
+  }
+
+  .app-title {
+    height: 100%;
+    margin: 0;
+    padding: 0 0.5rem;
+    line-height: var(--app-header-height);
+  }
+
+  .template-section {
+    background-color: white;
+    box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.49);
+    border-radius: 4px;
+    overflow: hidden;
+    --section-title-height: 2.3rem;
+  }
+
+  .template-parent {
+    height: calc(100vh - 2px - var(--app-header-height));
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+  }
+
+  .template-info-panel     { grid-area: 1 / 1 / 5 / 2; }
+  .template-manhattan-plot { grid-area: 1 / 2 / 5 / 4; }
+  .template-upset-plot     { grid-area: 1 / 4 / 3 / 6; }
+  .template-network-plot   { grid-area: 3 / 4 / 5 / 6; }
+
+  .template-section-title {
+    height: var(--section-title-height);
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 5px;
+    line-height: var(--section-title-height);
+    border-bottom: 1px solid dimgrey;
+  }
+
+  .template-section-body {
+    height: calc(100% - var(--section-title-height));
+  }
+
+</style>
+
+<div class = 'app-header'>
+  <h2 class = 'app-title'> {{ app_title }} </h2>
+</div>
+<div class = 'template-parent'>
+  <div class = 'template-info-panel template-section'>
+    {{ info_panel }}
+  </div>
+  <div class = 'template-manhattan-plot template-section'>
+    <h3 class = 'template-section-title'>{{ manhattan_plot_title }}</h3>
+    <div class = 'template-section-body'>
+      {{ manhattan_plot }}
+    </div>
+  </div>
+  <div class = 'template-upset-plot template-section'>
+     <h3 class = 'template-section-title'>{{ upset_title }}</h3>
+     <div class = 'template-section-body'>
+      {{ upset }}
+     </div>
+  </div>
+  <div class = 'template-network-plot template-section'>
+    <h3 class = 'template-section-title'>{{ network_title }}</h3>
+    <div class = 'template-section-body'>
+      {{ network }}
+    </div>
+  </div>
+</div>

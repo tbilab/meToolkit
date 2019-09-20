@@ -1,5 +1,7 @@
-library(tibble)
 context("test-subsettocodes")
+
+library(tibble)
+library(meToolkit)
 
 
 sample_phenotypes <- as_tibble(matrix(c(
@@ -12,7 +14,7 @@ sample_phenotypes <- as_tibble(matrix(c(
   0, 0, 0, 0, 1,
   0, 1, 0, 0, 0,
   0, 0, 0, 0, 1,
-  0, 1, 1, 1, 0 ), ncol = 5, byrow = TRUE ) )
+  0, 1, 1, 1, 0 ), ncol = 5, byrow = TRUE ),.name_repair = 'minimal')
 
 colnames(sample_phenotypes) <- c('001.00', '002.00', '003.00', '004.00', '005.00')
 sample_phenotypes['IID'] <- letters[1:10]
@@ -45,4 +47,14 @@ test_that("Inverting", {
   expect_equal(nrow(simple_invert), 6)
 
   expect_setequal(c('c', 'd', 'e', 'f', 'g', 'i'), simple_invert$IID)
+})
+
+test_that("Handles non-normalized codes", {
+
+  unnormed_codes <- subsetToCodes(
+    sample_phenotypes,
+    c('1.0', '02.00', '005')
+  )
+
+  expect_equal(ncol(unnormed_codes), 5)
 })

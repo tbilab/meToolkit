@@ -7,17 +7,21 @@
 codeFilter(type, code_list, current_codes)
 }
 \arguments{
-\item{type}{Character of 'delete' or 'isolate' deciding which type of filtering is desired}
+\item{type}{Character of 'delete' or 'isolate' deciding which type of
+filtering is desired}
 
-\item{code_list}{Character vector containing code ids that need to be filtered}
+\item{code_list}{Character vector containing code ids that need to be
+filtered}
 
-\item{current_codes}{Dataframe with currently selected codes that will be filtered.}
+\item{current_codes}{Dataframe with currently selected codes that will be
+filtered.}
 }
 \value{
 Filtered currently selected codes dataframe.
 }
 \description{
-Filter codes.
+Either removes or isolates codes from a list of phecodes based upon the
+\code{type} requested.
 }
 \examples{
 codeFilter('invert', c('001.00', '002.00'), myCurrentCodes)

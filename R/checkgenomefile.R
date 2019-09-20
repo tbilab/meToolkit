@@ -1,33 +1,49 @@
 #' Checks genome input dataframe for correct form
 #'
-#' @param genome Tibble loaded from supplied file.
+#' This function will lowercase all columns.
 #'
-#' @return A list of the genome data with the snp column renamed \code{snp} and the snp name saved as \code{snp_name}.
+#' @param genome Tibble loaded from supplied file.
+#' @param separate Return a list with snp name and data? Defaults to `TRUE`.
+#'
+#' @return A list of the genome data with the snp column renamed \code{snp} and
+#'   the snp name saved as \code{snp_name}.
 #' @export
 #'
 #' @examples
 #' checkGenomeFile(uploadedGenomeData)
-checkGenomeFile <- function(genome){
+checkGenomeFile <- function(genome, separate = TRUE){
 
-  columns <- colnames(genome)
+  # Make all columns lowercase.
+  colnames(genome) <- tolower(colnames(genome))
 
-  has_IID <- 'IID' %in% columns
-  if(!has_IID) stop("Missing IID column.", call. = FALSE)
+  # Make sure ID column is in and in the format we want.
+  genome <- meToolkit::detect_id_column(genome)
 
-  two_columns <- length(columns) == 2
+
+  two_columns <- length(colnames(genome)) == 2
   if(!two_columns) stop("File needs to be just two columns.", call. = FALSE)
 
   # grab the name of the snp as the column name
-  snp_name <- columns[columns != 'IID']
-
-  # rename column containing snp to 'snp' for app
-  colnames(genome)[columns == snp_name] <- 'snp'
+  snp_name <- colnames(genome)[colnames(genome) != 'id']
 
   # Make sure that the snp copies column is an integer or can be coerced to one.
-  unique_counts <- genome %>% head() %>% .$snp %>% unique()
+  unique_counts <- genome[[snp_name]] %>% unique()
   if(!all(unique_counts %in% c(0,1,2))){
     stop("Your SNP copies column appears to have values other than 0,1,2.", call. = FALSE)
   }
 
-  list(data = genome, snp_name = snp_name)
+  if(separate){
+    # rename column containing snp to 'snp' for app
+    colnames(genome)[colnames(genome) == snp_name] <- 'snp'
+
+    return(
+      list(
+        data = genome,
+        snp_name = snp_name
+      )
+    )
+  } else {
+    return(genome)
+  }
+
 }

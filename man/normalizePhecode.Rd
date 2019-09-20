@@ -2,24 +2,20 @@
 % Please edit documentation in R/normalizephecode.R
 \name{normalizePhecode}
 \alias{normalizePhecode}
-\title{Normalize a phecode vector to padded character
-Across ME we work with the phecodes that are provided in
-a million different formats. This takes any format (float, string) and
-converts it to a 0-padded character.}
+\title{Normalize a phecode vector to padded character}
 \usage{
 normalizePhecode(codes)
 }
 \arguments{
-\item{codes}{A vector of phecodes in whatever format your heart desires}
+\item{codes}{A vector of phecodes in whatever format your heart desires. E.g. \code{8.00}, \code{8}, \code{0008.0}, ...}
 }
 \value{
 A vector of 0-padded phecodes.
 }
 \description{
-Normalize a phecode vector to padded character
-Across ME we work with the phecodes that are provided in
-a million different formats. This takes any format (float, string) and
-converts it to a 0-padded character.
+Across ME we work with the phecodes that are provided in a million different
+formats. This takes any format (float, string) and converts it to a 0-padded
+character.
 }
 \examples{
 normalizePhecode(c(8, 8.1, 9.2))

@@ -13,7 +13,7 @@ checkPhenomeFile(phenome)
 Dataframe if no errors are thrown.
 }
 \description{
-Check uploaded phenome file for correctness
+This function will lowercase all columns.
 }
 \examples{
 checkPhenomeFile(uploadedPhenomeFile)
