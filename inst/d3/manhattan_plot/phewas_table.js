@@ -1,31 +1,24 @@
-function setup_table(dom_target, sizes){
+const arrow_colors = {
+  unsorted: 'dimgrey',
+  sorted: 'black',
+};
+
+function setup_table(dom_target, arrow_color){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
 
-  const col_sizes = {
-    small: '70px',
-    med: '120px',
-    large: '220px',
-  };
 
   // Scope variables that get modified by methods
   let selected_codes = [];
   let on_selection = selected_codes => console.log(selected_codes);
   let rows;
 
-  const body_height = sizes.height - sizes.header - sizes.padding;
-
   // Let CSS know this is the main container div.
   dom_target.classed('table_holder', true);
 
-  const main_div = dom_target.append('div.table_main');
-
-  const control_panel = main_div.append('div.control_panel');
-
   // ==============================================================
   // Search bar setup
-  const search_bar = control_panel
-    .append('div.search_box');
+  const search_bar = dom_target.append('div.search_box');
 
   search_bar.append('label')
     .text('Search for code(s):')
@@ -42,14 +35,15 @@ function setup_table(dom_target, sizes){
 
   // ==============================================================
   // Bring selected codes to top button
-  control_panel.append('button.raise_selected')
+  dom_target.append('div.raise_selected')
+    .append('button')
     .text('Bring selected to top')
     .on('click', raise_selected_codes);
 
-  const table = main_div.append('div.table')
+  const table = dom_target.append('div.table_wrapper')
     .style('overflow', 'scroll')
     .append('table')
-    .attr('class', 'fixed_header');
+    .attr('class', 'flex-table');
 
   const add_data = function(table_data, columns_to_show){
     // Add variable to keep track of sort direction for a column
@@ -58,24 +52,32 @@ function setup_table(dom_target, sizes){
     });
 
     // Draw headers for table
-    table.append('thead')
-      .st({
-        height: `${sizes.header}px`,
-      })
+    const header_columns = table.append('thead.flex-table-header')
       .append('tr')
       .selectAll('th')
       .data(columns_to_show).enter()
       .append('th')
-      .text(d => d.name)
-      .style('cursor', d => d.sortable ? down_cursor: null)
-      .style('width', d => col_sizes[d.size])
-      .attr('title', "Click to sort in decreasing order")
-      .attr('class', 'tool table_header')
-      .on('click', column_sort);
+      .html(d => `${d.name} `)
+      .attr('class', d => `tool ${d.size}-column ${d.id}`)
+      .each(function(d){
+        if(d.sortable){
+          const column_header = d3.select(this);
+          ['decrease', 'increase'].forEach(direction => {
+             column_header
+              .append(`span.${direction}`)
+              .text(direction === 'decrease' ? '↓' : '↑')
+              .style('font-weight', 'bold')
+              .attr('title', `Click to sort ${d.name} column in ${direction === 'decrease' ? 'decreasing': 'increasing'} order`)
+              .on('click', function(d){
+                column_sort(d.id, direction);
+              });
+          });
+        }
+      });
 
-    // Initialize rows for every datapoint
-  rows = table.append('tbody')
-    .style('height', `${sizes.height}px`)
+
+  // Initialize rows for every datapoint
+  rows = table.append('tbody.flex-table-body')
     .selectAll('tr')
     .data(table_data)
     .enter()
@@ -94,9 +96,12 @@ function setup_table(dom_target, sizes){
       })))
     .enter()
     .append('td')
-    .style('width', d => col_sizes[d.size])
     .attr('data-th', d => d.column)
-    .html(d => `${d.scroll ? `<div style="width:${col_sizes[d.size]}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
+    .attr('class', d => `${d.size}-column`)
+    .html(d => `${d.scroll ? `<div style="width:100%}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
+
+    // Initialize column sorting
+    column_sort('p_val', 'increase');
 
     return this;
   };
@@ -161,26 +166,33 @@ function setup_table(dom_target, sizes){
     on_selection(selected_codes);
   }
 
-  function column_sort(selected_column){
+  function column_sort(col_id, sort_direction){
+
     // Only do sorting if the column allows it.
-    if(!selected_column.sortable) return;
+    const header_cols = dom_target.selectAll(`.flex-table-header th`);
 
-    const id_to_sort = selected_column.id;
-    const sort_increasing = selected_column.sort_inc;
+    const column_selector = header_cols.filter(h => h.id === col_id);
 
-    // Update mouseover cursor to reflect new sorting option
-    d3.select(this)
-     .attr('title', `Click to sort in ${sort_increasing ? 'decreasing': 'increasing'} order`)
-     .style('cursor', sort_increasing? down_cursor: up_cursor);
+    // Reset all arrows to default colors
+    header_cols
+      .selectAll('span')
+      .st({
+        color: 'dimgrey',
+        opacity: 0.5,
+      });
+
+    // Update this header's proper sorting arrow to the active color
+    column_selector.select(`span.${sort_direction}`)
+      .st({
+        color: arrow_color,
+        opacity: 1,
+      });
 
     rows.sort((a,b) => {
-      const b_smaller =  b[id_to_sort] < a[id_to_sort];
-      const direction_scalar = sort_increasing ? 1: -1;
+      const b_smaller =  b[col_id] < a[col_id];
+      const direction_scalar = sort_direction == 'increase' ? -1: 1;
       return direction_scalar * (b_smaller ? -1: 1);
     });
-
-    // Update sorting direction.
-    selected_column.sort_inc = !selected_column.sort_inc;
   }
 
   function raise_selected_codes(){
