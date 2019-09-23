@@ -65,9 +65,9 @@ function setup_table(dom_target, arrow_color){
           ['decrease', 'increase'].forEach(direction => {
              column_header
               .append(`span.${direction}`)
-              .text(direction === 'decrease' ? '↓': '↑')
+              .text(direction === 'decrease' ? '↓' : '↑')
               .style('font-weight', 'bold')
-              .attr('title', `Click to sort ${d.name} column in ${'decrease' ? 'decreasing': 'increasing'} order`)
+              .attr('title', `Click to sort ${d.name} column in ${direction === 'decrease' ? 'decreasing': 'increasing'} order`)
               .on('click', function(d){
                 column_sort(d.id, direction);
               });
@@ -101,7 +101,7 @@ function setup_table(dom_target, arrow_color){
     .html(d => `${d.scroll ? `<div style="width:100%}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
 
     // Initialize column sorting
-    column_sort('p_val', 'decrease');
+    column_sort('p_val', 'increase');
 
     return this;
   };
@@ -190,7 +190,7 @@ function setup_table(dom_target, arrow_color){
 
     rows.sort((a,b) => {
       const b_smaller =  b[col_id] < a[col_id];
-      const direction_scalar = sort_direction == 'increase' ? 1: -1;
+      const direction_scalar = sort_direction == 'increase' ? -1: 1;
       return direction_scalar * (b_smaller ? -1: 1);
     });
   }
