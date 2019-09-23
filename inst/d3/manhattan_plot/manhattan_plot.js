@@ -86,7 +86,7 @@ const table_div = div.append('div');
 process_new_data(data);
 const my_table = setup_table(
     table_div,
-    {height: 400, header: 35, padding: 5, control_panel: 50}
+    options.colors.light_blue
   )
   .add_data(viz_data, columns_to_show)
   .set_selection_callback(send_table_selection);
