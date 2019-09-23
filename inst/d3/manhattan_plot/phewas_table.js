@@ -2,11 +2,6 @@ function setup_table(dom_target, sizes){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
 
-  const col_sizes = {
-    small: '70px',
-    med: '120px',
-    large: '220px',
-  };
 
   // Scope variables that get modified by methods
   let selected_codes = [];
@@ -18,14 +13,9 @@ function setup_table(dom_target, sizes){
   // Let CSS know this is the main container div.
   dom_target.classed('table_holder', true);
 
-  const main_div = dom_target.append('div.table_main');
-
-  const control_panel = main_div.append('div.control_panel');
-
   // ==============================================================
   // Search bar setup
-  const search_bar = control_panel
-    .append('div.search_box');
+  const search_bar = dom_target.append('div.search_box');
 
   search_bar.append('label')
     .text('Search for code(s):')
@@ -42,14 +32,15 @@ function setup_table(dom_target, sizes){
 
   // ==============================================================
   // Bring selected codes to top button
-  control_panel.append('button.raise_selected')
+  dom_target.append('div.raise_selected')
+    .append('button')
     .text('Bring selected to top')
     .on('click', raise_selected_codes);
 
-  const table = main_div.append('div.table')
+  const table = dom_target.append('div.table_wrapper')
     .style('overflow', 'scroll')
     .append('table')
-    .attr('class', 'fixed_header');
+    .attr('class', 'flex-table');
 
   const add_data = function(table_data, columns_to_show){
     // Add variable to keep track of sort direction for a column
@@ -58,24 +49,19 @@ function setup_table(dom_target, sizes){
     });
 
     // Draw headers for table
-    table.append('thead')
-      .st({
-        height: `${sizes.header}px`,
-      })
+    table.append('thead.flex-table-header')
       .append('tr')
       .selectAll('th')
       .data(columns_to_show).enter()
       .append('th')
       .text(d => d.name)
       .style('cursor', d => d.sortable ? down_cursor: null)
-      .style('width', d => col_sizes[d.size])
       .attr('title', "Click to sort in decreasing order")
-      .attr('class', 'tool table_header')
+      .attr('class', d => `tool ${d.size}-column`)
       .on('click', column_sort);
 
     // Initialize rows for every datapoint
-  rows = table.append('tbody')
-    .style('height', `${sizes.height}px`)
+  rows = table.append('tbody.flex-table-body')
     .selectAll('tr')
     .data(table_data)
     .enter()
@@ -94,9 +80,9 @@ function setup_table(dom_target, sizes){
       })))
     .enter()
     .append('td')
-    .style('width', d => col_sizes[d.size])
     .attr('data-th', d => d.column)
-    .html(d => `${d.scroll ? `<div style="width:${col_sizes[d.size]}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
+    .attr('class', d => `${d.size}-column`)
+    .html(d => `${d.scroll ? `<div style="width:100%}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
 
     return this;
   };
