@@ -6,3 +6,4 @@ module_tests/data/
 raw_data/
 *rsconnect/
 inst/doc
+data/manhattan_plot_zero_ors.rds
