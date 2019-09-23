@@ -58,7 +58,6 @@ function setup_table(dom_target, arrow_color){
       .data(columns_to_show).enter()
       .append('th')
       .html(d => `${d.name} `)
-      .attr('title', "Click to sort in decreasing order")
       .attr('class', d => `tool ${d.size}-column ${d.id}`)
       .each(function(d){
         if(d.sortable){
@@ -68,6 +67,7 @@ function setup_table(dom_target, arrow_color){
               .append(`span.${direction}`)
               .text(direction === 'decrease' ? '↓': '↑')
               .style('font-weight', 'bold')
+              .attr('title', `Click to sort ${d.name} column in ${'decrease' ? 'decreasing': 'increasing'} order`)
               .on('click', function(d){
                 column_sort(d.id, direction);
               });
