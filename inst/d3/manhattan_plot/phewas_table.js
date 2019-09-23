@@ -63,19 +63,15 @@ function setup_table(dom_target, arrow_color){
       .each(function(d){
         if(d.sortable){
           const column_header = d3.select(this);
-          column_header
-            .append('span.decrease')
-            .text('↓')
-            .on('click', function(d){
-              column_sort(d.id, 'decrease');
-            });
-
-          column_header
-            .append('span.increase')
-            .text('↑')
-            .on('click', function(d){
-              column_sort(d.id, 'increase');
-            });
+          ['decrease', 'increase'].forEach(direction => {
+             column_header
+              .append(`span.${direction}`)
+              .text(direction === 'decrease' ? '↓': '↑')
+              .style('font-weight', 'bold')
+              .on('click', function(d){
+                column_sort(d.id, direction);
+              });
+          });
         }
       });
 
@@ -180,11 +176,17 @@ function setup_table(dom_target, arrow_color){
     // Reset all arrows to default colors
     header_cols
       .selectAll('span')
-      .style('color', 'dimgrey');
+      .st({
+        color: 'dimgrey',
+        opacity: 0.5,
+      });
 
     // Update this header's proper sorting arrow to the active color
     column_selector.select(`span.${sort_direction}`)
-      .style('color', arrow_color);
+      .st({
+        color: arrow_color,
+        opacity: 1,
+      });
 
     rows.sort((a,b) => {
       const b_smaller =  b[col_id] < a[col_id];

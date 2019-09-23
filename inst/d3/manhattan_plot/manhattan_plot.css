@@ -71,6 +71,10 @@
   overflow-y: hidden;
 }
 
+.flex-table th span {
+  cursor: pointer;
+}
+
 .flex-table-body {
   flex: 1;
   overflow-y: scroll;
@@ -88,11 +92,6 @@
 .flex-table .small-column {
   flex: 1;
 }
-
-span.down-arrow {
-  color: red !important;
-}
-
 
 
 /* ================================================== */
