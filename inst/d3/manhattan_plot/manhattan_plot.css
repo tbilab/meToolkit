@@ -29,6 +29,7 @@
 
 .table_wrapper{
   grid-area: 2 / 1 / 3 / 3;
+  overflow-y: scroll;
 }
 
 

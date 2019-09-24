@@ -40,10 +40,23 @@ function setup_table(dom_target, arrow_color){
     .text('Bring selected to top')
     .on('click', raise_selected_codes);
 
-  const table = dom_target.append('div.table_wrapper')
-    .style('overflow', 'scroll')
+  const table_holder = dom_target.append('div.table_wrapper');
+
+  const table_header = table_holder
+    .append('table.header')
+    .append('thead')
+    .append('tr');
+
+  const scroll_area = table_holder
+    .append('div#scroll-area');
+
+  const content_area = scroll_area
     .append('table')
-    .attr('class', 'flex-table');
+    .append('tbody.clusterize-content')
+    .attr('id', 'content-area');
+
+  const table_body = content_area
+    .append('tr.clusterize-no-data');
 
   const add_data = function(table_data, columns_to_show){
     // Add variable to keep track of sort direction for a column
@@ -52,94 +65,122 @@ function setup_table(dom_target, arrow_color){
     });
 
     // Draw headers for table
-    const header_columns = table.append('thead.flex-table-header')
-      .append('tr')
+    table_header
       .selectAll('th')
-      .data(columns_to_show).enter()
+      .data(columns_to_show)
+      .enter()
       .append('th')
-      .html(d => `${d.name} `)
-      .attr('class', d => `tool ${d.size}-column ${d.id}`)
-      .each(function(d){
-        if(d.sortable){
-          const column_header = d3.select(this);
-          ['decrease', 'increase'].forEach(direction => {
-             column_header
-              .append(`span.${direction}`)
-              .text(direction === 'decrease' ? '↓' : '↑')
-              .style('font-weight', 'bold')
-              .attr('title', `Click to sort ${d.name} column in ${direction === 'decrease' ? 'decreasing': 'increasing'} order`)
-              .on('click', function(d){
-                column_sort(d.id, direction);
-              });
-          });
-        }
-      });
+      .html(d => `${d.name} `);
 
+    // Fill in first loading row
+    table_body.selectAll('td')
+      .data(columns_to_show)
+      .enter()
+      .append('th')
+      .text((d,i) => i === 0 ? 'Loading data...': '  ');
+
+
+
+    const data_for_clusterize = table_data.map(d => {
+      const row_data = columns_to_show
+        .map(col => `<td>${d[col.id]}</td>`)
+        .join(' ');
+
+      return `<tr>${row_data}</tr>`;
+    });
+    const clusterize = new Clusterize({
+      rows: data_for_clusterize,
+      scroll_el: scroll_area.node(),
+      content_el: content_area.node(),
+    });
+
+    //const header_columns = table.append('thead.flex-table-header')
+    //.append('tr')
+    //.selectAll('th')
+    //.data(columns_to_show).enter()
+    //.append('th')
+    //.html(d => `${d.name} `)
+    //.attr('class', d => `tool ${d.size}-column ${d.id}`)
+    //.each(function(d){
+    //  if(d.sortable){
+    //    const column_header = d3.select(this);
+    //    ['decrease', 'increase'].forEach(direction => {
+    //       column_header
+    //        .append(`span.${direction}`)
+    //        .text(direction === 'decrease' ? '↓' : '↑')
+    //        .style('font-weight', 'bold')
+    //        .attr('title', `Click to sort ${d.name} column in ${direction === 'decrease' ? 'decreasing': 'increasing'} order`)
+    //        .on('click', function(d){
+    //          column_sort(d.id, direction);
+    //        });
+    //    });
+    //  }
+    //});
 
   // Initialize rows for every datapoint
-  rows = table.append('tbody.flex-table-body')
-    .selectAll('tr')
-    .data(table_data)
-    .enter()
-    .append('tr')
-    .classed('selected', d => selected_codes.includes(d.code))
-    .on('click', on_row_click);
-
-  // Fill in rows with each columns data
-  rows.selectAll('td')
-    .data(d => columns_to_show
-      .map(({name, id, is_num, size, scroll}) => ({
-        column: name,
-        size: size,
-        value: is_num ? format_val(d[id]): d[id],
-        scroll: scroll,
-      })))
-    .enter()
-    .append('td')
-    .attr('data-th', d => d.column)
-    .attr('class', d => `${d.size}-column`)
-    .html(d => `${d.scroll ? `<div style="width:100%}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
+  //rows = table.append('tbody.flex-table-body')
+  //  .selectAll('tr')
+  //  .data(table_data.filter((_,i) => i < 10))
+  //  .enter()
+  //  .append('tr')
+  //  .classed('selected', d => selected_codes.includes(d.code))
+  //  .on('click', on_row_click);
+//
+  //// Fill in rows with each columns data
+  //rows.selectAll('td')
+  //  .data(d => columns_to_show
+  //    .map(({name, id, is_num, size, scroll}) => ({
+  //      column: name,
+  //      size: size,
+  //      value: is_num ? format_val(d[id]): d[id],
+  //      scroll: scroll,
+  //    })))
+  //  .enter()
+  //  .append('td')
+  //  .attr('data-th', d => d.column)
+  //  .attr('class', d => `${d.size}-column`)
+  //  .html(d => `${d.scroll ? `<div style="width:100%}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
 
     // Initialize column sorting
-    column_sort('p_val', 'increase');
+   // column_sort('p_val', 'increase');
 
     return this;
   };
 
   const select_codes = function(codes_to_select){
 
-    selected_codes = codes_to_select;
-    let number_changed = 0;
+   //selected_codes = codes_to_select;
+   //let number_changed = 0;
 
-    rows.classed('selected', function(d){
-      const is_selected = codes_to_select.includes(d.code);
-      if(is_selected){
-        // Check to see if this code was selected before to keep track of number of codes changed.
-        const new_selection = !d3.select(this).classed('selected');
-        if(new_selection) number_changed++;
-      }
-      return is_selected;
-    });
+   //rows.classed('selected', function(d){
+   //  const is_selected = codes_to_select.includes(d.code);
+   //  if(is_selected){
+   //    // Check to see if this code was selected before to keep track of number of codes changed.
+   //    const new_selection = !d3.select(this).classed('selected');
+   //    if(new_selection) number_changed++;
+   //  }
+   //  return is_selected;
+   //});
 
-    // If more than one code has changed in one go that means the user selected codes using dragging so
-    // we want to raise selected codes to top of table
-    if(number_changed > 1){
-      raise_selected_codes();
-    }
+   //// If more than one code has changed in one go that means the user selected codes using dragging so
+   //// we want to raise selected codes to top of table
+   //if(number_changed > 1){
+   //  raise_selected_codes();
+   //}
 
-    // If more than two selected codes have been changed, sort table too.
-    return this;
+   //// If more than two selected codes have been changed, sort table too.
+   //return this;
   };
 
   const disable_codes = function(or_bounds){
-    if(or_bounds == null) return
-
-    const is_disabled = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
-
-    rows.classed('disabled', is_disabled);
-
-
-    return this;
+   // if(or_bounds == null) return
+//
+   // const is_disabled = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
+//
+   // rows.classed('disabled', is_disabled);
+//
+//
+   // return this;
   }
 
   function set_selection_callback(callback){
