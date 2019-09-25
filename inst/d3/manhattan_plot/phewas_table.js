@@ -7,7 +7,7 @@ const arrow_colors = {
 const col_units = {
   small: 1,
   med: 2,
-  large: 3,
+  large: 4,
 };
 
 function build_column_style(columns_to_show, col_units){
@@ -27,24 +27,25 @@ function build_column_style(columns_to_show, col_units){
     col_to_width[col.id] = `${col_percent_widths[col.size]}%`;
   });
 
-  return (col, i = -1) => {
+  return (col, first_row = false, just_width = false) => {
     const w = col_to_width[col.id];
-    const width_st = i < 1 ? `width:${w}; min-width:${w};`: '';
-    const align_st = (
-      col.size === 'small' || i < 0
-      ? ''
-      : 'text-align: left'
-    );
+    if(just_width) return w;
+
+    const width_st = first_row ? `width:${w}; min-width:${w};`: '';
+    const align_st = col.size === 'small' ? '': 'text-align: left';
     return `style='${width_st} ${align_st}'`;
   };
 }
 
-function setup_table(dom_target, arrow_color){
+function setup_table(dom_target, arrow_color, columns_to_show){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
 
   // Scope variables that get modified by methods
   let selected_codes = [];
+  let table_data = [];
+  let current_sort = {col: 'p_val', direction: 'increasing'};
+
   let on_selection = selected_codes => console.log(selected_codes);
   let rows;
 
@@ -73,7 +74,9 @@ function setup_table(dom_target, arrow_color){
   dom_target.append('div.raise_selected')
     .append('button')
     .text('Bring selected to top')
-    .on('click', raise_selected_codes);
+    .on('click', function(){
+      sort_and_update_table(raise_selected = true);
+    });
 
   const table_holder = dom_target
     .append('div.table_wrapper');
@@ -95,139 +98,174 @@ function setup_table(dom_target, arrow_color){
   const table_body = content_area
     .append('tr.clusterize-no-data');
 
-  const add_data = function(table_data, columns_to_show){
-
-    // Add variable to keep track of sort direction for a column
-    columns_to_show.forEach(col => {
-      col.sort_inc = false;
-    });
-
-    // Build key for how wide each column needs to be.
+   // Build key for how wide each column needs to be.
     get_col_style = build_column_style(columns_to_show, col_units);
 
     // Draw headers for table
-    header_table
-      .html(columns_to_show
-        .map(col => {
-          const col_style = get_col_style(col);
-          return `<td ${col_style}>${col.name}</td>`;
-        })
-        .join(' ')
-      );
+    const header_columns = header_table
+      .selectAll('td')
+      .data(columns_to_show).enter()
+      .append('td')
+      .html(d => `${d.name}`)
+      .style('width', col => get_col_style(col, false, true))
+      .attr('class', d => `tool ${d.size}-column ${d.id}`)
+      .each(function(d){
+        if(d.sortable){
+          const column_header = d3.select(this);
+          ['decreasing', 'increasing'].forEach(direction => {
+             column_header
+              .append(`span.${direction}`)
+              .text(direction === 'decreasing' ? '↓' : '↑')
+              .attr(
+                'title',
+                `Click to sort ${d.name} column ` +
+                `in ${direction} order`
+              )
+              .on('click', function(d){
+                current_sort = {
+                  col: d.id,
+                  direction,
+                };
+                sort_and_update_table();
+              });
+          });
+        }
+      });
 
     // Fill in first loading row
     table_body.append('td')
       .attr('colspan', 100)
       .html(`Loading data...`);
 
-    const build_row_from_data = (d,i) => {
-      const row_data = columns_to_show
-        .map(col => {
-          // Only need to apply width settings to first row.
-          const body = col.is_num ? format_val(d[col.id]): d[col.id];
-          return `<td ${get_col_style(col, i)}>${body}</td>`;
-        })
-        .join(' ');
+  const table_obj = new Clusterize({
+    rows: [],
+    scroll_el: scroll_area.node(),
+    content_el: content_area.node(),
+  });
 
-      return `<tr>${row_data}</tr>`;
-    };
+  const build_row_from_data = (d,i) => {
+    const row_data = columns_to_show
+      .map(col => {
+        // Only need to apply width settings to first row.
+        const body = col.is_num ? format_val(d[col.id]): d[col.id];
+        return `<td ${get_col_style(col, i===0)}>${body}</td>`;
+      })
+      .join(' ');
+    const row_class = selected_codes.includes(d.code) ? `class='selected'`: '';
+    return `<tr data-code=${d.code} ${row_class}'>${row_data}</tr>`;
+  };
 
-    const data_for_clusterize = table_data.map(build_row_from_data);
+  // Logic for row/code selection
+  content_area.on('click', function(e){
+    const target = d3.event.target.parentNode;
+    if(target.nodeName != 'TR') return;
 
-    const clusterize = new Clusterize({
-      rows: data_for_clusterize,
-      scroll_el: scroll_area.node(),
-      content_el: content_area.node(),
-    });
+    // Grab code from of selected row
+    const target_code = target.dataset.code;
 
-    function sort_and_update_table(col_to_sort, table){
-       const data_for_clusterize_sorted = table_data
-         .sort((a,b) => a[col_to_sort] - b[col_to_sort])
-         .map(build_row_from_data);
+    const already_selected = selected_codes.includes(target_code);
 
-      clusterize.update(data_for_clusterize_sorted);
+    // Update selected codes array
+    if(already_selected){
+      selected_codes = selected_codes.filter(d => d.code === target_code);
+    } else {
+      selected_codes = [...selected_codes, target_code];
     }
 
-    sort_and_update_table('p_val', clusterize);
+    // Update class for selection
+    target.className = already_selected ? '': 'selected';
 
+    // Send new selection to callback
+    on_selection(selected_codes);
+  });
 
-    //const header_columns = table.append('thead.flex-table-header')
-    //.append('tr')
-    //.selectAll('th')
-    //.data(columns_to_show).enter()
-    //.append('th')
-    //.html(d => `${d.name} `)
-    //.attr('class', d => `tool ${d.size}-column ${d.id}`)
-    //.each(function(d){
-    //  if(d.sortable){
-    //    const column_header = d3.select(this);
-    //    ['decrease', 'increase'].forEach(direction => {
-    //       column_header
-    //        .append(`span.${direction}`)
-    //        .text(direction === 'decrease' ? '↓' : '↑')
-    //        .style('font-weight', 'bold')
-    //        .attr('title', `Click to sort ${d.name} column in ${direction === 'decrease' ? 'decreasing': 'increasing'} order`)
-    //        .on('click', function(d){
-    //          column_sort(d.id, direction);
-    //        });
-    //    });
-    //  }
-    //});
+  function sort_and_update_table(raise_selected = false){
 
-  // Initialize rows for every datapoint
-  //rows = table.append('tbody.flex-table-body')
-  //  .selectAll('tr')
-  //  .data(table_data.filter((_,i) => i < 10))
-  //  .enter()
-  //  .append('tr')
-  //  .classed('selected', d => selected_codes.includes(d.code))
-  //  .on('click', on_row_click);
-//
-  //// Fill in rows with each columns data
-  //rows.selectAll('td')
-  //  .data(d => columns_to_show
-  //    .map(({name, id, is_num, size, scroll}) => ({
-  //      column: name,
-  //      size: size,
-  //      value: is_num ? format_val(d[id]): d[id],
-  //      scroll: scroll,
-  //    })))
-  //  .enter()
-  //  .append('td')
-  //  .attr('data-th', d => d.column)
-  //  .attr('class', d => `${d.size}-column`)
-  //  .html(d => `${d.scroll ? `<div style="width:100%}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
+    const sort_eq = (row_a, row_b) => {
+      // If we're raising selected check selection status
+      if(raise_selected){
+        const a_selected = selected_codes.includes(row_a);
+        const b_selected = selected_codes.includes(row_b);
 
-    // Initialize column sorting
-   // column_sort('p_val', 'increase');
+        // If there is a difference in selection status,
+        // that's all we need for sorting
+        if(a_selected !== b_selected){
+          return a_selected - b_selected;
+        }
+        // Otherwise we need to proceed as usual...
+      }
+      return (
+        current_sort.direction === 'decreasing'
+        ? row_b[current_sort.col] - row_a[current_sort.col]
+        : row_a[current_sort.col] - row_b[current_sort.col]
+      );
+    };
 
+    table_data = table_data.sort(sort_eq);
+    update_table();
+
+    const header_cols = dom_target.selectAll(`table.header td`);
+    const column_selector = header_cols.filter(h => h.id === current_sort.col);
+
+    // Reset all arrows to default colors
+    header_cols
+      .selectAll('span')
+      .st({
+        color: 'dimgrey',
+        opacity: 0.5,
+      });
+
+    // Update this header's proper sorting arrow to the active color
+    column_selector.select(`span.${current_sort.direction}`)
+      .st({
+        color: arrow_color,
+        opacity: 1,
+      });
+  }
+
+  function add_data(new_table_data){
+    table_data = new_table_data;
+    update_table();
     return this;
-  };
+  }
 
-  const select_codes = function(codes_to_select){
+  // Takes the current table data, converts it to html, and updates
+  // the table object.
+  function update_table(){
+    table_obj.update(
+      table_data.map((d,i) => {
+        const row_data = columns_to_show
+          .map(col => {
+            // Only need to apply width settings to first row.
+            const body = col.is_num ? format_val(d[col.id]): d[col.id];
+            return `<td ${get_col_style(col, i===0)}>${body}</td>`;
+          })
+          .join(' ');
+        const row_class = selected_codes.includes(d.code) ? `class='selected'`: '';
+        return `<tr data-code=${d.code} ${row_class}'>${row_data}</tr>`;
+      })
+    );
+  }
 
-   //selected_codes = codes_to_select;
-   //let number_changed = 0;
+  function select_codes(codes_to_select){
+     // How many codes changed in this selection update?
+    const number_changed = unique([...codes_to_select, ...selected_codes])
+      .reduce(function(codes_changed, code){
+        const code_in_new = codes_to_select.includes(code);
+        const code_in_old = selected_codes.includes(code);
 
-   //rows.classed('selected', function(d){
-   //  const is_selected = codes_to_select.includes(d.code);
-   //  if(is_selected){
-   //    // Check to see if this code was selected before to keep track of number of codes changed.
-   //    const new_selection = !d3.select(this).classed('selected');
-   //    if(new_selection) number_changed++;
-   //  }
-   //  return is_selected;
-   //});
+        return codes_changed + (code_in_new && code_in_old ? 0 : 1);
+      }, 0);
 
-   //// If more than one code has changed in one go that means the user selected codes using dragging so
-   //// we want to raise selected codes to top of table
-   //if(number_changed > 1){
-   //  raise_selected_codes();
-   //}
+    // If more than two codes have changed, send selected to top.
+    if(number_changed > 2){
+      console.log('more than two codes changed')
+    }
 
-   //// If more than two selected codes have been changed, sort table too.
-   //return this;
-  };
+    selected_codes = codes_to_select;
+    update_table();
+    return this;
+  }
 
   const disable_codes = function(or_bounds){
    // if(or_bounds == null) return
@@ -245,61 +283,6 @@ function setup_table(dom_target, arrow_color){
     return this;
   }
 
-  function on_row_click(d){
-    const row = d3.select(this);
-
-    // Dont let user interact with disabled codes.
-    const is_disabled = row.classed('disabled');
-    if(is_disabled) return;
-
-    const new_selection = !row.classed('selected');
-
-    if(new_selection){
-      selected_codes.push(d.code);
-    } else {
-      // Remove code if user has selected a previously selected code
-      selected_codes = selected_codes.filter(code => code !== d.code);
-    }
-
-    on_selection(selected_codes);
-  }
-
-  function column_sort(col_id, sort_direction){
-
-    // Only do sorting if the column allows it.
-    const header_cols = dom_target.selectAll(`.flex-table-header th`);
-
-    const column_selector = header_cols.filter(h => h.id === col_id);
-
-    // Reset all arrows to default colors
-    header_cols
-      .selectAll('span')
-      .st({
-        color: 'dimgrey',
-        opacity: 0.5,
-      });
-
-    // Update this header's proper sorting arrow to the active color
-    column_selector.select(`span.${sort_direction}`)
-      .st({
-        color: arrow_color,
-        opacity: 1,
-      });
-
-    rows.sort((a,b) => {
-      const b_smaller =  b[col_id] < a[col_id];
-      const direction_scalar = sort_direction == 'increase' ? -1: 1;
-      return direction_scalar * (b_smaller ? -1: 1);
-    });
-  }
-
-  function raise_selected_codes(){
-    rows.sort((a,b) => {
-      const a_selected = selected_codes.includes(a.code);
-      const b_selected = selected_codes.includes(b.code);
-      return b_selected - a_selected;
-    });
-  }
 
   function on_code_search(){
     const current_search = this.value;
@@ -358,7 +341,7 @@ function setup_table(dom_target, arrow_color){
     search_clear_btn.classed('visible', true);
   }
 
-  return {add_data, select_codes, disable_codes, set_selection_callback, raise_selected_codes};
+  return {add_data, select_codes, disable_codes, set_selection_callback};
 }
 
 

@@ -55,9 +55,11 @@
   background-color: #d9d9d9;
 }
 
-.flex-table th span {
+.table_wrapper table.header span {
   cursor: pointer;
+  font-weight: bold;
 }
+
 
 /* ================================================== */
 /* Buttons */
