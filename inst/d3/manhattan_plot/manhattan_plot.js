@@ -86,7 +86,8 @@ const table_div = div.append('div');
 process_new_data(data);
 const my_table = setup_table(
     table_div,
-    options.colors.light_blue
+    options.colors.light_blue,
+    viz_width
   )
   .add_data(viz_data, columns_to_show)
   .set_selection_callback(send_table_selection);

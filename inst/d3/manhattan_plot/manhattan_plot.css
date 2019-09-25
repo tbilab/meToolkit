@@ -37,6 +37,10 @@
 /* Table */
 /* ================================================== */
 
+table td {
+  border: 1px solid black;
+}
+
 .flex-table {
   display: flex;
   flex-direction: column;

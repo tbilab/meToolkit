@@ -3,10 +3,36 @@ const arrow_colors = {
   sorted: 'black',
 };
 
-function setup_table(dom_target, arrow_color){
+// Relative size units of different column types
+const col_units = {
+  small: 1,
+  med: 2,
+  large: 3,
+};
+
+function build_column_widths(columns_to_show, col_units, width = 100){
+  // Get widths of columns in terms of percents
+  const single_unit_size = columns_to_show.reduce(function(units, col){
+    return units + col_units[col.size];
+  }, 0);
+
+  const col_percent_widths = Object.assign({},col_units);
+  for(let size in col_percent_widths){
+     col_percent_widths[size] *= (width/single_unit_size);
+  }
+
+  const col_to_width = {};
+
+  columns_to_show.forEach(function(col){
+    col_to_width[col.id] = `${Math.floor(col_percent_widths[col.size])}px`;
+  });
+
+  return col_to_width;
+}
+
+function setup_table(dom_target, arrow_color, width){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
-
 
   // Scope variables that get modified by methods
   let selected_codes = [];
@@ -44,55 +70,79 @@ function setup_table(dom_target, arrow_color){
 
   const table_header = table_holder
     .append('table.header')
-    .append('thead')
-    .append('tr');
+    .st({
+      tableLayout: 'fixed',
+      width: '100%'
+    })
+    .append('thead');
 
   const scroll_area = table_holder
     .append('div#scroll-area');
 
   const content_area = scroll_area
     .append('table')
+    .st({
+      tableLayout: 'fixed',
+      width: '100%',
+    })
     .append('tbody.clusterize-content')
-    .attr('id', 'content-area');
+    .attr('id', 'content-area')
+    .style('width', `${width}px`);
 
   const table_body = content_area
     .append('tr.clusterize-no-data');
 
   const add_data = function(table_data, columns_to_show){
+
     // Add variable to keep track of sort direction for a column
     columns_to_show.forEach(col => {
       col.sort_inc = false;
     });
 
+    // Build key for how wide each column needs to be.
+    col_id_to_size = build_column_widths(columns_to_show, col_units, width);
+
     // Draw headers for table
     table_header
-      .selectAll('th')
-      .data(columns_to_show)
-      .enter()
-      .append('th')
-      .html(d => `${d.name} `);
+      .html(columns_to_show
+        .map(col => {
+          const col_width = col_id_to_size[col.id];
+          return `<td style='width:${col_width}; min-width:${col_width}'>${col.name}</td>`;
+        })
+        .join(' ')
+      );
 
     // Fill in first loading row
-    table_body.selectAll('td')
-      .data(columns_to_show)
-      .enter()
-      .append('th')
-      .text((d,i) => i === 0 ? 'Loading data...': '  ');
+    table_body.append('td')
+      .attr('colspan', 100)
+      .html(`Loading data...`);
 
-
-
-    const data_for_clusterize = table_data.map(d => {
+    const build_row_from_data = d => {
       const row_data = columns_to_show
-        .map(col => `<td>${d[col.id]}</td>`)
+        .map(col => `<td style='width:${col_id_to_size[col.id]}'>${col.is_num ? format_val(d[col.id]): d[col.id]}</td>`)
         .join(' ');
 
       return `<tr>${row_data}</tr>`;
-    });
+    };
+
+    const data_for_clusterize = table_data.map(build_row_from_data);
+
     const clusterize = new Clusterize({
       rows: data_for_clusterize,
       scroll_el: scroll_area.node(),
       content_el: content_area.node(),
     });
+
+    function sort_and_update_table(col_to_sort, table){
+       const data_for_clusterize_sorted = table_data
+         .sort((a,b) => a[col_to_sort] - b[col_to_sort])
+         .map(build_row_from_data);
+
+      clusterize.update(data_for_clusterize_sorted);
+    }
+
+    sort_and_update_table('p_val', clusterize);
+
 
     //const header_columns = table.append('thead.flex-table-header')
     //.append('tr')
