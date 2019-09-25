@@ -75,7 +75,7 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     .append('button')
     .text('Bring selected to top')
     .on('click', function(){
-      sort_and_update_table(raise_selected = true);
+      update_table(raise_selected = true);
     });
 
   const table_holder = dom_target
@@ -126,7 +126,7 @@ function setup_table(dom_target, arrow_color, columns_to_show){
                   col: d.id,
                   direction,
                 };
-                sort_and_update_table();
+                update_table();
               });
           });
         }
@@ -179,18 +179,18 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     on_selection(selected_codes);
   });
 
-  function sort_and_update_table(raise_selected = false){
+  function update_table(raise_selected = false){
 
     const sort_eq = (row_a, row_b) => {
       // If we're raising selected check selection status
       if(raise_selected){
-        const a_selected = selected_codes.includes(row_a);
-        const b_selected = selected_codes.includes(row_b);
+        const a_selected = selected_codes.includes(row_a.code);
+        const b_selected = selected_codes.includes(row_b.code);
 
         // If there is a difference in selection status,
         // that's all we need for sorting
         if(a_selected !== b_selected){
-          return a_selected - b_selected;
+          return b_selected - a_selected;
         }
         // Otherwise we need to proceed as usual...
       }
@@ -202,7 +202,6 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     };
 
     table_data = table_data.sort(sort_eq);
-    update_table();
 
     const header_cols = dom_target.selectAll(`table.header td`);
     const column_selector = header_cols.filter(h => h.id === current_sort.col);
@@ -221,17 +220,10 @@ function setup_table(dom_target, arrow_color, columns_to_show){
         color: arrow_color,
         opacity: 1,
       });
-  }
 
-  function add_data(new_table_data){
-    table_data = new_table_data;
-    update_table();
-    return this;
-  }
-
-  // Takes the current table data, converts it to html, and updates
-  // the table object.
-  function update_table(){
+    // Finally actually run the table update.
+    // Takes the current table data, converts it to html, and updates
+    // the table object.
     table_obj.update(
       table_data.map((d,i) => {
         const row_data = columns_to_show
@@ -247,6 +239,12 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     );
   }
 
+  function add_data(new_table_data){
+    table_data = new_table_data;
+    update_table();
+    return this;
+  }
+
   function select_codes(codes_to_select){
      // How many codes changed in this selection update?
     const number_changed = unique([...codes_to_select, ...selected_codes])
@@ -257,13 +255,12 @@ function setup_table(dom_target, arrow_color, columns_to_show){
         return codes_changed + (code_in_new && code_in_old ? 0 : 1);
       }, 0);
 
-    // If more than two codes have changed, send selected to top.
-    if(number_changed > 2){
-      console.log('more than two codes changed')
-    }
-
     selected_codes = codes_to_select;
-    update_table();
+
+    const raising_selected = number_changed > 2;
+
+    // If more than two codes have changed, send selected to top.
+    update_table(raising_selected);
     return this;
   }
 
@@ -282,7 +279,6 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     on_selection = callback;
     return this;
   }
-
 
   function on_code_search(){
     const current_search = this.value;
