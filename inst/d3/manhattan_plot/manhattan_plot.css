@@ -9,6 +9,7 @@
   grid-template-rows: 2.5rem 1fr;
   grid-column-gap: 0px;
   grid-row-gap: 0px;
+  width: 100%;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -37,67 +38,26 @@
 /* Table */
 /* ================================================== */
 
-table td {
-  border: 1px solid black;
-}
 
-.flex-table {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+.table_wrapper table {
+  table-layout: fixed;
+  width: 100%;
   font-size: 0.85em;
 }
 
-.flex-table-header,
-.flex-table-body {
-  display: block;
+.table_wrapper table.header {
+  position: sticky;
+  top: 0;
 }
 
-.flex-table-header {
-  margin-right: 0px;
-}
-
-.flex-table-header tr {
-  text-align: left;
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
-
-.flex-table tr {
-  width: 100%;
-  display: flex;
-}
-
-.flex-table th,
-.flex-table td {
-  display: block;
-  flex: 1;
-  overflow-x: scroll;
-  overflow-y: hidden;
+.table_wrapper table.header tbody {
+  display: table-row-group;
+  background-color: #d9d9d9;
 }
 
 .flex-table th span {
   cursor: pointer;
 }
-
-.flex-table-body {
-  flex: 1;
-  overflow-y: scroll;
-}
-
-
-.flex-table .large-column {
-  flex: 3;
-}
-
-.flex-table .med-column {
-  flex: 2;
-}
-
-.flex-table .small-column {
-  flex: 1;
-}
-
 
 /* ================================================== */
 /* Buttons */

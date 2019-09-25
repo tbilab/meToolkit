@@ -10,7 +10,7 @@ const col_units = {
   large: 3,
 };
 
-function build_column_widths(columns_to_show, col_units, width = 100){
+function build_column_style(columns_to_show, col_units){
   // Get widths of columns in terms of percents
   const single_unit_size = columns_to_show.reduce(function(units, col){
     return units + col_units[col.size];
@@ -18,19 +18,28 @@ function build_column_widths(columns_to_show, col_units, width = 100){
 
   const col_percent_widths = Object.assign({},col_units);
   for(let size in col_percent_widths){
-     col_percent_widths[size] *= (width/single_unit_size);
+     col_percent_widths[size] *= (100/single_unit_size);
   }
 
   const col_to_width = {};
 
   columns_to_show.forEach(function(col){
-    col_to_width[col.id] = `${Math.floor(col_percent_widths[col.size])}px`;
+    col_to_width[col.id] = `${col_percent_widths[col.size]}%`;
   });
 
-  return col_to_width;
+  return (col, i = -1) => {
+    const w = col_to_width[col.id];
+    const width_st = i < 1 ? `width:${w}; min-width:${w};`: '';
+    const align_st = (
+      col.size === 'small' || i < 0
+      ? ''
+      : 'text-align: left'
+    );
+    return `style='${width_st} ${align_st}'`;
+  };
 }
 
-function setup_table(dom_target, arrow_color, width){
+function setup_table(dom_target, arrow_color){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
 
@@ -66,28 +75,22 @@ function setup_table(dom_target, arrow_color, width){
     .text('Bring selected to top')
     .on('click', raise_selected_codes);
 
-  const table_holder = dom_target.append('div.table_wrapper');
+  const table_holder = dom_target
+    .append('div.table_wrapper');
 
-  const table_header = table_holder
+  const header_table = table_holder
     .append('table.header')
-    .st({
-      tableLayout: 'fixed',
-      width: '100%'
-    })
-    .append('thead');
+    .append('tbody')
+    .append('tr');
 
   const scroll_area = table_holder
-    .append('div#scroll-area');
+    .append('div#scroll-area')
+    .style('overflow-y', 'scroll');
 
   const content_area = scroll_area
-    .append('table')
-    .st({
-      tableLayout: 'fixed',
-      width: '100%',
-    })
+    .append('table.content')
     .append('tbody.clusterize-content')
-    .attr('id', 'content-area')
-    .style('width', `${width}px`);
+    .attr('id', 'content-area');
 
   const table_body = content_area
     .append('tr.clusterize-no-data');
@@ -100,14 +103,14 @@ function setup_table(dom_target, arrow_color, width){
     });
 
     // Build key for how wide each column needs to be.
-    col_id_to_size = build_column_widths(columns_to_show, col_units, width);
+    get_col_style = build_column_style(columns_to_show, col_units);
 
     // Draw headers for table
-    table_header
+    header_table
       .html(columns_to_show
         .map(col => {
-          const col_width = col_id_to_size[col.id];
-          return `<td style='width:${col_width}; min-width:${col_width}'>${col.name}</td>`;
+          const col_style = get_col_style(col);
+          return `<td ${col_style}>${col.name}</td>`;
         })
         .join(' ')
       );
@@ -117,9 +120,13 @@ function setup_table(dom_target, arrow_color, width){
       .attr('colspan', 100)
       .html(`Loading data...`);
 
-    const build_row_from_data = d => {
+    const build_row_from_data = (d,i) => {
       const row_data = columns_to_show
-        .map(col => `<td style='width:${col_id_to_size[col.id]}'>${col.is_num ? format_val(d[col.id]): d[col.id]}</td>`)
+        .map(col => {
+          // Only need to apply width settings to first row.
+          const body = col.is_num ? format_val(d[col.id]): d[col.id];
+          return `<td ${get_col_style(col, i)}>${body}</td>`;
+        })
         .join(' ');
 
       return `<tr>${row_data}</tr>`;
