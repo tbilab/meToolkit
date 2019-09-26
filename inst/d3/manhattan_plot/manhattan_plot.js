@@ -1,4 +1,4 @@
-// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js'), here::here('inst/d3/manhattan_plot/clusterize.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'), here::here('inst/d3/manhattan_plot/clusterize.css'))
+// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js'), here::here('inst/d3/manhattan_plot/clusterize.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
 //Test data path 'data/manhattan_test_data.rds'
 //bad or data path 'data/manhattan_plot_zero_ors.rds'
 // ===============================================================
@@ -15,13 +15,13 @@ const margin = {left: 70, right: 15, top: 35, bottom: 20};
 const manhattan_unit = 3;
 const hist_unit = 1;
 const table_unit = 2;
-const total_units = manhattan_unit + hist_unit + table_unit + 0.1;
+const total_units = manhattan_unit + hist_unit + table_unit;
 
 
 const size_props = {
   manhattan: manhattan_unit/total_units,
   histogram: hist_unit/total_units,
-  table:     table_unit/total_units - 0.01,
+  table:     table_unit/total_units,
 };
 
 const num_hist_bins = 100;
