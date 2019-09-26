@@ -76,7 +76,7 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     .append('button')
     .text('Bring selected to top')
     .on('click', function(){
-      update_w_sort(raise_selected = true);
+      update_w_sort('selected');
     });
 
   const table_holder = dom_target
@@ -146,7 +146,6 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     content_el: content_area.node(),
   });
 
-
   // Logic for row/code selection
   content_area.on('click', function(e){
 
@@ -173,12 +172,11 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     on_selection(selected_codes);
   });
 
-  function update_w_sort(raise_selected = false){
-
+  function update_w_sort(raise = 'none'){
 
     const sort_eq = (row_a, row_b) => {
       // If we're raising selected check selection status
-      if(raise_selected){
+      if(raise === 'selected'){
         const a_selected = selected_codes.includes(row_a.code);
         const b_selected = selected_codes.includes(row_b.code);
 
@@ -188,6 +186,16 @@ function setup_table(dom_target, arrow_color, columns_to_show){
           return b_selected - a_selected;
         }
         // Otherwise we need to proceed as usual...
+      }
+      if(raise === 'search_results'){
+        const a_found = row_a.found_in_search;
+        const b_found = row_b.found_in_search;
+
+        // If there is a difference in selection status,
+        // that's all we need for sorting
+        if(a_found !== b_found){
+          return b_found - a_found;
+        }
       }
       return (
         current_sort.direction === 'decreasing'
@@ -232,17 +240,22 @@ function setup_table(dom_target, arrow_color, columns_to_show){
         })
         .join(' ');
 
-      const inside_or_bounds = d.log_or > or_bounds[0] && d.log_or < or_bounds[1];
-
-      const row_class = (
-        inside_or_bounds
-        ? (
-           selected_codes.includes(d.code)
-           ? `class='selected'`
-           : ''
-          )
-        : `class='disabled'`
+      const inside_or_bounds = (
+        d.log_or > or_bounds[0] &&
+        d.log_or < or_bounds[1]
       );
+      const found_in_search = d.found_in_search;
+      const selected = selected_codes.includes(d.code);
+
+      let row_class;
+      if(inside_or_bounds){
+        row_class = `class=`;
+        if(found_in_search) row_class += `'found_in_search'`;
+        if(selected) row_class += ` 'selected'`;
+      } else {
+        row_class = '';
+      }
+
       return `<tr data-code=${d.code} ${row_class}'>${row_data}</tr>`;
     };
 
@@ -272,7 +285,7 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     const raising_selected = number_changed > 2;
 
     // If more than two codes have changed, send selected to top.
-    update_w_sort(raising_selected);
+    update_w_sort(raising_selected ? 'selected': 'none');
     return this;
   }
 
@@ -297,34 +310,30 @@ function setup_table(dom_target, arrow_color, columns_to_show){
       show_clear_btn();
     }
 
-    // Only start searching if the query is over two letters long for efficiency.
+    // Only start searching if the query is over two
+    // letters long for efficiency.
     if(current_search.length < 2) {
-      rows.classed('found_in_search', false);
+      // Reset search status
+      table_data.forEach(function(d){
+        d.found_in_search = false;
+      });
+      update_w_sort();
       return;
     }
 
     let num_results = 0;
-    rows.each(function(d){
 
+    table_data.forEach(function(d){
       d.found_in_search = (
         d.code.includes(current_search) ||
         d.description.includes(current_search)
       );
-
       if(d.found_in_search) num_results++;
-
-      // Update classes of each row to let css know if it
-      // was found and what it was found because of
-      d3.select(this).classed('found_in_search', d.found_in_search);
-    })
+    });
 
     // Only do sorting if the search has any results.
     if(num_results > 0){
-      rows.sort((a,b) => {
-        const a_found = a.found_in_search;
-        const b_found = b.found_in_search;
-        return b_found - a_found
-      });
+      update_w_sort('search_results');
     }
   }
 
