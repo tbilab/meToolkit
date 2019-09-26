@@ -68,7 +68,11 @@ function setup_table(dom_target, arrow_color, columns_to_show){
 
   const search_clear_btn = search_bar.append('button.clear_search.hidden')
     .text('Clear')
-    .on('click', clear_search);
+    .on('click', function(){
+      clear_search();
+      search_text.node().value = '';
+      hide_clear_btn();
+    });
 
   // ==============================================================
   // Bring selected codes to top button
@@ -247,16 +251,14 @@ function setup_table(dom_target, arrow_color, columns_to_show){
       const found_in_search = d.found_in_search;
       const selected = selected_codes.includes(d.code);
 
-      let row_class;
+      let row_class = '';
       if(inside_or_bounds){
         row_class = `class=`;
         if(found_in_search) row_class += `'found_in_search'`;
         if(selected) row_class += ` 'selected'`;
-      } else {
-        row_class = '';
       }
 
-      return `<tr data-code=${d.code} ${row_class}'>${row_data}</tr>`;
+      return `<tr data-code=${d.code} ${row_class}>${row_data}</tr>`;
     };
 
     table_obj.update(
@@ -268,6 +270,20 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     table_data = new_table_data;
     update_w_sort();
     return this;
+  }
+
+  function search_codes(current_search){
+    let num_results = 0;
+
+    table_data.forEach(function(d){
+      d.found_in_search = (
+        d.code.includes(current_search) ||
+        d.description.includes(current_search)
+      );
+      if(d.found_in_search) num_results++;
+    });
+
+    return num_results;
   }
 
   function select_codes(codes_to_select){
@@ -284,8 +300,14 @@ function setup_table(dom_target, arrow_color, columns_to_show){
 
     const raising_selected = number_changed > 2;
 
-    // If more than two codes have changed, send selected to top.
-    update_w_sort(raising_selected ? 'selected': 'none');
+    if(number_changed > 2){
+      // If more than two codes have changed, send selected to top.
+      update_w_sort('selected');
+    } else {
+      // Otherwise just update the table with new selection
+      update_table();
+    }
+
     return this;
   }
 
@@ -293,11 +315,6 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     if(new_or_bounds == null) return;
     or_bounds = new_or_bounds;
     update_table();
-  }
-
-  function set_selection_callback(callback){
-    on_selection = callback;
-    return this;
   }
 
   function on_code_search(){
@@ -313,34 +330,22 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     // Only start searching if the query is over two
     // letters long for efficiency.
     if(current_search.length < 2) {
-      // Reset search status
-      table_data.forEach(function(d){
-        d.found_in_search = false;
-      });
-      update_w_sort();
-      return;
-    }
-
-    let num_results = 0;
-
-    table_data.forEach(function(d){
-      d.found_in_search = (
-        d.code.includes(current_search) ||
-        d.description.includes(current_search)
-      );
-      if(d.found_in_search) num_results++;
-    });
-
-    // Only do sorting if the search has any results.
-    if(num_results > 0){
-      update_w_sort('search_results');
+      clear_search();
+    } else {
+      const num_results = search_codes(current_search);
+      // Only do sorting if the search has any results.
+      if(num_results > 0){
+        update_w_sort('search_results');
+      }
     }
   }
 
   function clear_search(){
-    rows.classed('found_in_search', false);
-    search_text.node().value = '';
-    hide_clear_btn();
+    // Reset search status
+    table_data.forEach(function(d){
+      d.found_in_search = false;
+    });
+    update_w_sort();
   }
 
   function hide_clear_btn(){
@@ -351,6 +356,11 @@ function setup_table(dom_target, arrow_color, columns_to_show){
   function show_clear_btn(){
     search_clear_btn.classed('hidden', false);
     search_clear_btn.classed('visible', true);
+  }
+
+  function set_selection_callback(callback){
+    on_selection = callback;
+    return this;
   }
 
   return {add_data, select_codes, disable_codes, set_selection_callback};
