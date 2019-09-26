@@ -1,4 +1,4 @@
-// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
+// !preview r2d3 data=readr::read_rds(here::here('data/manhattan_test_data.rds')), options=readr::read_rds(here::here('data/manhattan_test_options.rds')), container = 'div', dependencies = c('d3-jetpack', here::here('inst/d3/helpers.js'), here::here('inst/d3/manhattan_plot/phewas_table.js'), here::here('inst/d3/manhattan_plot/clusterize.js')), css = c( here::here('inst/d3/manhattan_plot/manhattan_plot.css'), here::here('inst/d3/helpers.css'), here::here('inst/css/common.css'))
 //Test data path 'data/manhattan_test_data.rds'
 //bad or data path 'data/manhattan_plot_zero_ors.rds'
 // ===============================================================
@@ -15,13 +15,13 @@ const margin = {left: 70, right: 15, top: 35, bottom: 20};
 const manhattan_unit = 3;
 const hist_unit = 1;
 const table_unit = 2;
-const total_units = manhattan_unit + hist_unit + table_unit + 0.1;
+const total_units = manhattan_unit + hist_unit + table_unit;
 
 
 const size_props = {
   manhattan: manhattan_unit/total_units,
   histogram: hist_unit/total_units,
-  table:     table_unit/total_units - 0.01,
+  table:     table_unit/total_units,
 };
 
 const num_hist_bins = 100;
@@ -78,7 +78,7 @@ const columns_to_show = [
   {name: 'OR',          id: 'OR',          is_num: true,  scroll: false, sortable: true,  size: 'small', small_col: true},
   {name: 'P-Value',     id: 'p_val',       is_num: true,  scroll: false, sortable: true,  size: 'small', small_col: true},
   {name: 'Description', id: 'description', is_num: false, scroll: true,  sortable: false, size: 'large', small_col: false},
-  {name: 'Category',    id: 'category',    is_num: false, scroll: true,  sortable: true,  size: 'med', small_col: false},
+  {name: 'Category',    id: 'category',    is_num: false, scroll: true,  sortable: false,  size: 'med', small_col: false},
 ];
 
 const table_div = div.append('div');
@@ -86,9 +86,10 @@ const table_div = div.append('div');
 process_new_data(data);
 const my_table = setup_table(
     table_div,
-    options.colors.light_blue
+    options.colors.light_blue,
+    columns_to_show
   )
-  .add_data(viz_data, columns_to_show)
+  .add_data(viz_data)
   .set_selection_callback(send_table_selection);
 
 // Setup tooltip to show same info as table.

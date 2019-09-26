@@ -154,3 +154,55 @@ function setup_tooltip(dom_target, fields_to_show = ['code','OR']){
   return {show, hide}
 }
 
+
+function refine(collection, path){
+  // Walk down path into object to find value desired
+  return path.reduce(
+    function(refinement, element){
+      try {
+        return refinement[element];
+      } catch (ignore) {}
+    },
+    collection
+  );
+}
+
+function by(...keys){
+  const paths = keys.map(
+    function(element){
+      return element.toString().split(".");
+    }
+  );
+
+  // Compare each pair of values until finding a mismatch
+  // if no mismatch, then items are equal.
+  return function compare(first, second){
+    // These hold the first value that differs between
+    // the first and second object
+    let first_value;
+    let second_value;
+
+    // Walks down path until we find where the two
+    // objects differ from eachother. If none do, then
+    // we just return as objects are essentially same.
+    const all_values_equal = paths.every(function(path){
+      first_value = refine(first, path);
+      second_value = refine(second, path);
+      return first_value === second_value;
+    });
+
+    if (all_values_equal){
+      return 0;
+    }
+
+    return(
+      (
+        typeof first_value === typeof second_value
+        ? first_value < second_value
+        : typeof first_value < typeof second_value
+      )
+      ? -1
+      : 1
+    );
+  }
+}

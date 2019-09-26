@@ -3,13 +3,50 @@ const arrow_colors = {
   sorted: 'black',
 };
 
-function setup_table(dom_target, arrow_color){
+// Relative size units of different column types
+const col_units = {
+  small: 1,
+  med: 2,
+  large: 4,
+};
+
+function build_column_style(columns_to_show, col_units){
+  // Get widths of columns in terms of percents
+  const single_unit_size = columns_to_show.reduce(function(units, col){
+    return units + col_units[col.size];
+  }, 0);
+
+  const col_percent_widths = Object.assign({},col_units);
+  for(let size in col_percent_widths){
+     col_percent_widths[size] *= (100/single_unit_size);
+  }
+
+  const col_to_width = {};
+
+  columns_to_show.forEach(function(col){
+    col_to_width[col.id] = `${col_percent_widths[col.size]}%`;
+  });
+
+  return (col, first_row = false, just_width = false) => {
+    const w = col_to_width[col.id];
+    if(just_width) return w;
+
+    const width_st = first_row ? `width:${w}; min-width:${w};`: '';
+    const align_st = col.size === 'small' ? '': 'text-align: left';
+    return `style='${width_st} ${align_st}'`;
+  };
+}
+
+function setup_table(dom_target, arrow_color, columns_to_show){
   const up_cursor = 'n-resize';
   const down_cursor = 's-resize';
 
-
   // Scope variables that get modified by methods
   let selected_codes = [];
+  let or_bounds = [-Infinity, Infinity];
+  let table_data = [];
+  let current_sort = {col: 'p_val', direction: 'increasing'};
+
   let on_selection = selected_codes => console.log(selected_codes);
   let rows;
 
@@ -31,147 +68,150 @@ function setup_table(dom_target, arrow_color){
 
   const search_clear_btn = search_bar.append('button.clear_search.hidden')
     .text('Clear')
-    .on('click', clear_search);
+    .on('click', function(){
+      clear_search();
+      search_text.node().value = '';
+      hide_clear_btn();
+    });
 
   // ==============================================================
   // Bring selected codes to top button
   dom_target.append('div.raise_selected')
     .append('button')
     .text('Bring selected to top')
-    .on('click', raise_selected_codes);
-
-  const table = dom_target.append('div.table_wrapper')
-    .style('overflow', 'scroll')
-    .append('table')
-    .attr('class', 'flex-table');
-
-  const add_data = function(table_data, columns_to_show){
-    // Add variable to keep track of sort direction for a column
-    columns_to_show.forEach(col => {
-      col.sort_inc = false;
+    .on('click', function(){
+      update_w_sort('selected');
     });
+
+  const table_holder = dom_target
+    .append('div.table_wrapper');
+
+  const header_table = table_holder
+    .append('table.header')
+    .append('tbody')
+    .append('tr');
+
+  const scroll_area = table_holder
+    .append('div#scroll-area')
+    .style('overflow-y', 'scroll');
+
+  const content_area = scroll_area
+    .append('table.content')
+    .append('tbody.clusterize-content')
+    .attr('id', 'content-area');
+
+  const table_body = content_area
+    .append('tr.clusterize-no-data');
+
+   // Build key for how wide each column needs to be.
+    get_col_style = build_column_style(columns_to_show, col_units);
+
+    function setup_sort_arrows(d){
+      if(d.sortable){
+        const column_header = d3.select(this);
+        ['decreasing', 'increasing'].forEach(direction => {
+           column_header
+            .append(`span.${direction}`)
+            .text(direction === 'decreasing' ? ' ↓' : '↑')
+            .attr(
+              'title',
+              `Click to sort ${d.name} column ` +
+              `in ${direction} order`
+            )
+            .on('click', function(d){
+              current_sort = {
+                col: d.id,
+                direction,
+              };
+              update_w_sort();
+            });
+        });
+      }
+    }
 
     // Draw headers for table
-    const header_columns = table.append('thead.flex-table-header')
-      .append('tr')
-      .selectAll('th')
+    const header_columns = header_table
+      .selectAll('td')
       .data(columns_to_show).enter()
-      .append('th')
-      .html(d => `${d.name} `)
+      .append('td')
+      .html(d => `${d.name}`)
+      .style('width', col => get_col_style(col, false, true))
       .attr('class', d => `tool ${d.size}-column ${d.id}`)
-      .each(function(d){
-        if(d.sortable){
-          const column_header = d3.select(this);
-          ['decrease', 'increase'].forEach(direction => {
-             column_header
-              .append(`span.${direction}`)
-              .text(direction === 'decrease' ? '↓' : '↑')
-              .style('font-weight', 'bold')
-              .attr('title', `Click to sort ${d.name} column in ${direction === 'decrease' ? 'decreasing': 'increasing'} order`)
-              .on('click', function(d){
-                column_sort(d.id, direction);
-              });
-          });
-        }
-      });
+      .each(setup_sort_arrows);
 
+    // Fill in first loading row
+    table_body.append('td')
+      .attr('colspan', 100)
+      .html(`Loading data...`);
 
-  // Initialize rows for every datapoint
-  rows = table.append('tbody.flex-table-body')
-    .selectAll('tr')
-    .data(table_data)
-    .enter()
-    .append('tr')
-    .classed('selected', d => selected_codes.includes(d.code))
-    .on('click', on_row_click);
+  const table_obj = new Clusterize({
+    rows: [],
+    scroll_el: scroll_area.node(),
+    content_el: content_area.node(),
+  });
 
-  // Fill in rows with each columns data
-  rows.selectAll('td')
-    .data(d => columns_to_show
-      .map(({name, id, is_num, size, scroll}) => ({
-        column: name,
-        size: size,
-        value: is_num ? format_val(d[id]): d[id],
-        scroll: scroll,
-      })))
-    .enter()
-    .append('td')
-    .attr('data-th', d => d.column)
-    .attr('class', d => `${d.size}-column`)
-    .html(d => `${d.scroll ? `<div style="width:100%}"><span>`: ''} ${d.value} ${d.scroll ? '</span></div>': ''}`);
+  // Logic for row/code selection
+  content_area.on('click', function(e){
 
-    // Initialize column sorting
-    column_sort('p_val', 'increase');
+    const target = d3.event.target.parentNode;
+    if(target.nodeName != 'TR') return;
 
-    return this;
-  };
+    // Grab code from of selected row
+    const target_code = target.dataset.code;
 
-  const select_codes = function(codes_to_select){
+    const already_selected = selected_codes.includes(target_code);
 
-    selected_codes = codes_to_select;
-    let number_changed = 0;
-
-    rows.classed('selected', function(d){
-      const is_selected = codes_to_select.includes(d.code);
-      if(is_selected){
-        // Check to see if this code was selected before to keep track of number of codes changed.
-        const new_selection = !d3.select(this).classed('selected');
-        if(new_selection) number_changed++;
-      }
-      return is_selected;
-    });
-
-    // If more than one code has changed in one go that means the user selected codes using dragging so
-    // we want to raise selected codes to top of table
-    if(number_changed > 1){
-      raise_selected_codes();
-    }
-
-    // If more than two selected codes have been changed, sort table too.
-    return this;
-  };
-
-  const disable_codes = function(or_bounds){
-    if(or_bounds == null) return
-
-    const is_disabled = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
-
-    rows.classed('disabled', is_disabled);
-
-
-    return this;
-  }
-
-  function set_selection_callback(callback){
-    on_selection = callback;
-    return this;
-  }
-
-  function on_row_click(d){
-    const row = d3.select(this);
-
-    // Dont let user interact with disabled codes.
-    const is_disabled = row.classed('disabled');
-    if(is_disabled) return;
-
-    const new_selection = !row.classed('selected');
-
-    if(new_selection){
-      selected_codes.push(d.code);
+    // Update selected codes array
+    if(already_selected){
+      selected_codes = selected_codes
+        .filter(code => code !== target_code);
     } else {
-      // Remove code if user has selected a previously selected code
-      selected_codes = selected_codes.filter(code => code !== d.code);
+      selected_codes = [...selected_codes, target_code];
     }
 
+    // Update class for selection
+    target.className = already_selected ? '': 'selected';
+
+    // Send new selection to callback
     on_selection(selected_codes);
-  }
+  });
 
-  function column_sort(col_id, sort_direction){
+  function update_w_sort(raise = 'none'){
 
-    // Only do sorting if the column allows it.
-    const header_cols = dom_target.selectAll(`.flex-table-header th`);
+    const sort_eq = (row_a, row_b) => {
+      // If we're raising selected check selection status
+      if(raise === 'selected'){
+        const a_selected = selected_codes.includes(row_a.code);
+        const b_selected = selected_codes.includes(row_b.code);
 
-    const column_selector = header_cols.filter(h => h.id === col_id);
+        // If there is a difference in selection status,
+        // that's all we need for sorting
+        if(a_selected !== b_selected){
+          return b_selected - a_selected;
+        }
+        // Otherwise we need to proceed as usual...
+      }
+      if(raise === 'search_results'){
+        const a_found = row_a.found_in_search;
+        const b_found = row_b.found_in_search;
+
+        // If there is a difference in selection status,
+        // that's all we need for sorting
+        if(a_found !== b_found){
+          return b_found - a_found;
+        }
+      }
+      return (
+        current_sort.direction === 'decreasing'
+        ? row_b[current_sort.col] - row_a[current_sort.col]
+        : row_a[current_sort.col] - row_b[current_sort.col]
+      );
+    };
+
+    table_data = table_data.sort(sort_eq);
+
+    const header_cols = dom_target.selectAll(`table.header td`);
+    const column_selector = header_cols.filter(h => h.id === current_sort.col);
 
     // Reset all arrows to default colors
     header_cols
@@ -182,25 +222,99 @@ function setup_table(dom_target, arrow_color){
       });
 
     // Update this header's proper sorting arrow to the active color
-    column_selector.select(`span.${sort_direction}`)
+    column_selector.select(`span.${current_sort.direction}`)
       .st({
         color: arrow_color,
         opacity: 1,
       });
 
-    rows.sort((a,b) => {
-      const b_smaller =  b[col_id] < a[col_id];
-      const direction_scalar = sort_direction == 'increase' ? -1: 1;
-      return direction_scalar * (b_smaller ? -1: 1);
-    });
+    // Finally actually run the table update.
+    update_table();
   }
 
-  function raise_selected_codes(){
-    rows.sort((a,b) => {
-      const a_selected = selected_codes.includes(a.code);
-      const b_selected = selected_codes.includes(b.code);
-      return b_selected - a_selected;
+  // Takes the current table data, converts it to html,
+  // and updates the table object.
+  function update_table(){
+    const build_row_html = (d,i) => {
+      const row_data = columns_to_show
+        .map(col => {
+          // Only need to apply width settings to first row.
+          const body = col.is_num ? format_val(d[col.id]): d[col.id];
+          return `<td ${get_col_style(col, i===0)}>${body}</td>`;
+        })
+        .join(' ');
+
+      const inside_or_bounds = (
+        d.log_or > or_bounds[0] &&
+        d.log_or < or_bounds[1]
+      );
+      const found_in_search = d.found_in_search;
+      const selected = selected_codes.includes(d.code);
+
+      let row_class = '';
+      if(inside_or_bounds){
+        row_class = `class=`;
+        if(found_in_search) row_class += `'found_in_search'`;
+        if(selected) row_class += ` 'selected'`;
+      }
+
+      return `<tr data-code=${d.code} ${row_class}>${row_data}</tr>`;
+    };
+
+    table_obj.update(
+      table_data.map(build_row_html)
+    );
+  }
+
+  function add_data(new_table_data){
+    table_data = new_table_data;
+    update_w_sort();
+    return this;
+  }
+
+  function search_codes(current_search){
+    let num_results = 0;
+
+    table_data.forEach(function(d){
+      d.found_in_search = (
+        d.code.includes(current_search) ||
+        d.description.includes(current_search)
+      );
+      if(d.found_in_search) num_results++;
     });
+
+    return num_results;
+  }
+
+  function select_codes(codes_to_select){
+     // How many codes changed in this selection update?
+    const number_changed = unique([...codes_to_select, ...selected_codes])
+      .reduce(function(codes_changed, code){
+        const code_in_new = codes_to_select.includes(code);
+        const code_in_old = selected_codes.includes(code);
+
+        return codes_changed + (code_in_new && code_in_old ? 0 : 1);
+      }, 0);
+
+    selected_codes = codes_to_select;
+
+    const raising_selected = number_changed > 2;
+
+    if(number_changed > 2){
+      // If more than two codes have changed, send selected to top.
+      update_w_sort('selected');
+    } else {
+      // Otherwise just update the table with new selection
+      update_table();
+    }
+
+    return this;
+  }
+
+  function disable_codes(new_or_bounds){
+    if(new_or_bounds == null) return;
+    or_bounds = new_or_bounds;
+    update_table();
   }
 
   function on_code_search(){
@@ -213,41 +327,25 @@ function setup_table(dom_target, arrow_color){
       show_clear_btn();
     }
 
-    // Only start searching if the query is over two letters long for efficiency.
+    // Only start searching if the query is over two
+    // letters long for efficiency.
     if(current_search.length < 2) {
-      rows.classed('found_in_search', false);
-      return;
-    }
-
-    let num_results = 0;
-    rows.each(function(d){
-
-      d.found_in_search = (
-        d.code.includes(current_search) ||
-        d.description.includes(current_search)
-      );
-
-      if(d.found_in_search) num_results++;
-
-      // Update classes of each row to let css know if it
-      // was found and what it was found because of
-      d3.select(this).classed('found_in_search', d.found_in_search);
-    })
-
-    // Only do sorting if the search has any results.
-    if(num_results > 0){
-      rows.sort((a,b) => {
-        const a_found = a.found_in_search;
-        const b_found = b.found_in_search;
-        return b_found - a_found
-      });
+      clear_search();
+    } else {
+      const num_results = search_codes(current_search);
+      // Only do sorting if the search has any results.
+      if(num_results > 0){
+        update_w_sort('search_results');
+      }
     }
   }
 
   function clear_search(){
-    rows.classed('found_in_search', false);
-    search_text.node().value = '';
-    hide_clear_btn();
+    // Reset search status
+    table_data.forEach(function(d){
+      d.found_in_search = false;
+    });
+    update_w_sort();
   }
 
   function hide_clear_btn(){
@@ -260,7 +358,12 @@ function setup_table(dom_target, arrow_color){
     search_clear_btn.classed('visible', true);
   }
 
-  return {add_data, select_codes, disable_codes, set_selection_callback, raise_selected_codes};
+  function set_selection_callback(callback){
+    on_selection = callback;
+    return this;
+  }
+
+  return {add_data, select_codes, disable_codes, set_selection_callback};
 }
 
 
