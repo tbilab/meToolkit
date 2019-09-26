@@ -43,6 +43,7 @@ function setup_table(dom_target, arrow_color, columns_to_show){
 
   // Scope variables that get modified by methods
   let selected_codes = [];
+  let or_bounds = [-Infinity, Infinity];
   let table_data = [];
   let current_sort = {col: 'p_val', direction: 'increasing'};
 
@@ -75,7 +76,7 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     .append('button')
     .text('Bring selected to top')
     .on('click', function(){
-      update_table(raise_selected = true);
+      update_w_sort(raise_selected = true);
     });
 
   const table_holder = dom_target
@@ -101,6 +102,29 @@ function setup_table(dom_target, arrow_color, columns_to_show){
    // Build key for how wide each column needs to be.
     get_col_style = build_column_style(columns_to_show, col_units);
 
+    function setup_sort_arrows(d){
+      if(d.sortable){
+        const column_header = d3.select(this);
+        ['decreasing', 'increasing'].forEach(direction => {
+           column_header
+            .append(`span.${direction}`)
+            .text(direction === 'decreasing' ? ' ↓' : '↑')
+            .attr(
+              'title',
+              `Click to sort ${d.name} column ` +
+              `in ${direction} order`
+            )
+            .on('click', function(d){
+              current_sort = {
+                col: d.id,
+                direction,
+              };
+              update_w_sort();
+            });
+        });
+      }
+    }
+
     // Draw headers for table
     const header_columns = header_table
       .selectAll('td')
@@ -109,28 +133,7 @@ function setup_table(dom_target, arrow_color, columns_to_show){
       .html(d => `${d.name}`)
       .style('width', col => get_col_style(col, false, true))
       .attr('class', d => `tool ${d.size}-column ${d.id}`)
-      .each(function(d){
-        if(d.sortable){
-          const column_header = d3.select(this);
-          ['decreasing', 'increasing'].forEach(direction => {
-             column_header
-              .append(`span.${direction}`)
-              .text(direction === 'decreasing' ? '↓' : '↑')
-              .attr(
-                'title',
-                `Click to sort ${d.name} column ` +
-                `in ${direction} order`
-              )
-              .on('click', function(d){
-                current_sort = {
-                  col: d.id,
-                  direction,
-                };
-                update_table();
-              });
-          });
-        }
-      });
+      .each(setup_sort_arrows);
 
     // Fill in first loading row
     table_body.append('td')
@@ -143,20 +146,10 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     content_el: content_area.node(),
   });
 
-  const build_row_from_data = (d,i) => {
-    const row_data = columns_to_show
-      .map(col => {
-        // Only need to apply width settings to first row.
-        const body = col.is_num ? format_val(d[col.id]): d[col.id];
-        return `<td ${get_col_style(col, i===0)}>${body}</td>`;
-      })
-      .join(' ');
-    const row_class = selected_codes.includes(d.code) ? `class='selected'`: '';
-    return `<tr data-code=${d.code} ${row_class}'>${row_data}</tr>`;
-  };
 
   // Logic for row/code selection
   content_area.on('click', function(e){
+
     const target = d3.event.target.parentNode;
     if(target.nodeName != 'TR') return;
 
@@ -167,7 +160,8 @@ function setup_table(dom_target, arrow_color, columns_to_show){
 
     // Update selected codes array
     if(already_selected){
-      selected_codes = selected_codes.filter(d => d.code === target_code);
+      selected_codes = selected_codes
+        .filter(code => code !== target_code);
     } else {
       selected_codes = [...selected_codes, target_code];
     }
@@ -179,7 +173,8 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     on_selection(selected_codes);
   });
 
-  function update_table(raise_selected = false){
+  function update_w_sort(raise_selected = false){
+
 
     const sort_eq = (row_a, row_b) => {
       // If we're raising selected check selection status
@@ -222,26 +217,43 @@ function setup_table(dom_target, arrow_color, columns_to_show){
       });
 
     // Finally actually run the table update.
-    // Takes the current table data, converts it to html, and updates
-    // the table object.
+    update_table();
+  }
+
+  // Takes the current table data, converts it to html,
+  // and updates the table object.
+  function update_table(){
+    const build_row_html = (d,i) => {
+      const row_data = columns_to_show
+        .map(col => {
+          // Only need to apply width settings to first row.
+          const body = col.is_num ? format_val(d[col.id]): d[col.id];
+          return `<td ${get_col_style(col, i===0)}>${body}</td>`;
+        })
+        .join(' ');
+
+      const inside_or_bounds = d.log_or > or_bounds[0] && d.log_or < or_bounds[1];
+
+      const row_class = (
+        inside_or_bounds
+        ? (
+           selected_codes.includes(d.code)
+           ? `class='selected'`
+           : ''
+          )
+        : `class='disabled'`
+      );
+      return `<tr data-code=${d.code} ${row_class}'>${row_data}</tr>`;
+    };
+
     table_obj.update(
-      table_data.map((d,i) => {
-        const row_data = columns_to_show
-          .map(col => {
-            // Only need to apply width settings to first row.
-            const body = col.is_num ? format_val(d[col.id]): d[col.id];
-            return `<td ${get_col_style(col, i===0)}>${body}</td>`;
-          })
-          .join(' ');
-        const row_class = selected_codes.includes(d.code) ? `class='selected'`: '';
-        return `<tr data-code=${d.code} ${row_class}'>${row_data}</tr>`;
-      })
+      table_data.map(build_row_html)
     );
   }
 
   function add_data(new_table_data){
     table_data = new_table_data;
-    update_table();
+    update_w_sort();
     return this;
   }
 
@@ -260,19 +272,14 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     const raising_selected = number_changed > 2;
 
     // If more than two codes have changed, send selected to top.
-    update_table(raising_selected);
+    update_w_sort(raising_selected);
     return this;
   }
 
-  const disable_codes = function(or_bounds){
-   // if(or_bounds == null) return
-//
-   // const is_disabled = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
-//
-   // rows.classed('disabled', is_disabled);
-//
-//
-   // return this;
+  function disable_codes(new_or_bounds){
+    if(new_or_bounds == null) return;
+    or_bounds = new_or_bounds;
+    update_table();
   }
 
   function set_selection_callback(callback){

@@ -78,7 +78,7 @@ const columns_to_show = [
   {name: 'OR',          id: 'OR',          is_num: true,  scroll: false, sortable: true,  size: 'small', small_col: true},
   {name: 'P-Value',     id: 'p_val',       is_num: true,  scroll: false, sortable: true,  size: 'small', small_col: true},
   {name: 'Description', id: 'description', is_num: false, scroll: true,  sortable: false, size: 'large', small_col: false},
-  {name: 'Category',    id: 'category',    is_num: false, scroll: true,  sortable: true,  size: 'med', small_col: false},
+  {name: 'Category',    id: 'category',    is_num: false, scroll: true,  sortable: false,  size: 'med', small_col: false},
 ];
 
 const table_div = div.append('div');
