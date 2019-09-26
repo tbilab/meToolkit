@@ -47,6 +47,10 @@
   font-size: 0.85em;
 }
 
+.content td {
+  padding: 2px 4px;
+}
+
 .table_wrapper table.header {
   position: sticky;
   top: 0;
@@ -57,7 +61,7 @@
   background-color: #d9d9d9;
 }
 
-.table_wrapper table.header span {
+.table_wrapper table.header {
   cursor: pointer;
   font-weight: bold;
 }
