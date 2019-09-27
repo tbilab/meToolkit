@@ -1,5 +1,5 @@
 # Build site
-pkgdown::build_site()
+pkgdown::build_site(preview = FALSE)
 
 # Deploy package site to RStudio connect
 site_loc <- here::here('docs/')
