@@ -4,7 +4,14 @@
 \alias{run_me}
 \title{Run ME app locally}
 \usage{
-run_me()
+run_me(preloaded_path = NULL, auto_run = FALSE)
+}
+\arguments{
+\item{preloaded_path}{File path relative to app that preloaded data is
+stored. Defaults to \code{NULL}.}
+
+\item{auto_run}{Do you want the app to run immediately or do you want the ui
+and server components of the app to run later? Defaults to \code{TRUE}.}
 }
 \value{
 Shiny app process

@@ -1,45 +1,12 @@
 # testing main app module in own shiny app.
 library(shiny)
-library(readr)
+# library(meToolkit)
 # Need to load fresh copy of package because shinytests runs in new thread.
-devtools::load_all('../')
+# devtools::load_all('../')
 
-
-ui <- htmlTemplate(
-  system.file("html_templates/empty_page.html", package = "meToolkit"),
-  app_content = uiOutput("ui")
+data_loading_app <- run_me(
+  preloaded_path = 'preloaded_data',
+  auto_run = FALSE
 )
 
-server <- function(input, output, session) {
-
-  # Shows preloaded data if provided a good path
-  # loaded_data <- callModule(data_loader, 'data_loader', 'sample_data/')
-  loaded_data <- callModule(
-    data_loader,
-    'data_loader',
-    preloaded_path = 'preloaded_data')
-
-  output$ui <- renderUI({
-    no_data <- is.null(loaded_data())
-    if(no_data){
-      data_loader_UI("data_loader", "Load Data for PheWAS-ME")
-    }else{
-      main_dashboard_UI("main_app")
-    }
-  })
-
-  observeEvent(loaded_data(), {
-    app_data <- loaded_data()
-
-    callModule(
-      main_dashboard, 'main_app',
-      snp_name           = app_data$snp_name,
-      phewas_results     = app_data$phewas_results,
-      individual_data    = app_data$individual_data,
-      max_allowed_codes  = 45
-    )
-  })
-}
-
-
-shinyApp(ui, server)
+shinyApp(data_loading_app$ui, data_loading_app$server)

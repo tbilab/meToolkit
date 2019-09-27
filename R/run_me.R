@@ -3,6 +3,9 @@
 #' Function to spawn a shiny app instance for Multimorbidity Explorer app with
 #' data loading screen.
 #'
+#' @inheritParams data_loader
+#' @inheritParams build_me_app
+#'
 #' @return Shiny app process
 #' @export
 #'
@@ -10,8 +13,9 @@
 #' \dontrun{
 #' meToolkit::run_me()
 #' }
-run_me <- function(){
+run_me <- function(preloaded_path = NULL, auto_run = FALSE){
 
+  path_for_preloaded <-
   app_ui <- shiny::htmlTemplate(
     system.file("html_templates/empty_page.html", package = "meToolkit"),
     app_content = shiny::uiOutput("ui")
@@ -21,10 +25,18 @@ run_me <- function(){
 
     # Shows preloaded data if provided a good path
     # loaded_data <- callModule(data_loader, 'data_loader', 'sample_data/')
+   if(is.null(preloaded_path) ){
+     loaded_data <- shiny::callModule(
+       meToolkit::data_loader,
+       'data_loader',
+     )
+   } else {
     loaded_data <- shiny::callModule(
       meToolkit::data_loader,
-      'data_loader'
+      'data_loader',
+      preloaded_path = preloaded_path
     )
+   }
 
     output$ui <- shiny::renderUI({
       no_data <- is.null(loaded_data())
@@ -46,7 +58,15 @@ run_me <- function(){
         max_allowed_codes  = 45
       )
     })
-  }
+ }
 
-  shiny::shinyApp(app_ui, app_server)
+ if(auto_run){
+    shiny::shinyApp(app_ui, app_server)
+ } else {
+   return(list(
+     ui = app_ui,
+     server = app_server
+   ))
+ }
+
 }
