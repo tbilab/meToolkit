@@ -57,7 +57,21 @@ snp_annotations <- read_csv(
     symbol,
     gene_id,
     HGVSp
+  ) %>%
+  bind_rows( # Add a fake snp for use for simulated data
+    tibble(
+      rsid = 'rs123456',
+      name = 'fake snp',
+      chr = '1',
+      gene = 'sample gene',
+      minor_allele = 'U',
+      ExAC_maf = '0.123456',
+      clinical_sig = 'benign',
+      consequence = 'nothing',
+      impact = 'minor',
+      symbol = 'ABCDE',
+      gene_id = 'SAMPLEGENE'
+    )
   )
-
 
 usethis::use_data(snp_annotations, overwrite = TRUE)
