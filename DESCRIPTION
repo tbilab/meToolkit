@@ -25,7 +25,8 @@ Imports:
     jsonlite,
     purrr,
     glue,
-    shinytest (>= 1.3.1.9999)
+    shinytest (>= 1.3.1.9999),
+    markdown
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
