@@ -253,9 +253,7 @@ function setup_table(dom_target, arrow_color, columns_to_show){
 
       let row_class = '';
       if(inside_or_bounds){
-        row_class = `class=`;
-        if(found_in_search) row_class += `'found_in_search'`;
-        if(selected) row_class += ` 'selected'`;
+        row_class = `class="${found_in_search ? 'found_in_search ' : ''}${selected ? 'selected': ''}"`;
       }
 
       return `<tr data-code=${d.code} ${row_class}>${row_data}</tr>`;
