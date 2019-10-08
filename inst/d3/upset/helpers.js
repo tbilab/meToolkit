@@ -9,10 +9,19 @@ function remove_zero_tick(axis){
 
 
 // Function to filter data down to the minimum desired set size
-function filter_set_size(data, marginal_data, min_set_size = 100){
+function filter_set_size(data, marginal_data, min_set_size = 100, remove_singletons = false){
   // Filter the main dataset down
   const filtered_data = data
-    .filter(d => d.count >= min_set_size)
+    .filter(d => {
+      const larger_than_min_size = d.count >= min_set_size;
+      const has_multiple_codes = d.size !== 1;
+
+      if(remove_singletons){
+        return larger_than_min_size && has_multiple_codes;
+      }
+
+      return larger_than_min_size;
+    })
     .sort((a,b) => b.count - a.count);
 
   // Get the remaining codes present after filtering

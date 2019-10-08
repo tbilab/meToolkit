@@ -118,8 +118,8 @@ function setup_chart_sizes(width, height, margin, only_snps){
   };
 }
 
-function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
-  const {patterns, marginals} = filter_set_size(viz_data, viz_options.marginalData, min_set_size);
+function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data, remove_singletons = false){
+  const {patterns, marginals} = filter_set_size(viz_data, viz_options.marginalData, min_set_size, remove_singletons);
 
   // Setup the scales
   const scales = setup_scales(patterns, marginals, sizes, set_size_x);
@@ -264,6 +264,7 @@ function draw_upset(){
   // ---------------------------------------------------------------------
 
   const filtered_on_snp = viz_data.filter(d => d.num_snp < d.count).length === 0;
+  let filtering_singletons = false;
 
   // Setup the sizes of chart components
   const sizes = setup_chart_sizes(viz_width, viz_height, margin, filtered_on_snp);
@@ -304,13 +305,56 @@ function draw_upset(){
         set_size_x,
         sizes,
         starting_min_size,
-        new_size => draw_with_set_size(g, new_size, sizes, set_size_x, filtered_on_snp));
+        new_size => draw_with_set_size(g, new_size, sizes, set_size_x, filtered_on_snp, filtering_singletons));
+
+    // Setup singleton filter button
+    const singleton_filter_button = g.selectAppend('g.singleton_filter_button')
+      .translate([-20,-20])
+      .call(
+        draw_singleton_filter_button,
+        filtering_singletons,
+        function(){
+          filtering_singletons = !filtering_singletons;
+
+          d3.select(this).select('rect')
+            .attr('fill', filtering_singletons ? 'orangered': 'forestgreen');
+
+          d3.select(this).select('text')
+            .text(filtering_singletons
+                  ? 'Show single code patterns'
+                  : 'Hide single code patterns'
+            );
+
+          draw_with_set_size(g, starting_min_size, sizes, set_size_x, filtered_on_snp, filtering_singletons);
+      });
 
     // Initialize viz
     draw_with_set_size(g, starting_min_size, sizes, set_size_x, filtered_on_snp);
   }
 };
 
+function draw_singleton_filter_button(g, starting_filtered, on_click){
+  // Setup handle container
+  const button_width = 20;
+  g.selectAppend('rect')
+    .at({
+      width: button_width,
+      height: button_width,
+      fill: starting_filtered ? 'orangered': 'forestgreen'
+    });
+
+  g.selectAppend('text')
+    .at({
+      x: button_width,
+      dominantBaseline: 'hanging',
+    })
+    .text(starting_filtered
+          ? 'Show single code patterns'
+          : 'Hide single code patterns'
+    );
+
+  g.on('click', on_click)
+}
 
 r2d3.onRender((data, svg, width, height, options) => {
   viz_data = data;
