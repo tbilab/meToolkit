@@ -357,6 +357,7 @@ function create_pattern_interaction_layer(g, patterns, scales, sizes, callbacks)
   const pattern_rows = g.selectAll('.pattern_row')
     .data(patterns)
     .enter().append('g.pattern_row')
+    .attr('id', d => make_id_string(d, 'pattern'))
     .translate((d,i) => [-sizes.padding, scales.pattern_y(i)] )
     .selectAppend('rect')
       .classed('interaction_box', true)
@@ -380,6 +381,7 @@ function create_code_interaction_layer(g, marginals, scales, sizes, callbacks){
   const code_cols = g.selectAll('.code_col')
     .data(marginals)
     .enter().append('g.code_col')
+    .attr('id', d => make_id_string(d, 'code'))
     .translate((d,i) => [scales.matrix_width_scale(d.code), -sizes.padding])
     .selectAppend('rect')
       .classed('interaction_box', true)
@@ -581,8 +583,7 @@ function create_info_panel(g, panel_size, side = 'left'){
 }
 
 
-
-function draw_singleton_filter_button(g, starting_filtered, on_click){
+function draw_singleton_filter_toggle(g, starting_filtered, on_click){
   // Setup handle container
   const button_width = 11;
   const button_height = button_width * 1.75;
@@ -618,7 +619,7 @@ function draw_singleton_filter_button(g, starting_filtered, on_click){
     stroke: 'white',
     strokeWidth: 1,
     opacity: 0.3,
-  })
+  });
 
  g.selectAppend('text')
    .at({
@@ -627,9 +628,9 @@ function draw_singleton_filter_button(g, starting_filtered, on_click){
      dominantBaseline: 'middle',
      fontSize: "0.9rem",
    })
-   .text('Show single code patterns');
+   .text('Hide single code patterns');
 
-  g.on('click', on_click)
+  g.on('click', on_click);
 
  function toggle_switch(filtering_singletons){
     toggle_handle
@@ -649,4 +650,9 @@ function draw_singleton_filter_button(g, starting_filtered, on_click){
  return {
    toggle: toggle_switch,
  };
+}
+
+
+function make_id_string(d, code_or_pattern){
+  return `${code_or_pattern}_${d[code_or_pattern].replace(/\./g, '')}`;
 }
