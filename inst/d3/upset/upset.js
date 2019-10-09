@@ -1,12 +1,13 @@
 // !preview r2d3 data = readr::read_rds(here::here('data/fake_upset_main.rds')), options = readr::read_rds(here::here('data/fake_upset_options.rds')), dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/upset/helpers.js')), css=c(here::here('inst/d3/upset/upset.css'), here::here('inst/css/common.css'))
 
-let viz_data = data,
-    viz_svg = svg,
-    viz_options = options,
-    viz_width = width,
-    viz_height = height;
+let viz_data = data;
+let viz_svg = svg;
+let viz_options = options;
+let viz_width = width;
+let viz_height = height;
 
 let highlighted_pattern;
+let current_min_size;
 
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
@@ -118,8 +119,22 @@ function setup_chart_sizes(width, height, margin, only_snps){
   };
 }
 
-function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data, remove_singletons = false){
-  const {patterns, marginals} = filter_set_size(viz_data, viz_options.marginalData, min_set_size, remove_singletons);
+function draw_with_set_size(g, sizes, set_size_x, only_snp_data, remove_singletons = false){
+
+
+  const {patterns, marginals} = filter_set_size(viz_data, viz_options.marginalData, current_min_size, remove_singletons);
+
+  if(patterns.length < 2){
+    const lead_message = patterns.length === 1 ? "Only one group meets" : "No groups meet";
+    svg.selectAppend('text.threshold_warning_message')
+      .attr('text-anchor', 'middle')
+      .tspans([`${lead_message} filter size threshold`, 'Adjust threshold down to see groups.'])
+      .attr('x', viz_width/2)
+      .attr('y', viz_height/2);
+  } else {
+    // Make sure warning is gone if it was shown before
+    svg.select('text.threshold_warning_message').remove();
+  }
 
   // Setup the scales
   const scales = setup_scales(patterns, marginals, sizes, set_size_x);
@@ -296,7 +311,7 @@ function draw_upset(){
     const num_patterns_shown = sorted_sizes.findIndex(d => d < viz_options.min_set_size);
 
     // If the viz is only showing 2 or fewer patterns adjust min size to show at least 2.
-    const starting_min_size = num_patterns_shown < 2 ? sorted_sizes[1]: viz_options.min_set_size;
+    current_min_size = num_patterns_shown < 2 ? sorted_sizes[1]: viz_options.min_set_size;
 
     // Setup the size slider
     const set_size_slider =  g.selectAppend('g.set_size_slider')
@@ -304,57 +319,35 @@ function draw_upset(){
       .call(make_set_size_slider,
         set_size_x,
         sizes,
-        starting_min_size,
-        new_size => draw_with_set_size(g, new_size, sizes, set_size_x, filtered_on_snp, filtering_singletons));
+        current_min_size,
+        new_size => {
+          current_min_size = new_size;
+          draw_with_set_size(g, sizes, set_size_x, filtered_on_snp, filtering_singletons)
+        });
 
     // Setup singleton filter button
     const singleton_filter_button = g.selectAppend('g.singleton_filter_button')
-      .translate([-20,-20])
-      .call(
-        draw_singleton_filter_button,
-        filtering_singletons,
-        function(){
-          filtering_singletons = !filtering_singletons;
+      .translate([-margin.left,-margin.top]);
 
-          d3.select(this).select('rect')
-            .attr('fill', filtering_singletons ? 'orangered': 'forestgreen');
+    const singleton_toggle = draw_singleton_filter_button(
+      singleton_filter_button,
+      filtering_singletons,
+      on_singleton_toggle
+    );
 
-          d3.select(this).select('text')
-            .text(filtering_singletons
-                  ? 'Show single code patterns'
-                  : 'Hide single code patterns'
-            );
+    function on_singleton_toggle(){
+      filtering_singletons = !filtering_singletons;
 
-          draw_with_set_size(g, starting_min_size, sizes, set_size_x, filtered_on_snp, filtering_singletons);
-      });
+      singleton_toggle.toggle(filtering_singletons);
 
-    // Initialize viz
-    draw_with_set_size(g, starting_min_size, sizes, set_size_x, filtered_on_snp);
+      draw_with_set_size(g, sizes, set_size_x, filtered_on_snp, filtering_singletons);
+    }
+
+    // Kick off viz
+    draw_with_set_size(g, sizes, set_size_x, filtered_on_snp, filtering_singletons);
   }
 };
 
-function draw_singleton_filter_button(g, starting_filtered, on_click){
-  // Setup handle container
-  const button_width = 20;
-  g.selectAppend('rect')
-    .at({
-      width: button_width,
-      height: button_width,
-      fill: starting_filtered ? 'orangered': 'forestgreen'
-    });
-
-  g.selectAppend('text')
-    .at({
-      x: button_width,
-      dominantBaseline: 'hanging',
-    })
-    .text(starting_filtered
-          ? 'Show single code patterns'
-          : 'Hide single code patterns'
-    );
-
-  g.on('click', on_click)
-}
 
 r2d3.onRender((data, svg, width, height, options) => {
   viz_data = data;

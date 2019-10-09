@@ -432,7 +432,6 @@ function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_releas
       rx: 7,
     });
 
-
   // Add vertical line marking exact cutoff position
   const handle_pointer = handle.selectAppend('line')
     .at({
@@ -579,4 +578,75 @@ function create_info_panel(g, panel_size, side = 'left'){
     hide,
     show,
   };
+}
+
+
+
+function draw_singleton_filter_button(g, starting_filtered, on_click){
+  // Setup handle container
+  const button_width = 11;
+  const button_height = button_width * 1.75;
+  const color_background = filtering => filtering ? 'forestgreen' : 'orangered';
+
+  // First draw background of toggle
+  const toggle_background = g.selectAppend('rect.toggle-background')
+    .at({
+      width: button_width*2,
+      height: button_height,
+      fill: color_background(starting_filtered),
+      rx: 5,
+      ry: 5,
+    });
+
+ const toggle_handle = g.selectAppend('g.toggle-handle');
+
+ const toggle_handle_rect = toggle_handle.selectAppend('rect')
+   .at({
+     width: button_width ,
+     height: button_height,
+     fill: 'dimgrey',
+     rx: 5,
+     ry: 5
+   });
+
+ toggle_handle.selectAppend('line')
+  .at({
+    x2: button_width/2,
+    x1: button_width/2,
+    y2: 5,
+    y1: button_height-5,
+    stroke: 'white',
+    strokeWidth: 1,
+    opacity: 0.3,
+  })
+
+ g.selectAppend('text')
+   .at({
+     x: button_width * 2 + 5,
+     y: button_height/2,
+     dominantBaseline: 'middle',
+     fontSize: "0.9rem",
+   })
+   .text('Show single code patterns');
+
+  g.on('click', on_click)
+
+ function toggle_switch(filtering_singletons){
+    toggle_handle
+      .transition()
+      .duration(200)
+      .translate([
+        filtering_singletons ? button_width : 0,
+        0
+      ]);
+
+    toggle_background
+      .transition()
+      .duration(200)
+      .attr('fill', color_background(filtering_singletons));
+ }
+
+ return {
+   toggle: toggle_switch,
+ };
 }
