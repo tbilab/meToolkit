@@ -11,6 +11,15 @@
 
   .app-header {
     height: var(--app-header-height);
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  #return-to-loader-button {
+    height: 80%;
+    align-self: center;
+    margin-right: 0.2rem;
   }
 
   .app-title {
@@ -59,6 +68,7 @@
 
 <div class = 'app-header'>
   <h2 class = 'app-title'> {{ app_title }} </h2>
+  <button id = 'return-to-loader-button' >Return to data loading</button>
 </div>
 <div class = 'template-parent'>
   <div class = 'template-info-panel template-section'>
