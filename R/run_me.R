@@ -15,7 +15,6 @@
 #' }
 run_me <- function(preloaded_path = NULL, auto_run = FALSE){
 
-  path_for_preloaded <-
   app_ui <- shiny::htmlTemplate(
     system.file("html_templates/empty_page.html", package = "meToolkit"),
     app_content = shiny::uiOutput("ui")
@@ -55,9 +54,17 @@ run_me <- function(preloaded_path = NULL, auto_run = FALSE){
         snp_name           = app_data$snp_name,
         phewas_results     = app_data$phewas_results,
         individual_data    = app_data$individual_data,
-        max_allowed_codes  = 45
+        max_allowed_codes  = 45,
+        show_back_button_messenger   = session$sendCustomMessage
       )
+
+
     })
+
+  # Watch back button for press
+  shiny::observeEvent(input$back_button_clicked, {
+    print('User clicked the back button')
+  })
  }
 
  if(auto_run){

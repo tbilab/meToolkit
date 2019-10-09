@@ -83,7 +83,8 @@ main_dashboard <- function(
     light_blue = "#4292c6",
     green      = "#74c476"
   ),
-  debug_mode = FALSE
+  debug_mode = FALSE,
+  show_back_button_messenger = NULL
  ) {
 
   if(usage_instructions == 'default'){
@@ -333,4 +334,11 @@ main_dashboard <- function(
     )
     app_interaction(action_object_message)
   })
+
+  should_enable_back_button = !is.null(show_back_button_messenger)
+  if(should_enable_back_button){
+    print('Enabling back button');
+    # Enable back button
+    show_back_button_messenger('show_back_button', 'thanks');
+  }
 }
