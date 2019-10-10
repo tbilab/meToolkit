@@ -80,8 +80,17 @@ data_loader <- function(
     phewas_data = NULL,          # dataframe of results of univariate statistical tests
     snp_name = NULL              # Name of the current snp being looked at.
   )
-
   data_to_return <- reactiveVal()
+
+  bookmarked_snp <- reactiveVal()
+
+  # Look to see if the URL used had desired codes in it.
+  url_state <- isolate(session$clientData$url_search) %>%
+    meToolkit::extract_snp_codes_from_url()
+
+  if(!is.null(url_state$snp)){
+    bookmarked_snp(url_state$snp)
+  }
 
   # Check if the user has given us a path to find preloaded data
   if (!is.null(preloaded_path)) {
@@ -183,9 +192,14 @@ data_loader <- function(
     }) # end progress messages
   })
 
+  trigger_preload <- reactive({
+    have_bookmarked_snp <- !is.null(bookmarked_snp())
+    preload_button_pressed <- input$preLoadedData != 0
+    req(have_bookmarked_snp | preload_button_pressed)
+    list(input$preLoadedData, bookmarked_snp())
+  })
 
-  shiny::observeEvent(input$preLoadedData, {
-
+  shiny::observeEvent(trigger_preload(), {
     base_dir <- glue::glue("{preloaded_path}/{input$dataset_selection}")
     phewas_results <- glue::glue("{base_dir}/phewas_results.csv") %>%
       readr::read_csv()
