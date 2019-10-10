@@ -112,8 +112,7 @@ main_dashboard <- function(
     dplyr::pull(code)
 
   # Look to see if the URL used had desired codes in it.
-  url_state <- isolate(session$clientData$url_search) %>%
-    meToolkit::extract_snp_codes_from_url()
+  url_state <- meToolkit::extract_snp_codes_from_url(session)
 
   desired_snp <- url_state$snp
   requested_codes <- url_state$codes
@@ -277,12 +276,8 @@ main_dashboard <- function(
       )
     }
 
-     # Update the URL of the app so user's can return to point easily
-    saved_codes <- state$selected_codes() %>%
-      stringr::str_remove('\\.') %>%
-      paste(collapse = '_')
-
-    shiny::updateQueryString(glue::glue("?{saved_codes}"))
+    # Update the URL of the app so user's can return to point easily
+    meToolkit::embed_snp_codes_in_url(snp_name, state$selected_codes())
   })
 
   #----------------------------------------------------------------

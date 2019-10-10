@@ -1,18 +1,37 @@
 #' Extract SNP and Codes from URL query string
 #'
-#' Takes a bookmarked state in the form of a url query string, parses it, and
-#' returns therequested snp and phecodes
+#' Reads a bookmarked state from an apps URL, parses it, and
+#' returns the requested snp and phecodes. Uses \code{\link{extract_snp_codes_from_url_string}} to
+#' parse the string.
 #'
-#' @param url_string string from a url with form `?snp_id__<code 1>_<code 2>` sans decimal.
+#' @param session session variable from current shiny server. Used to grab current URL string
 #'
 #' @return A list containing the requested SNP id and codes
 #' @export
 #'
 #' @examples
-#' extract_snp_codes_from_url("?rs123456__00800_90800_08300")
-extract_snp_codes_from_url <- function(url_string){
+#' \dontrun{
+#' extract_snp_codes_from_url(session)
+#' }
+extract_snp_codes_from_url <- function(session){
+  shiny::isolate(session$clientData$url_search) %>%
+    extract_snp_codes_from_url_string()
+}
 
-  query_string <- url_string %>%
+#' Extract SNP and Codes from raw URL query string
+#'
+#' Takes a bookmarked state in the form of a url query string, parses it, and
+#' returns the requested snp and phecodes. Called by \code{\link{extract_snp_codes_from_url}}
+#'
+#' @param session session variable from current shiny server. Used to grab current URL string
+#'
+#' @return A list containing the requested SNP id and codes
+#' @export
+#'
+#' @examples
+#' extract_snp_codes_from_url_string("?rs123456__00800_90800_08300")
+extract_snp_codes_from_url_string <- function(query_string_raw){
+  query_string <- query_string_raw %>%
     stringr::str_remove("\\?")
 
   snp_and_delim_pattern <- "rs.+__"
@@ -36,4 +55,16 @@ extract_snp_codes_from_url <- function(url_string){
     snp =   if (no_snp_found)   NULL else snp_id,
     codes = if (no_codes_found) NULL else codes
   )
+}
+
+embed_snp_codes_in_url <- function(snp, codes){
+
+  # Collapse codes to decimal-less string
+  codes_string <- codes %>%
+    stringr::str_remove('\\.') %>%
+    paste(collapse = '_')
+
+  new_url_string <- glue::glue("?{snp}__{codes_string}")
+
+  shiny::updateQueryString(new_url_string)
 }

@@ -85,11 +85,9 @@ data_loader <- function(
   bookmarked_snp <- reactiveVal()
 
   # Look to see if the URL used had desired codes in it.
-  url_state <- isolate(session$clientData$url_search) %>%
-    meToolkit::extract_snp_codes_from_url()
+  url_state <- meToolkit::extract_snp_codes_from_url(session)
 
   have_requested_snp <- !is.null(url_state$snp)
-
 
   # Check if the user has given us a path to find preloaded data
   if (!is.null(preloaded_path)) {
