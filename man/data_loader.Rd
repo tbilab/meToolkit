@@ -20,5 +20,5 @@ Multimorbidity Explorer dashboard.
 Server function of upset module
 }
 \examples{
-callModule(data_loader, 'data_loader', 'data/preloaded')
+callModule(data_loader, "data_loader", "data/preloaded")
 }
