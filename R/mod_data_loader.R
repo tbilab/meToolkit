@@ -88,9 +88,8 @@ data_loader <- function(
   url_state <- isolate(session$clientData$url_search) %>%
     meToolkit::extract_snp_codes_from_url()
 
-  if(!is.null(url_state$snp)){
-    bookmarked_snp(url_state$snp)
-  }
+  have_requested_snp <- !is.null(url_state$snp)
+
 
   # Check if the user has given us a path to find preloaded data
   if (!is.null(preloaded_path)) {
@@ -112,6 +111,16 @@ data_loader <- function(
           shiny::hr()
         )
       })
+
+      # Check if the user has requested a snp that is in our preloaded snps list
+      # if they have, auto-load that snp
+      if (have_requested_snp) {
+        if (url_state$snp %in% preloaded_snps) {
+          bookmarked_snp(url_state$snp)
+        } else {
+          print(glue::glue("Requested SNP {url_state$snp} was not available"))
+        }
+      }
     }
   }
 
