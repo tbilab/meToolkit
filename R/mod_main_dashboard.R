@@ -112,24 +112,27 @@ main_dashboard <- function(
     dplyr::pull(code)
 
   # Look to see if the URL used had desired codes in it.
-  url_message <- isolate(session$clientData$url_search)
+  url_state <- isolate(session$clientData$url_search) %>%
+    meToolkit::extract_snp_codes_from_url()
+
+  desired_snp <- url_state$snp
+  requested_codes <- url_state$codes
 
   starting_codes <- c()
-  if(url_message != ""){
-    requested_codes <- url_message %>%
-      stringr::str_remove('\\?') %>%
-      stringr::str_split('_') %>%
-      purrr::pluck(1) %>%
-      stringr::str_replace("(.{3})(.*)", "\\1.\\2")
 
-    # Make sure that we actually have these codes...
-    starting_codes <- intersect(requested_codes, available_codes)
+  # If the user has requested some codes to be loaded via the URL...
+  if(!is.null(requested_codes)){
+    # Only attempt to load codes if requested snp is what we are currently looking at
+    if(desired_snp == snp_name){
+      # Make sure that we actually have these codes...
+      starting_codes <- intersect(requested_codes, available_codes)
+    }
   }
 
   # Fall back to using the five most significant codes if nothing was suggested
   # or no codes of the suggested could be found
   if(length(starting_codes) == 0){
-      starting_codes <- head(available_codes, 5)
+    starting_codes <- head(available_codes, 5)
   }
 
   #----------------------------------------------------------------
