@@ -60,8 +60,11 @@ run_me <- function(preloaded_path = NULL, auto_run = FALSE) {
 
       # Watch back button for press
       shiny::observeEvent(input$back_button_clicked, {
-         # Let app know data is loaded
-         current_view("loader")
+        # Clear the bookmarked state in URL
+        shiny::updateQueryString("?")
+
+        # Let app know data is loaded
+        current_view("loader")
       })
 
     } # End app_server()
