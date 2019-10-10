@@ -202,8 +202,12 @@ data_loader <- function(
 
     app_data$data_loaded <- TRUE
 
-    print("Returning preloaded data")
-    data_to_return(shiny::isolate(app_data$reconciled_data))
+    data_to_return(
+      c(
+        list('timestamp' = date()),
+        shiny::isolate(app_data$reconciled_data)
+      )
+    )
   })
 
   return(data_to_return)
