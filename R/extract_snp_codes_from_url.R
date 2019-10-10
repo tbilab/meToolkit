@@ -57,6 +57,16 @@ extract_snp_codes_from_url_string <- function(query_string_raw){
   )
 }
 
+#' Embed snp id and selected codes in app URL
+#'
+#' @param snp Name of current snp
+#' @param codes List of currently selected codes
+#'
+#' @return Nothing (updates app URL)
+#' @export
+#'
+#' @examples
+#' embed_snp_codes_in_url('rs123456', c('009.00', '008.10', '008.20'))
 embed_snp_codes_in_url <- function(snp, codes){
 
   # Collapse codes to decimal-less string
