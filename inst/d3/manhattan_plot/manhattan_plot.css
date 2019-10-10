@@ -98,8 +98,8 @@ input[type=text]:focus,
 textarea:focus,
 
 .found_in_search {
-  box-shadow: 0 0 5px #2ca25f;
-  border: 1px solid #2ca25f;
+  border-left: 6px solid #2ca25f;
+  border-right: 6px solid #2ca25f;
 }
 
 .search_box {

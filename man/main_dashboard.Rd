@@ -9,7 +9,7 @@ main_dashboard(input, output, session, snp_name, phewas_results,
   usage_instructions = "default", colors = list(light_grey = "#f7f7f7",
   med_grey = "#d9d9d9", dark_grey = "#bdbdbd", light_red = "#fcbba1",
   dark_red = "#ef3b2c", light_blue = "#4292c6", green = "#74c476"),
-  debug_mode = FALSE)
+  debug_mode = FALSE, show_back_button_messenger = NULL)
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}

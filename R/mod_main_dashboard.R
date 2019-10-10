@@ -83,7 +83,8 @@ main_dashboard <- function(
     light_blue = "#4292c6",
     green      = "#74c476"
   ),
-  debug_mode = FALSE
+  debug_mode = FALSE,
+  show_back_button_messenger = NULL
  ) {
 
   if(usage_instructions == 'default'){
@@ -111,24 +112,26 @@ main_dashboard <- function(
     dplyr::pull(code)
 
   # Look to see if the URL used had desired codes in it.
-  url_message <- isolate(session$clientData$url_search)
+  url_state <- meToolkit::extract_snp_codes_from_url(session)
+
+  desired_snp <- url_state$snp
+  requested_codes <- url_state$codes
 
   starting_codes <- c()
-  if(url_message != ""){
-    requested_codes <- url_message %>%
-      stringr::str_remove('\\?') %>%
-      stringr::str_split('_') %>%
-      purrr::pluck(1) %>%
-      stringr::str_replace("(.{3})(.*)", "\\1.\\2")
 
-    # Make sure that we actually have these codes...
-    starting_codes <- intersect(requested_codes, available_codes)
+  # If the user has requested some codes to be loaded via the URL...
+  if(!is.null(requested_codes)){
+    # Only attempt to load codes if requested snp is what we are currently looking at
+    if(desired_snp == snp_name){
+      # Make sure that we actually have these codes...
+      starting_codes <- intersect(requested_codes, available_codes)
+    }
   }
 
   # Fall back to using the five most significant codes if nothing was suggested
   # or no codes of the suggested could be found
   if(length(starting_codes) == 0){
-      starting_codes <- head(available_codes, 5)
+    starting_codes <- head(available_codes, 5)
   }
 
   #----------------------------------------------------------------
@@ -273,12 +276,8 @@ main_dashboard <- function(
       )
     }
 
-     # Update the URL of the app so user's can return to point easily
-    saved_codes <- state$selected_codes() %>%
-      stringr::str_remove('\\.') %>%
-      paste(collapse = '_')
-
-    shiny::updateQueryString(glue::glue("?{saved_codes}"))
+    # Update the URL of the app so user's can return to point easily
+    meToolkit::embed_snp_codes_in_url(snp_name, state$selected_codes())
   })
 
   #----------------------------------------------------------------
@@ -333,4 +332,13 @@ main_dashboard <- function(
     )
     app_interaction(action_object_message)
   })
+
+
+  # If we are in the full data-loader + dashboard setup, enable back button
+  should_enable_back_button = !is.null(show_back_button_messenger)
+  if(should_enable_back_button){
+    print('Enabling back button');
+    # Enable back button
+    show_back_button_messenger("show_back_button", "<span class='back-arrow'>&#10554;</span> Return to data loader");
+  }
 }

@@ -1,12 +1,13 @@
 // !preview r2d3 data = readr::read_rds(here::here('data/fake_upset_main.rds')), options = readr::read_rds(here::here('data/fake_upset_options.rds')), dependencies = c("d3-jetpack", here::here('inst/d3/helpers.js'), here::here('inst/d3/upset/helpers.js')), css=c(here::here('inst/d3/upset/upset.css'), here::here('inst/css/common.css'))
 
-let viz_data = data,
-    viz_svg = svg,
-    viz_options = options,
-    viz_width = width,
-    viz_height = height;
+let viz_data = data;
+let viz_svg = svg;
+let viz_options = options;
+let viz_width = width;
+let viz_height = height;
 
 let highlighted_pattern;
+let current_min_size;
 
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
@@ -118,8 +119,27 @@ function setup_chart_sizes(width, height, margin, only_snps){
   };
 }
 
-function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
-  const {patterns, marginals} = filter_set_size(viz_data, viz_options.marginalData, min_set_size);
+function draw_with_set_size(g, sizes, set_size_x, only_snp_data, remove_singletons = false){
+
+  const {patterns, marginals} = filter_set_size(viz_data, viz_options.marginalData, current_min_size, remove_singletons);
+
+  if(patterns.length < 1){
+    const warning_message = svg.selectAppend('g.threshold_warning_message');
+    warning_message.selectAppend('rect')
+      .at({
+        width: viz_width,
+        height: viz_height/2,
+        fill: 'white'
+      });
+    warning_message.selectAppend('text')
+      .attr('text-anchor', 'middle')
+      .tspans([`No groups meet filter size threshold`, 'Adjust threshold down to see groups.'])
+      .attr('x', viz_width/2)
+      .attr('y', viz_height/2);
+  } else {
+    // Make sure warning is gone if it was shown before
+    svg.select('g.threshold_warning_message').remove();
+  }
 
   // Setup the scales
   const scales = setup_scales(patterns, marginals, sizes, set_size_x);
@@ -164,14 +184,6 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
     'right'
   );
 
-  const reset_and_highlight = function(node_to_highlight, already_highlighted){
-    // Reset all boxes
-    svg.selectAll('rect.interaction_box').at(interaction_box_styles)
-    if(!already_highlighted){
-      node_to_highlight.at(selected_interaction_box);
-    }
-  }
-
   const pattern_callbacks = {
     mouseover: function(d){
       const line_height = 22;
@@ -198,18 +210,7 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       d3.select(this).attr('stroke-width', 0);
   },
     click: function(d){
-      const already_highlighted = highlighted_pattern === d.pattern;
-      reset_and_highlight(d3.select(this), already_highlighted);
-      if(already_highlighted){
-        // Unhighlight and send to shiny
-        highlighted_pattern = null;
-        send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
-      } else {
-        // Otherwise, parse the pattern and send to shiny
-        highlighted_pattern = d.pattern;
-        const codes_in_pattern = d.pattern.split('-');
-        send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
-      }
+      toggle_pattern_highlight(d, 'pattern');
     }
   };
 
@@ -233,19 +234,7 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
       d3.select(this).attr('stroke-width', 0);
     },
     click: function(d){
-
-      const already_highlighted = highlighted_pattern === d.code;
-
-      reset_and_highlight(d3.select(this), already_highlighted);
-
-      // Reset all boxes
-      if(already_highlighted){
-        highlighted_pattern = null;
-        send_to_shiny('code_highlight', [], viz_options.msg_loc || 'no_shiny');
-      } else {
-        highlighted_pattern = d.code;
-        send_to_shiny('code_highlight', [d.code], viz_options.msg_loc || 'no_shiny');
-      }
+      toggle_pattern_highlight(d, 'code');
     }
   };
 
@@ -256,6 +245,11 @@ function draw_with_set_size(g, min_set_size, sizes, set_size_x, only_snp_data){
   const pattern_interaction_layer = g.selectAppend('g.pattern_interaction_layer')
     .translate([0, sizes.margin_count_h])
     .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
+
+  // Redo old highlight if it's there
+  if(highlighted_pattern !== null){
+    highlight_or_reset_pattern(highlighted_pattern);
+  }
 }
 
 function draw_upset(){
@@ -264,6 +258,7 @@ function draw_upset(){
   // ---------------------------------------------------------------------
 
   const filtered_on_snp = viz_data.filter(d => d.num_snp < d.count).length === 0;
+  let filtering_singletons = false;
 
   // Setup the sizes of chart components
   const sizes = setup_chart_sizes(viz_width, viz_height, margin, filtered_on_snp);
@@ -295,7 +290,7 @@ function draw_upset(){
     const num_patterns_shown = sorted_sizes.findIndex(d => d < viz_options.min_set_size);
 
     // If the viz is only showing 2 or fewer patterns adjust min size to show at least 2.
-    const starting_min_size = num_patterns_shown < 2 ? sorted_sizes[1]: viz_options.min_set_size;
+    current_min_size = num_patterns_shown < 2 ? sorted_sizes[1]: viz_options.min_set_size;
 
     // Setup the size slider
     const set_size_slider =  g.selectAppend('g.set_size_slider')
@@ -303,11 +298,32 @@ function draw_upset(){
       .call(make_set_size_slider,
         set_size_x,
         sizes,
-        starting_min_size,
-        new_size => draw_with_set_size(g, new_size, sizes, set_size_x, filtered_on_snp));
+        current_min_size,
+        new_size => {
+          current_min_size = new_size;
+          draw_with_set_size(g, sizes, set_size_x, filtered_on_snp, filtering_singletons)
+        });
 
-    // Initialize viz
-    draw_with_set_size(g, starting_min_size, sizes, set_size_x, filtered_on_snp);
+    // Setup singleton filter button
+    const singleton_filter_button = g.selectAppend('g.singleton_filter_button')
+      .translate([-margin.left + 3,-margin.top + 3]);
+
+    const singleton_toggle = draw_singleton_filter_toggle(
+      singleton_filter_button,
+      filtering_singletons,
+      on_singleton_toggle
+    );
+
+    function on_singleton_toggle(){
+      filtering_singletons = !filtering_singletons;
+
+      singleton_toggle.toggle(filtering_singletons);
+
+      draw_with_set_size(g, sizes, set_size_x, filtered_on_snp, filtering_singletons);
+    }
+
+    // Kick off viz
+    draw_with_set_size(g, sizes, set_size_x, filtered_on_snp, filtering_singletons);
   }
 };
 
@@ -326,5 +342,45 @@ r2d3.onResize((width,height) => {
   draw_upset(viz_data, viz_svg, viz_width, viz_height, viz_options);
 });
 
+function highlight_or_reset_pattern(id_of_pattern, undoing_highlight = false){
+
+  // Can we find pattern in current view?
+  const pattern_holder = svg.select(`#${id_of_pattern}`);
+
+  // Is the pattern out of view?
+  const missing_pattern = pattern_holder.empty();
+
+  // Reset all boxes
+  svg.selectAll('rect.interaction_box').at(interaction_box_styles);
+
+  if(missing_pattern || undoing_highlight){
+    // Unhighlight and send to shiny
+    highlighted_pattern = null;
+    send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
+  } else {
+    // Otherwise, parse the pattern and send to shiny
+    pattern_holder.select('.interaction_box').at(selected_interaction_box);
+    highlighted_pattern = id_of_pattern;
+  }
+}
+
+function toggle_pattern_highlight(d, code_or_pattern){
+
+  const id_of_pattern = make_id_string(d, code_or_pattern);
+
+  // Is this pattern already highlighted? (thus we're turning it off?)
+  const undoing_highlight = id_of_pattern === highlighted_pattern;
+
+  // Perform the actual visual changes (and send to shiny if we're resetting to no highlight)
+  highlight_or_reset_pattern(id_of_pattern, undoing_highlight)
+
+  // If we're not simply reseting then update the current highlight and send to shiny the new
+  // pattern.
+  if(!undoing_highlight){
+    highlighted_pattern = id_of_pattern;
+    const codes_in_pattern = d[code_or_pattern].split('-');
+    send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
+  }
+}
 
 

@@ -13,60 +13,67 @@
 #' \dontrun{
 #' meToolkit::run_me()
 #' }
-run_me <- function(preloaded_path = NULL, auto_run = FALSE){
+run_me <- function(preloaded_path = NULL, auto_run = FALSE) {
 
-  path_for_preloaded <-
-  app_ui <- shiny::htmlTemplate(
-    system.file("html_templates/empty_page.html", package = "meToolkit"),
-    app_content = shiny::uiOutput("ui")
-  )
+   app_ui <- shiny::htmlTemplate(
+      system.file("html_templates/empty_page.html", package = "meToolkit"),
+      app_content = shiny::uiOutput("ui")
+   )
 
- app_server <- function(input, output, session) {
+   app_server <- function(input, output, session) {
 
-    # Shows preloaded data if provided a good path
-    # loaded_data <- callModule(data_loader, 'data_loader', 'sample_data/')
-   if(is.null(preloaded_path) ){
-     loaded_data <- shiny::callModule(
-       meToolkit::data_loader,
-       'data_loader',
-     )
-   } else {
-    loaded_data <- shiny::callModule(
-      meToolkit::data_loader,
-      'data_loader',
-      preloaded_path = preloaded_path
-    )
-   }
+      current_view <- reactiveVal("loader")
 
-    output$ui <- shiny::renderUI({
-      no_data <- is.null(loaded_data())
-      if(no_data){
-        meToolkit::data_loader_UI("data_loader", "Load Data for PheWAS-ME")
-      }else{
-        meToolkit::main_dashboard_UI("main_app")
-      }
-    })
+      output$ui <- shiny::renderUI({
+         if (current_view() == "loader") {
+            meToolkit::data_loader_UI("data_loader", "Load Data for PheWAS-ME")
+         } else{
+            meToolkit::main_dashboard_UI("main_app")
+         }
+      })
 
-    shiny::observeEvent(loaded_data(), {
-      app_data <- loaded_data()
+      # Render the main dashboard if we have data to do so
+      shiny::observe({
+         shiny::req(data_loader_results())
 
-      shiny::callModule(
-        meToolkit::main_dashboard, 'main_app',
-        snp_name           = app_data$snp_name,
-        phewas_results     = app_data$phewas_results,
-        individual_data    = app_data$individual_data,
-        max_allowed_codes  = 45
+         # Change view to dashboard
+         current_view("dashboard")
+
+         app_data <- data_loader_results()
+         shiny::callModule(
+            meToolkit::main_dashboard,
+            "main_app",
+            snp_name           = app_data$snp_name,
+            phewas_results     = app_data$phewas_results,
+            individual_data    = app_data$individual_data,
+            max_allowed_codes  = 45,
+            show_back_button_messenger = session$sendCustomMessage
+         )
+      })
+
+      # Render the data loading module
+      data_loader_results <- shiny::callModule(
+         meToolkit::data_loader,
+         "data_loader",
+         preloaded_path = preloaded_path
       )
-    })
- }
 
- if(auto_run){
-    shiny::shinyApp(app_ui, app_server)
- } else {
-   return(list(
-     ui = app_ui,
-     server = app_server
-   ))
- }
+      # Watch back button for press
+      shiny::observeEvent(input$back_button_clicked, {
+        # Clear the bookmarked state in URL
+        shiny::updateQueryString("?")
+
+        # Let app know data is loaded
+        current_view("loader")
+      })
+
+    } # End app_server()
+
+    if (auto_run) {
+      shiny::shinyApp(app_ui, app_server)
+    } else {
+      return(list(ui = app_ui,
+                  server = app_server))
+    }
 
 }

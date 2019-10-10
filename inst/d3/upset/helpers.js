@@ -9,10 +9,19 @@ function remove_zero_tick(axis){
 
 
 // Function to filter data down to the minimum desired set size
-function filter_set_size(data, marginal_data, min_set_size = 100){
+function filter_set_size(data, marginal_data, min_set_size = 100, remove_singletons = false){
   // Filter the main dataset down
   const filtered_data = data
-    .filter(d => d.count >= min_set_size)
+    .filter(d => {
+      const larger_than_min_size = d.count >= min_set_size;
+      const has_multiple_codes = d.size !== 1;
+
+      if(remove_singletons){
+        return larger_than_min_size && has_multiple_codes;
+      }
+
+      return larger_than_min_size;
+    })
     .sort((a,b) => b.count - a.count);
 
   // Get the remaining codes present after filtering
@@ -348,6 +357,7 @@ function create_pattern_interaction_layer(g, patterns, scales, sizes, callbacks)
   const pattern_rows = g.selectAll('.pattern_row')
     .data(patterns)
     .enter().append('g.pattern_row')
+    .attr('id', d => make_id_string(d, 'pattern'))
     .translate((d,i) => [-sizes.padding, scales.pattern_y(i)] )
     .selectAppend('rect')
       .classed('interaction_box', true)
@@ -371,6 +381,7 @@ function create_code_interaction_layer(g, marginals, scales, sizes, callbacks){
   const code_cols = g.selectAll('.code_col')
     .data(marginals)
     .enter().append('g.code_col')
+    .attr('id', d => make_id_string(d, 'code'))
     .translate((d,i) => [scales.matrix_width_scale(d.code), -sizes.padding])
     .selectAppend('rect')
       .classed('interaction_box', true)
@@ -422,7 +433,6 @@ function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_releas
       fillOpacity: 0.6,
       rx: 7,
     });
-
 
   // Add vertical line marking exact cutoff position
   const handle_pointer = handle.selectAppend('line')
@@ -570,4 +580,79 @@ function create_info_panel(g, panel_size, side = 'left'){
     hide,
     show,
   };
+}
+
+
+function draw_singleton_filter_toggle(g, starting_filtered, on_click){
+  // Setup handle container
+  const button_width = 11;
+  const button_height = button_width * 1.75;
+  const color_background = filtering => filtering ? 'forestgreen' : 'orangered';
+
+  // First draw background of toggle
+  const toggle_background = g.selectAppend('rect.toggle-background')
+    .at({
+      width: button_width*2,
+      height: button_height,
+      fill: color_background(starting_filtered),
+      rx: 5,
+      ry: 5,
+    });
+
+ const toggle_handle = g.selectAppend('g.toggle-handle');
+
+ const toggle_handle_rect = toggle_handle.selectAppend('rect')
+   .at({
+     width: button_width ,
+     height: button_height,
+     fill: 'dimgrey',
+     rx: 5,
+     ry: 5
+   });
+
+ toggle_handle.selectAppend('line')
+  .at({
+    x2: button_width/2,
+    x1: button_width/2,
+    y2: 5,
+    y1: button_height-5,
+    stroke: 'white',
+    strokeWidth: 1,
+    opacity: 0.3,
+  });
+
+ g.selectAppend('text')
+   .at({
+     x: button_width * 2 + 5,
+     y: button_height/2,
+     dominantBaseline: 'middle',
+     fontSize: "0.9rem",
+   })
+   .text('Hide single code patterns');
+
+  g.on('click', on_click);
+
+ function toggle_switch(filtering_singletons){
+    toggle_handle
+      .transition()
+      .duration(200)
+      .translate([
+        filtering_singletons ? button_width : 0,
+        0
+      ]);
+
+    toggle_background
+      .transition()
+      .duration(200)
+      .attr('fill', color_background(filtering_singletons));
+ }
+
+ return {
+   toggle: toggle_switch,
+ };
+}
+
+
+function make_id_string(d, code_or_pattern){
+  return `${code_or_pattern}_${d[code_or_pattern].replace(/\./g, '')}`;
 }

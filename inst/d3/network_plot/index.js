@@ -144,54 +144,70 @@ function setup_network_viz(dom_elements, on_node_click){
     patient_patterns = patterns;
   };
 
-  const draw_subjects_w_highlight = function({type, codes}){
-    if(layout_data){
+  function find_nodes_to_highlight({type, codes}){
+    let to_highlight = [];
 
-      let to_highlight = [];
-
-      // If we have a null code dump, nothing gets highlighted.
-      if(codes !== null){
-        if(type === 'code'){
-          to_highlight = patient_patterns
-            .filter(d => d.pattern.includes(codes))
-            .map(d => d.name);
-        } else {
-          const single_code = typeof codes === 'string';
-
-          // Find the patient nodes who have the pattern we want to highlight
-          to_highlight = patient_patterns
-            .filter(d => arrays_equal(d.pattern, single_code ? [codes] : codes))
-            .map(d => d.name);
-        }
-
-        // Make sure scales are update width current zoom
-        update_scales();
-      }
-
-      // Update the canvas to highlight these nodes
-      draw_canvas_portion(layout_data, scales, dom_elements, C, to_highlight);
+    // If we have a null code dump, nothing gets highlighted.
+    if(codes === null) {
+      return to_highlight;
     }
-  };
 
-  const default_highlight = function(){
-    // Resets highlight to the last app-sent pattern
-    draw_subjects_w_highlight(viz.options.highlighted_pattern)
+    if(type === 'code'){
+      to_highlight = patient_patterns
+        .filter(d => d.pattern.includes(codes))
+        .map(d => d.name);
+    } else {
+      const single_code = typeof codes === 'string';
+
+      // Find the patient nodes who have the pattern we want to highlight
+      to_highlight = patient_patterns
+        .filter(d => arrays_equal(d.pattern, single_code ? [codes] : codes))
+        .map(d => d.name);
+    }
+
+    return to_highlight;
   }
 
-  const draw = function(){
+  function highlight_nodes(highlight_pattern){
+
+    const nodes_to_highlight = find_nodes_to_highlight(highlight_pattern);
+
+    // Highlight SVG nodes if in export mode
+    if(C.export_mode){
+
+      dom_elements.svg.selectAll('circle')
+        .at({
+          stroke: 'black',
+          strokeWidth: d => nodes_to_highlight.includes(d.name) ? 1: 0,
+        });
+
+    } else {
+      draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
+    }
+  }
+
+  const draw = function(highlight_pattern = viz.options.highlighted_pattern){
     // Update scales with the zoom if we have any
     update_scales();
 
-    // Draw svg nodes of network
+
     const node_callbacks = {
-      mouseover: d => draw_subjects_w_highlight({type: 'code', codes: d.name}),
-      mouseout: d => default_highlight(),
+      mouseover: d => highlight_nodes({type: 'code', codes: d.name}),
+      mouseout: d => {
+        highlight_nodes(highlight_pattern);
+      },
     };
 
-    draw_svg_nodes(layout_data, scales, dom_elements, C, on_node_click, node_callbacks);
+    draw_svg_nodes({
+      layout_data,
+      scales,
+      dom_elements,
+      C,
+      on_node_click,
+      node_callbacks,
+    });
 
-    default_highlight();
-    //draw_canvas_portion(layout_data, scales, dom_elements, C, nodes_to_highlight);
+    highlight_nodes(highlight_pattern);
   };
 
   dom_elements.svg.call(
@@ -206,7 +222,7 @@ function setup_network_viz(dom_elements, on_node_click){
     })
   );
 
-  return {new_data, resize, new_patterns, default_highlight};
+  return {new_data, resize, new_patterns, redraw:draw};
 };
 
 
@@ -253,7 +269,7 @@ r2d3.onRender(function(data, div, width, height, options){
     // Reset selected codes
     selected_codes = [];
   } else {
-    network_viz.default_highlight();
+    network_viz.redraw();
   }
 
 
@@ -309,7 +325,16 @@ function size_viz(width, height){
 
 
 // Function to draw svg parts of network
-function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip}, C, on_click, node_callbacks){
+function draw_svg_nodes({
+  layout_data,
+  scales,
+  dom_elements,
+  C,
+  on_node_click,
+  node_callbacks,
+}){
+  const {nodes, links} = layout_data;
+  const {svg, canvas, context, tooltip} = dom_elements;
 
   // Make sure we have node positions provided by the webworker before we try and draw
   if(nodes[0].x === undefined) return;
@@ -394,7 +419,7 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       // Reset nodes that may have been highlighted
       node_callbacks.mouseout(d);
     })
-    .on('click', on_click);
+    .on('click', on_node_click);
 
     // Callout boxes
     if(C.callouts){
@@ -526,6 +551,7 @@ function draw_svg_nodes({nodes, links}, scales, {svg, canvas, context, tooltip},
       // Make sure the nodes are above the links
       link_holder.lower();
       svg.selectAll('circle').raise();
+
     } else {
       svg.selectAll('line.link_lines').remove();
     }

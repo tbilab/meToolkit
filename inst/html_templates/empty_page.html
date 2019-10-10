@@ -3,6 +3,36 @@
 <html>
   <head>
     {{ headContent() }}
+    <script>
+      function initiate_back_button(button_text){
+
+        const event_listener_add_attempt = setInterval(start_event_listener, 1000);
+
+        function start_event_listener(){
+          const back_button = document.getElementById("return-to-loader-button");
+
+          // If our selection worked, enable the event listener
+          if(back_button){
+            // Add event listener for click
+            back_button.addEventListener(
+              "click",
+              () => Shiny.onInputChange('back_button_clicked', Math.random()),
+              false
+            );
+
+            // Remove hidden class from button
+            back_button.className = '';
+            back_button.innerHTML = button_text;
+
+            // Stop attempting to add event listener
+            clearInterval(event_listener_add_attempt);
+            console.log("Successsfully added event listener to button.");
+          }
+        }
+      }
+
+      Shiny.addCustomMessageHandler('show_back_button', initiate_back_button);
+    </script>
   </head>
   <body>
     {{ app_content }}
