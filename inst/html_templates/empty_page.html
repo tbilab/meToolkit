@@ -4,7 +4,7 @@
   <head>
     {{ headContent() }}
     <script>
-      function initiate_back_button(message){
+      function initiate_back_button(button_text){
 
         const event_listener_add_attempt = setInterval(start_event_listener, 1000);
 
@@ -22,6 +22,7 @@
 
             // Remove hidden class from button
             back_button.className = '';
+            back_button.innerHTML = button_text;
 
             // Stop attempting to add event listener
             clearInterval(event_listener_add_attempt);

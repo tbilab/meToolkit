@@ -335,10 +335,12 @@ main_dashboard <- function(
     app_interaction(action_object_message)
   })
 
+
+  # If we are in the full data-loader + dashboard setup, enable back button
   should_enable_back_button = !is.null(show_back_button_messenger)
   if(should_enable_back_button){
     print('Enabling back button');
     # Enable back button
-    show_back_button_messenger('show_back_button', 'thanks');
+    show_back_button_messenger("show_back_button", "<span class='back-arrow'>&#10554;</span> Return to data loader");
   }
 }
