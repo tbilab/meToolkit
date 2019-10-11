@@ -125,6 +125,8 @@ Other state information includes, subjects that are to be highlighted or phenoty
 
 Throughout the following sections the functionality of each panel of the dashboard is broken into two parts: what the panel shows and how interactivity works within the context of the panel, along with how that panel can interact with the main application state (the __App Interaction__) subsection for each panel. 
 
+The application state is saved in the URL of the page. To return to a pre-determined view, simply bookmark or copy the current URL. For apps with data loading screen, the state will automatically select the correct snp from preloaded data if it is available. 
+
 ## Interactive Phewas Manhattan Plot
 
 ```{r, echo = FALSE}
@@ -191,6 +193,8 @@ The Comorbidity Upset Plot is an [Upset plot](https://caleydo.org/tools/upset/) 
 
 __Pattern Matrix__
 The center of the visualization contains a matrix with the currently selected phecodes as columns and unique patterns of those phecodes seen in the individual-level data as the rows. A pattern is represented by a dot being filled in at each column corresponding to a code in the pattern.  These dots are colored by the category of the phenotype. 
+
+A toggle is provided to hide patterns that consist of only a single phecode. Singleton patterns can dominate the plot due to how common they are, so filtering them out can allow for closer inspection of comorbidity patterns. 
 
 __Marginal Counts__
 At the top of each Phecode column in the plot is a bar representing how many subjects had that code in the data. These bars can be hovered over to get a text-summary. 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Main Multimorbidity Explorer Dashboard: Server function — main_dashboard • meToolkit</title>
+<title>Extract SNP and Codes from URL query string — extract_snp_codes_from_url • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,10 @@
 
 
 
-<meta property="og:title" content="Main Multimorbidity Explorer Dashboard: Server function — main_dashboard" />
-<meta property="og:description" content="Generates a full dashboard page containing various visualizations for
-investigating comobidity patterns in individual level data and how they
-relate to the results of a phewas analysis." />
+<meta property="og:title" content="Extract SNP and Codes from URL query string — extract_snp_codes_from_url" />
+<meta property="og:description" content="Reads a bookmarked state from an apps URL, parses it, and
+returns the requested snp and phecodes. Uses extract_snp_codes_from_url_string to
+parse the string." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -105,92 +105,42 @@ relate to the results of a phewas analysis." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Main Multimorbidity Explorer Dashboard: Server function</h1>
+    <h1>Extract SNP and Codes from URL query string</h1>
     
-    <div class="hidden name"><code>main_dashboard.Rd</code></div>
+    <div class="hidden name"><code>extract_snp_codes_from_url.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generates a full dashboard page containing various visualizations for
-investigating comobidity patterns in individual level data and how they
-relate to the results of a phewas analysis.</p>
+    <p>Reads a bookmarked state from an apps URL, parses it, and
+returns the requested snp and phecodes. Uses <code><a href='extract_snp_codes_from_url_string.html'>extract_snp_codes_from_url_string</a></code> to
+parse the string.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>main_dashboard</span>(<span class='no'>input</span>, <span class='no'>output</span>, <span class='no'>session</span>, <span class='no'>snp_name</span>, <span class='no'>phewas_results</span>,
-  <span class='no'>individual_data</span>, <span class='kw'>max_allowed_codes</span> <span class='kw'>=</span> <span class='fl'>40</span>,
-  <span class='kw'>usage_instructions</span> <span class='kw'>=</span> <span class='st'>"default"</span>, <span class='kw'>colors</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>light_grey</span> <span class='kw'>=</span> <span class='st'>"#f7f7f7"</span>,
-  <span class='kw'>med_grey</span> <span class='kw'>=</span> <span class='st'>"#d9d9d9"</span>, <span class='kw'>dark_grey</span> <span class='kw'>=</span> <span class='st'>"#bdbdbd"</span>, <span class='kw'>light_red</span> <span class='kw'>=</span> <span class='st'>"#fcbba1"</span>,
-  <span class='kw'>dark_red</span> <span class='kw'>=</span> <span class='st'>"#ef3b2c"</span>, <span class='kw'>light_blue</span> <span class='kw'>=</span> <span class='st'>"#4292c6"</span>, <span class='kw'>green</span> <span class='kw'>=</span> <span class='st'>"#74c476"</span>),
-  <span class='kw'>debug_mode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>show_back_button_messenger</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>extract_snp_codes_from_url</span>(<span class='no'>session</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>input, output, session</th>
-      <td><p>Auto-filled by callModule | ignore</p></td>
-    </tr>
-    <tr>
-      <th>snp_name</th>
-      <td><p>Character string containing the RSID of the snp you're
-viewing. Used to find annotation information.</p></td>
-    </tr>
-    <tr>
-      <th>phewas_results</th>
-      <td><p>Dataframe containing the results of the phewas study.
-Needs columns <code>p_val</code>, <code>id</code>, <code>category</code>(along with
-accompanying <code>color</code>), <code>tooltip</code>.</p></td>
-    </tr>
-    <tr>
-      <th>individual_data</th>
-      <td><p>Dataframe containing columns on <code>IID</code>,
-<code>snp</code>(# copies of allele), and columns for each code included.</p></td>
-    </tr>
-    <tr>
-      <th>max_allowed_codes</th>
-      <td><p>How many codes can the app show at any given time.
-Defaults to 40. (Too many and app may get slow.)</p></td>
-    </tr>
-    <tr>
-      <th>usage_instructions</th>
-      <td><p>HTML tags corresponding to static content to be
-displayed in bottom half of info panel. Any html content works. Defaults to
-light description.</p></td>
-    </tr>
-    <tr>
-      <th>colors</th>
-      <td><p>A list of CSS-valid colors to paint interface in if custom
-colors desired. Needs <code>light_grey, med_grey, dark_grey, light_blue,
-  light_red, dark_red, light_blue, green</code>.</p></td>
-    </tr>
-    <tr>
-      <th>debug_mode</th>
-      <td><p>Boolean controlling if changes in app state should be
-recorded in logs. Defaults to off.</p></td>
+      <th>session</th>
+      <td><p>session variable from current shiny server. Used to grab current URL string</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Shiny module of main Multimorbidity Explorer dashboard</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='main_dashboard_UI.html'>main_dashboard_UI</a></code></p></div>
+    <p>A list containing the requested SNP id and codes</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>callModule</span>(
-  <span class='no'>main_dashboard</span>, <span class='st'>'main_dashboard'</span>,
-  <span class='no'>my_phewas_results</span>,
-  <span class='no'>my_individual_data</span>,
-  <span class='kw'>usage_instructions</span> <span class='kw'>=</span> <span class='st'>'This app is complicated!'</span>
-)</div><div class='output co'>#&gt; <span class='error'>Error in callModule(main_dashboard, "main_dashboard", my_phewas_results,     my_individual_data, usage_instructions = "This app is complicated!"): could not find function "callModule"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='fu'>extract_snp_codes_from_url</span>(<span class='no'>session</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
