@@ -306,7 +306,8 @@ function draw_upset(){
 
     // Setup singleton filter button
     const singleton_filter_button = g.selectAppend('g.singleton_filter_button')
-      .translate([-margin.left + 3,-margin.top + 3]);
+      .translate([-margin.left + 3,-margin.top + 3])
+      .html(""); // Make sure selection is empty so previous state doesn't get carried over
 
     const singleton_toggle = draw_singleton_filter_toggle(
       singleton_filter_button,
