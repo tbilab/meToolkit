@@ -4,8 +4,16 @@
 \alias{info_panel}
 \title{SNP info panel: Server function}
 \usage{
-info_panel(input, output, session, snp_name, all_individual_data,
-  instructions, colors, current_individual_data)
+info_panel(
+  input,
+  output,
+  session,
+  snp_name,
+  all_individual_data,
+  instructions,
+  colors,
+  current_individual_data
+)
 }
 \arguments{
 \item{input}{Auto-filled by callModule | ignore}

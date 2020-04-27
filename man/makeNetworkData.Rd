@@ -5,9 +5,16 @@
 \title{Convert phenotype dataframe to a data list that works with network plotting
 functions}
 \usage{
-makeNetworkData(data, phecode_info, inverted_codes = c(),
-  case_size = 0.1, code_size = 0.3, no_copies = "#bdbdbd",
-  one_copy = "orangered", two_copies = "red")
+makeNetworkData(
+  data,
+  phecode_info,
+  inverted_codes = c(),
+  case_size = 0.1,
+  code_size = 0.3,
+  no_copies = "#bdbdbd",
+  one_copy = "orangered",
+  two_copies = "red"
+)
 }
 \arguments{
 \item{data}{A phenome dataframe with phecodes as columns and also with an

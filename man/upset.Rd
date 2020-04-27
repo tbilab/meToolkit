@@ -4,8 +4,16 @@
 \alias{upset}
 \title{Server function of upset module}
 \usage{
-upset(input, output, session, individual_data, all_patient_snps,
-  results_data, colors, action_object = NULL)
+upset(
+  input,
+  output,
+  session,
+  individual_data,
+  all_patient_snps,
+  results_data,
+  colors,
+  action_object = NULL
+)
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}

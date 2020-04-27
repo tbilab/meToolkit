@@ -4,8 +4,11 @@
 \alias{detect_id_column}
 \title{Detect Id column in data}
 \usage{
-detect_id_column(data, possible_id_cols = c("iid", "id", "grid"),
-  final_id_name = "id")
+detect_id_column(
+  data,
+  possible_id_cols = c("iid", "id", "grid"),
+  final_id_name = "id"
+)
 }
 \arguments{
 \item{data}{Dataframe that should have id column}

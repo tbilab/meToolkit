@@ -4,8 +4,14 @@
 \alias{build_me_app}
 \title{Build ME app from data}
 \usage{
-build_me_app(phewas_results, genotypes, phenotypes,
-  max_allowed_codes = 45, auto_run = FALSE, debug_mode = FALSE)
+build_me_app(
+  phewas_results,
+  genotypes,
+  phenotypes,
+  max_allowed_codes = 45,
+  auto_run = FALSE,
+  debug_mode = FALSE
+)
 }
 \arguments{
 \item{phewas_results}{Dataframe containing the results of the phewas study.

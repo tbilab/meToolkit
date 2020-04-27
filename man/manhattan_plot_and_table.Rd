@@ -4,8 +4,15 @@
 \alias{manhattan_plot_and_table}
 \title{Server function of manhattan plot module.}
 \usage{
-manhattan_plot_and_table(input, output, session, results_data,
-  selected_codes, colors, action_object)
+manhattan_plot_and_table(
+  input,
+  output,
+  session,
+  results_data,
+  selected_codes,
+  colors,
+  action_object
+)
 }
 \arguments{
 \item{input, output, session}{Auto-filled by callModule | ignore}
