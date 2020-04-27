@@ -7,6 +7,7 @@
 #'
 #' @inheritParams reconcile_data
 #' @inheritParams main_dashboard
+#' @inheritParams main_dashboard_UI
 #' @param max_allowed_codes How many codes can the app show at any given time.
 #'   Defaults to 40. (Too many and app may get slow.)
 #' @param auto_run Do you want the app to run immediately or do you want the ui
@@ -30,7 +31,8 @@ build_me_app <- function(
   phenotypes,
   max_allowed_codes = 45,
   auto_run = FALSE,
-  debug_mode = FALSE
+  debug_mode = FALSE,
+  snp_colors = c('#bdbdbd','#fecc5c', '#a50f15')
 ){
 
   # Setup data in the module-friendly combined format
@@ -38,7 +40,7 @@ build_me_app <- function(
 
   app_ui <- shiny::htmlTemplate(
     system.file("html_templates/empty_page.html", package = "meToolkit"),
-    app_content = meToolkit::main_dashboard_UI("main_app")
+    app_content = meToolkit::main_dashboard_UI("main_app", snp_colors = snp_colors)
   )
 
   app_server <- function(input, output, session) {
@@ -48,7 +50,8 @@ build_me_app <- function(
       phewas_results     = data_for_shiny$phewas_results,
       individual_data    = data_for_shiny$individual_data,
       max_allowed_codes  = max_allowed_codes,
-      debug_mode         = debug_mode
+      debug_mode         = debug_mode,
+      snp_colors         = snp_colors
     )
   }
 
