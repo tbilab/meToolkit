@@ -102,7 +102,7 @@ function setup_network_viz(dom_elements, on_node_click){
 
     // Make sure message buttons are hidden only if
     // no codes are selected.
-    if(selected_codes.length == 0) {
+    if(selected_codes.length === 0) {
       dom_elements.message_buttons.hide();
     }
 

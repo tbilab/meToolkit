@@ -4,12 +4,12 @@
 \alias{main_dashboard_UI}
 \title{Main Multimorbidity Explorer Dashboard: UI function}
 \usage{
-main_dashboard_UI(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"))
+main_dashboard_UI(id, snp_colors)
 }
 \arguments{
 \item{id}{String with unique id of module in app}
 
-\item{snp_colors}{Array of css color codes for 0, 1, and 2 copies of the
+\item{snp_colors}{Array of valid css color codes for 0, 1, and 2 copies of the
 minor allele in network plot.}
 }
 \value{
@@ -19,7 +19,7 @@ HTML component of shiny module
 Main Multimorbidity Explorer Dashboard: UI function
 }
 \examples{
-main_dashboard_UI('my_app')
+main_dashboard_UI('my_app', snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'))
 }
 \seealso{
 \code{\link{main_dashboard}}

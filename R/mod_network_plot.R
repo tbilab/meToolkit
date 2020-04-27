@@ -11,10 +11,10 @@
 #'
 #' @examples
 #'
-#' network_plot_UI('mycomorbiditynetwork_plot', '100%')
+#' network_plot_UI('mycomorbiditynetwork_plot', snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'))
 network_plot_UI <- function(
   id,
-  snp_colors = c('#bdbdbd','#fcae91', '#a50f15')
+  snp_colors
 ) {
   ns <- NS(id)
 
@@ -58,8 +58,11 @@ network_plot_UI <- function(
   # CSS Styles
   rounded_span <- function(color){
     glue::glue("
-      border-radius: 15px;
+      border-radius: 50%;
+      font-family: Monaco;
+      font-size: 0.9rem;
       padding: 1px 6px;
+      color: white;
       background: {color};")
   }
 

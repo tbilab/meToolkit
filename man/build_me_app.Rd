@@ -10,7 +10,8 @@ build_me_app(
   phenotypes,
   max_allowed_codes = 45,
   auto_run = FALSE,
-  debug_mode = FALSE
+  debug_mode = FALSE,
+  snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15")
 )
 }
 \arguments{
@@ -26,6 +27,9 @@ and server components of the app to run later? Defaults to \code{TRUE}.}
 
 \item{debug_mode}{Boolean controlling if changes in app state should be
 recorded in logs. Defaults to off.}
+
+\item{snp_colors}{Array of valid css color codes for 0, 1, and 2 copies of the
+minor allele in network plot.}
 }
 \value{
 If \code{auto_run = TRUE}, starts an ME app with your data, otherwise
