@@ -13,9 +13,9 @@ main_dashboard(
   individual_data,
   max_allowed_codes = 40,
   usage_instructions = "default",
-  colors = list(light_grey = "#f7f7f7", med_grey = "#d9d9d9", dark_grey = "#bdbdbd",
-    light_red = "#fcbba1", dark_red = "#ef3b2c", light_blue = "#4292c6", green =
-    "#74c476"),
+  colors = list(light_grey = "#f7f7f7", med_grey = "#d9d9d9", light_blue = "#4292c6",
+    green = "#74c476"),
+  snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15"),
   debug_mode = FALSE,
   show_back_button_messenger = NULL
 )
@@ -41,8 +41,11 @@ displayed in bottom half of info panel. Any html content works. Defaults to
 light description.}
 
 \item{colors}{A list of CSS-valid colors to paint interface in if custom
-colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue,
-  light_red, dark_red, light_blue, green}.}
+colors desired. Needs \code{light_grey, med_grey, light_blue,
+  light_blue, green}.}
+
+\item{snp_colors}{Array of valid css color codes for 0, 1, and 2 copies of the
+minor allele in network plot.}
 
 \item{debug_mode}{Boolean controlling if changes in app state should be
 recorded in logs. Defaults to off.}

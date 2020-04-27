@@ -4,7 +4,7 @@
 \alias{network_plot_UI}
 \title{Interactive individual-level data network diagram of patients to codes}
 \usage{
-network_plot_UI(id, snp_colors = c("#bdbdbd", "#fcae91", "#a50f15"))
+network_plot_UI(id, snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15"))
 }
 \arguments{
 \item{id}{Unique id of module}
