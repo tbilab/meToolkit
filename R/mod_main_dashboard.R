@@ -136,7 +136,7 @@ main_dashboard <- function(
 
   #----------------------------------------------------------------
   # App state that can be modified by user.
-  #   This explicitely defines what the user can interact with.
+  #   This explicitly defines what the user can interact with.
   #   Each snapshot of this state fully defines the current view of the app.
   #----------------------------------------------------------------
   state <- list(

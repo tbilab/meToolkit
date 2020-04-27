@@ -507,45 +507,51 @@ function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_releas
 // Creates a panel that can display text wherever it is placed
 // Returns methods to update, show, and hide info
 function create_info_panel(g, panel_size, side = 'left'){
-  const width = panel_size[0];
   const panel = g.selectAppend('g.info');
 
-  let text_x = width/2,
-      font_size = '24px',
-      text_anchor = 'middle';
+  // How much into the margins should the text fall?
+  const shift = 20;
+  const width = panel_size[0];
 
-  if(width > 300){
-    // Very big
-    // No changes to defaults
-  } else if (width > 200){
-    // Big
-    font_size = '22px';
-  } else if (width > 150){
-    // Medium
-    font_size = '20px';
-  } else if (width > 100){
-    // Small
-    text_x = side == 'left' ? 0 : width;
-    font_size = '18px';
-    text_anchor =  side == 'left' ? 'start' : 'end';
-  } else {
-    // Tiny
-    text_x = side == 'left' ? 0 : width;
-    font_size = '15px';
-    text_anchor = side == 'left' ? 'start' : 'end';
+  let text_x = -shift;
+  let clip_rect_start = text_x;
+  let text_anchor = 'start';
+
+  if(side == 'right'){
+    text_x = width + shift;
+    clip_rect_start = 0;
+    text_anchor = 'end';
   }
 
-  panel.selectAppend('rect')
+  // Scale font size by general categories
+  const font_size = width > 300
+    ? '24px'        // Very big
+    : width > 200   // Big
+    ? '22px'
+    : width > 150   // Medium
+    ? '20px'
+    : width > 100   // Small
+    ? '18px'
+    : '15px';       // Tiny
+
+
+  // Create a background rectangle that will clip text that goes over into the chart
+  panel
+    .selectAppend('defs')
+    .selectAppend(`clipPath#avoid_chart_${side}`)
+    .selectAppend("rect")
     .at({
-      width: panel_size[0],
+      x: clip_rect_start,
+      width: panel_size[0] + shift,
       height: panel_size[1],
-      fillOpacity: 0,
     });
+
 
   const panel_text = panel.selectAppend('text')
     .at({
       y: panel_size[1]/2,
       x: text_x,
+      clipPath: `url(#avoid_chart_${side})`
     })
     .st({
       fontSize: font_size, // make font size's mildly responsive to try and avoid overlapping axis
