@@ -14,7 +14,7 @@
 #' network_plot_UI('mycomorbiditynetwork_plot', '100%')
 network_plot_UI <- function(
   id,
-  snp_colors = c('#bdbdbd','#fcae91', '#a50f15')
+  snp_colors = c('#bdbdbd','#fecc5c', '#a50f15')
 ) {
   ns <- NS(id)
 

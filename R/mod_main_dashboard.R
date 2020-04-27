@@ -3,14 +3,14 @@
 #'
 #' @seealso \code{\link{main_dashboard}}
 #' @param id String with unique id of module in app
-#' @param snp_colors Array of css color codes for 0, 1, and 2 copies of the
+#' @param snp_colors Array of valid css color codes for 0, 1, and 2 copies of the
 #'   minor allele in network plot.
 #' @return HTML component of shiny module
 #' @export
 #'
 #' @examples
-#' main_dashboard_UI('my_app')
-main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c")) {
+#' main_dashboard_UI('my_app', snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'))
+main_dashboard_UI <- function(id, snp_colors = c('#bdbdbd','#fecc5c', '#a50f15')) {
   ns <- NS(id)
   shiny::tagList(
     use_pretty_popup(),
@@ -39,6 +39,7 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
 #'
 #'
 #' @seealso \code{\link{main_dashboard_UI}}
+#' @inheritParams main_dashboard_UI
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param snp_name Character string containing the RSID of the snp you're
 #'   viewing. Used to find annotation information.
@@ -53,8 +54,8 @@ main_dashboard_UI <- function(id, snp_colors = c("#bdbdbd", "#fcbba1", "#ef3b2c"
 #'   displayed in bottom half of info panel. Any html content works. Defaults to
 #'   light description.
 #' @param colors A list of CSS-valid colors to paint interface in if custom
-#'   colors desired. Needs \code{light_grey, med_grey, dark_grey, light_blue,
-#'   light_red, dark_red, light_blue, green}.
+#'   colors desired. Needs \code{light_grey, med_grey, light_blue,
+#'   light_blue, green}.
 #' @param debug_mode Boolean controlling if changes in app state should be
 #'   recorded in logs. Defaults to off.
 #' @return Shiny module of main Multimorbidity Explorer dashboard
@@ -77,15 +78,18 @@ main_dashboard <- function(
   colors = list(
     light_grey = "#f7f7f7",
     med_grey   = "#d9d9d9",
-    dark_grey  = "#bdbdbd",
-    light_red  = "#fcbba1",
-    dark_red   = "#ef3b2c",
     light_blue = "#4292c6",
     green      = "#74c476"
   ),
+  snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'),
   debug_mode = FALSE,
   show_back_button_messenger = NULL
  ) {
+
+  # Fill in color info for snp data
+  colors["dark_grey"] = snp_colors[1]
+  colors["light_red"] = snp_colors[2]
+  colors["dark_red"] = snp_colors[3]
 
   if(usage_instructions == 'default'){
     app_instructions <- div(
@@ -173,9 +177,9 @@ main_dashboard <- function(
       data = curr_ind_data(),
       phecode_info = phewas_results,
       inverted_codes = state$inverted_codes(),
-      no_copies = colors$dark_grey,
-      one_copy = colors$light_red,
-      two_copies = colors$dark_red
+      no_copies = snp_colors[1],
+      one_copy = snp_colors[2],
+      two_copies = snp_colors[3]
     )
   })
 
