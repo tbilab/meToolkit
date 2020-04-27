@@ -58,8 +58,11 @@ network_plot_UI <- function(
   # CSS Styles
   rounded_span <- function(color){
     glue::glue("
-      border-radius: 15px;
+      border-radius: 50%;
+      font-family: Monaco;
+      font-size: 0.9rem;
       padding: 1px 6px;
+      color: white;
       background: {color};")
   }
 
