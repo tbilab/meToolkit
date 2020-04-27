@@ -11,7 +11,7 @@ my_ME_app <- build_me_app(
   phewas_results,
   id_to_snp,
   id_to_phenome,
-  snp_colors = c('#bdbdbd', '#fecc5c', '#a50f15'),
+  snp_colors = c('#bdbdbd', '#fc9272', '#a50f15'),
   debug_mode = TRUE
 )
 
