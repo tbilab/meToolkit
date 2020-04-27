@@ -15,7 +15,7 @@ main_dashboard(
   usage_instructions = "default",
   colors = list(light_grey = "#f7f7f7", med_grey = "#d9d9d9", light_blue = "#4292c6",
     green = "#74c476"),
-  snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15"),
+  snp_colors,
   debug_mode = FALSE,
   show_back_button_messenger = NULL
 )

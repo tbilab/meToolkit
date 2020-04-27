@@ -4,7 +4,7 @@
 \alias{network_plot_UI}
 \title{Interactive individual-level data network diagram of patients to codes}
 \usage{
-network_plot_UI(id, snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15"))
+network_plot_UI(id, snp_colors)
 }
 \arguments{
 \item{id}{Unique id of module}
@@ -21,7 +21,7 @@ Interactive individual-level data network diagram of patients to codes
 }
 \examples{
 
-network_plot_UI('mycomorbiditynetwork_plot', '100\%')
+network_plot_UI('mycomorbiditynetwork_plot', snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'))
 }
 \seealso{
 \code{\link{network_plot}}

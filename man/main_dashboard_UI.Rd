@@ -4,7 +4,7 @@
 \alias{main_dashboard_UI}
 \title{Main Multimorbidity Explorer Dashboard: UI function}
 \usage{
-main_dashboard_UI(id, snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15"))
+main_dashboard_UI(id, snp_colors)
 }
 \arguments{
 \item{id}{String with unique id of module in app}
