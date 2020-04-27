@@ -134,19 +134,17 @@ upset <- function(
     codes_remaining <- pattern_to_enrichment$pattern %>%
       paste(collapse = '-') %>%
       stringr::str_split('-') %>%
-      `[[`(1) %>%
+      purrr::pluck(1) %>%
       unique()
+
 
     # Get summary of basic values after we filtered codes
     code_marginal_data <- tidy_phenotypes %>%
       dplyr::filter(code %in% codes_remaining) %>%
       dplyr::group_by(code) %>%
-      dplyr::summarise(
-        count = n(),
-        num_snp = sum(snp)
-      ) %>%
+      dplyr::summarise(count = n(),  num_snp = sum(snp)) %>%
+      dplyr::left_join(phecode_descriptions, by = c("code" = "phecode")) %>%
       jsonlite::toJSON()
-
 
     # Send everything to the upset javascript code
     r2d3::r2d3(
