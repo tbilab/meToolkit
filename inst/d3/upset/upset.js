@@ -216,9 +216,13 @@ function draw_with_set_size(g, sizes, set_size_x, only_snp_data, remove_singleto
 
   const code_callbacks = {
     mouseover: function(d){
+
       const line_height = 22;
 
-      left_info_panel.update(`Code: ${d.code}`).show();
+      left_info_panel.update(`
+      <tspan>Code: ${d.code}:</tspan>
+      <tspan style="font-size: 0.6rem;" dy="${line_height}">${d.description}</tspan>
+      `).show();
 
       right_info_panel.update(`
         <tspan>Appears</tspan>
