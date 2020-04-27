@@ -11,10 +11,10 @@
 #'
 #' @examples
 #'
-#' network_plot_UI('mycomorbiditynetwork_plot', '100%')
+#' network_plot_UI('mycomorbiditynetwork_plot', snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'))
 network_plot_UI <- function(
   id,
-  snp_colors = c('#bdbdbd','#fecc5c', '#a50f15')
+  snp_colors
 ) {
   ns <- NS(id)
 
