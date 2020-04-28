@@ -240,6 +240,9 @@ class App_State{
         this.modify_property('selected_codes', default_selection);
         this.modify_property('or_bounds', [-Infinity, Infinity]);
         break;
+      case 'set_sig_bars':
+        this.modify_property('sig_bars', payload);
+        break;
       default:
         console.log('unknown input');
     }
@@ -275,6 +278,12 @@ function new_state(state){
     draw_histogram(viz_data);
 
     hist_brush = initialize_histogram_brush(data, this.get('or_bounds'));
+
+    manhattan_plot.draw_sig_line(this.get('sig_bars'));
+  }
+
+  if(state.has_changed('sig_bars')){
+    manhattan_plot.draw_sig_line(this.get('sig_bars'));
   }
 
 
@@ -316,6 +325,7 @@ function new_state(state){
     }
   }
 
+
   // Make all the props completed.
   changed_props.forEach(p => state.mark_completed(p));
 }
@@ -325,6 +335,7 @@ const initial_state = {
   or_bounds: [-Infinity, Infinity],
   selected_codes: default_selection,
   sizes: null,
+  sig_bar_locs: [],
 };
 
 const app_state = new App_State(initial_state, new_state);
@@ -343,7 +354,9 @@ r2d3.onRender(function(data, svg, width, height, options) {
     app_state.pass_action('new_sizes', [viz_width, height]);
     app_state.pass_action('reset_button', null);
     app_state.pass_action('table_selection', default_selection);
+    app_state.pass_action('set_sig_bars', options.sig_bar_locs);
   }
+
 });
 
 // ===============================================================
@@ -445,11 +458,19 @@ function draw_manhattan(data){
 
   // Add an extendable line to demostrate significance threshold
   const draw_sig_line = function(p_val){
+
+    const no_threshold = !p_val;
+
+    if(no_threshold){
+      main_viz.selectAppend(`g.significance_line`).remove();
+      return;
+    }
+
     const sig_line_indent = -27;
     const line_end_extended = manhattan_scales.x.range()[1] - sig_line_indent;
     const line_end_shrunk = -(sig_line_indent + 4);
     const significance_thresh = main_viz
-      .selectAppend(`g.significance_line_${p_val.toString().replace("\.", "")}`)
+      .selectAppend(`g.significance_line`)
       .attr("transform",
             `translate(${sig_line_indent},${manhattan_scales.y(-Math.log10(p_val))})`);
 
@@ -493,7 +514,7 @@ function draw_manhattan(data){
       .on('click', toggle_line);
   }
 
-  draw_sig_line(0.05);
+  //draw_sig_line(0.05);
 
   const disable_codes = function(or_bounds) {
 

@@ -80,6 +80,7 @@ manhattan_plot_and_table <- function(
       options = list(
         msg_loc = session$ns(message_path),
         selected = selected_codes(),
+        sig_bar_locs = c(0.05),
         colors = colors
       )
     )
