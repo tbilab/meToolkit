@@ -16,10 +16,6 @@
 manhattan_plot_and_table_UI <- function(id, height = NULL) {
   ns <- NS(id)
 
-  wrapper_height <- ''
-  if(!is.null(height)){
-    wrapper_height <- glue::glue('height: {height}px')
-  }
   tagList(
     r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%')
   )
