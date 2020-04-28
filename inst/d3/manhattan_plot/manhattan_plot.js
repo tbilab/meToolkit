@@ -357,6 +357,11 @@ r2d3.onRender(function(data, svg, width, height, options) {
     app_state.pass_action('set_sig_bars', options.sig_bar_locs);
   }
 
+  if(app_state.get('sig_bars') !== options.sig_bar_locs){
+    app_state.pass_action('set_sig_bars', options.sig_bar_locs);
+  }
+  //debugger;
+
 });
 
 // ===============================================================
@@ -459,7 +464,7 @@ function draw_manhattan(data){
   // Add an extendable line to demostrate significance threshold
   const draw_sig_line = function(p_val){
 
-    const no_threshold = !p_val;
+    const no_threshold = !p_val || p_val === "None";
 
     if(no_threshold){
       main_viz.selectAppend(`g.significance_line`).remove();
