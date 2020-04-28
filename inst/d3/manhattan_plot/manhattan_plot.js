@@ -505,10 +505,12 @@ function draw_manhattan(data){
         textAnchor: 'end',
         fontStyle: 'italic'
       })
+      .style("cursor", "pointer")
       .on('click', toggle_line)
 
     significance_thresh.selectAppend('text.label')
       .text(`P=${p_val}`)
+      .style("cursor", "pointer")
       .at({
         x: -3,
         fontSize: 12,
