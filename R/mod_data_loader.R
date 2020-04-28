@@ -26,7 +26,12 @@ data_loader_UI <-
                        accept = accepter_formats),
       shiny::fileInput(ns("phenome"),
                        "ID to phenome file",
-                       accept = accepter_formats)
+                       accept = accepter_formats),
+      shiny::h3("P-Value adjustment"),
+      shiny::p("Should multiple-comparisons adjustment be done on P-Values of phewas results file?"),
+      shiny::radioButtons(ns("pval_correction"), label = h3("Correction type"),
+                   choices = list("None" = "none", "Bonferroni" = "bonferroni", "Benjamini-Hochberg" = "BH"),
+                   selected = "none")
     )
 
     shiny::tagList(
@@ -74,6 +79,7 @@ data_loader <- function(input, output, session,
     # dataframe of results of univariate statistical tests
     snp_name = NULL              # Name of the current snp being looked at.
   )
+
   data_to_return <- reactiveVal()
 
   bookmarked_snp <- reactiveVal()
@@ -178,7 +184,8 @@ data_loader <- function(input, output, session,
       app_data$reconciled_data <- meToolkit::reconcile_data(
         phewas_results = app_data$phewas_raw,
         id_to_snp = app_data$genome_raw,
-        id_to_code = app_data$phenome_raw
+        id_to_code = app_data$phenome_raw,
+        multiple_comparisons_adjustment = input$pval_correction
       )
 
       # Sending to app
@@ -208,7 +215,8 @@ data_loader <- function(input, output, session,
     app_data$reconciled_data <- meToolkit::reconcile_data(
       phewas_results =  phewas_results,
       id_to_snp = genome,
-      id_to_code = phenome
+      id_to_code = phenome,
+      multiple_comparisons_adjustment = input$pval_correction
     )
 
     app_data$data_loaded <- TRUE
