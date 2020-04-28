@@ -981,7 +981,7 @@ function add_axis_label(label, y_axis = true){
   const axis_label_style = {
     [bump_axis]: y_axis ? -3: 8,
     textAnchor: 'end',
-    fontWeight: '300',
+    fontWeight: '400',
     fontSize: '0.8rem'
   };
 
