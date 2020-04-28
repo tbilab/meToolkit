@@ -360,8 +360,6 @@ r2d3.onRender(function(data, svg, width, height, options) {
   if(app_state.get('sig_bars') !== options.sig_bar_locs){
     app_state.pass_action('set_sig_bars', options.sig_bar_locs);
   }
-  //debugger;
-
 });
 
 // ===============================================================
@@ -518,8 +516,6 @@ function draw_manhattan(data){
       })
       .on('click', toggle_line);
   }
-
-  //draw_sig_line(0.05);
 
   const disable_codes = function(or_bounds) {
 
