@@ -12,11 +12,11 @@ let viz_width = width,
 
 const margin = {left: 70, right: 15, top: 35, bottom: 20};
 
+// Relative sizes of the output components
 const manhattan_unit = 3;
 const hist_unit = 1;
 const table_unit = 2;
 const total_units = manhattan_unit + hist_unit + table_unit;
-
 
 const size_props = {
   manhattan: manhattan_unit/total_units,
@@ -418,13 +418,11 @@ function draw_manhattan(data){
       app_state.pass_action('manhattan_click', d.code);
     });
 
-
   // Draw a legend
    main_viz
      .selectAppend('g.legend')
      .translate([margin.left, -margin.top + 5])
      .call(draw_legend);
-
 
   // Draw the axes
   main_viz.selectAppend("g#y-axis")
@@ -444,23 +442,78 @@ function draw_manhattan(data){
         .call(add_axis_label('Phecode', false))
     );
 
-  const disable_codes = or_bounds => {
 
-    const is_disable = d =>  (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
+  // Add an extendable line to demostrate significance threshold
+  const draw_sig_line = function(p_val){
+    const sig_line_indent = -27;
+    const line_end_extended = manhattan_scales.x.range()[1] - sig_line_indent;
+    const line_end_shrunk = -(sig_line_indent + 4);
+    const significance_thresh = main_viz
+      .selectAppend(`g.significance_line_${p_val.toString().replace("\.", "")}`)
+      .attr("transform",
+            `translate(${sig_line_indent},${manhattan_scales.y(-Math.log10(p_val))})`);
+
+    const significance_line = significance_thresh
+      .selectAppend("line")
+      .at({
+        x1: line_end_shrunk,
+        stroke: 'dimgrey',
+        strokeWidth: 1,
+      });
+
+    const toggle_line = function(){
+      const is_extended = significance_line.attr('x1') == line_end_extended;
+      significance_instructions.text(is_extended ? "Show": "Hide");
+      significance_line
+        .transition()
+        .attr(
+          'x1',
+          is_extended ? line_end_shrunk : line_end_extended
+        );
+    };
+
+    const significance_instructions = significance_thresh.selectAppend('text.instructions')
+      .text("Show")
+      .at({
+        x: -3,
+        y: 11,
+        fontSize: 10,
+        textAnchor: 'end',
+        fontStyle: 'italic'
+      })
+      .on('click', toggle_line)
+
+    significance_thresh.selectAppend('text.label')
+      .text(`P=${p_val}`)
+      .at({
+        x: -3,
+        fontSize: 12,
+        textAnchor: 'end',
+      })
+      .on('click', toggle_line);
+  }
+
+  draw_sig_line(0.05);
+
+  const disable_codes = function(or_bounds) {
+
+    const is_disabled = function(d){
+      return (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1])
+    };
 
     manhattan_points
-      .filter(d => is_disable(d))
+      .filter(is_disabled)
       .at(disabled_point)
       .each(d => d.disabled = true);
 
     const non_disabled_points = manhattan_points
-      .filter(d => !is_disable(d) && !currently_selected_points.includes(d.code))
+      .filter(d => !is_disabled(d) && !currently_selected_points.includes(d.code))
       .at(default_point)
       .raise()
       .each(d => d.disabled = false);
   };
 
-  const highlight_codes = selected_codes => {
+  const highlight_codes = function(selected_codes){
     currently_selected_points = selected_codes;
     manhattan_points
       .filter(d => selected_codes.includes(d.code))
@@ -477,7 +530,8 @@ function draw_manhattan(data){
 
   return {
     highlight: highlight_codes,
-    disable: disable_codes
+    disable: disable_codes,
+    draw_sig_line,
   };
 }
 
@@ -610,8 +664,6 @@ function draw_histogram(data){
     .html(
       `<tspan class = 'main-title'>Log Odds Ratio distribution</tspan>   <tspan class = 'sub-title'>Drag handles to filter to codes in a given range</tspan>`
     );
-
-
 }
 
 
@@ -887,11 +939,9 @@ function reset_scales(data, sizes){
   const largest_bin = bin_sizes[0];
   const big_bin_variance = largest_bin > bin_sizes[1]*2;
 
-  if(big_bin_variance){
-    histogram_scales.y = d3.scaleSqrt();
-  } else {
-    histogram_scales.y = d3.scaleLinear();
-  }
+  histogram_scales.y = big_bin_variance
+    ? d3.scaleSqrt()
+    : d3.scaleLinear();
 
   histogram_scales.y
     .range([hist_height - margin.top - margin.bottom, 0])
@@ -909,7 +959,7 @@ function add_axis_label(label, y_axis = true){
   const axis_label_style = {
     [bump_axis]: y_axis ? -3: 8,
     textAnchor: 'end',
-    fontWeight: '500',
+    fontWeight: '300',
     fontSize: '0.8rem'
   };
 
