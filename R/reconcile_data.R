@@ -12,8 +12,14 @@
 #'   accompanying \code{color}), \code{tooltip}.
 #' @param id_to_snp Dataframe containing columns on \code{id}, \code{snp}(#
 #'   copies of allele).
-#' @param id_to_code Dataframe containing column \code{id}, and columns for
-#'   each code included.
+#' @param id_to_code Dataframe containing column \code{id}, and columns for each
+#'   code included.
+#' @param multiple_comparisons_adjustment What type of multiple comparisons
+#'   adjustment should be done to the phewas results? Options include "None",
+#'   "Bonferroni", and "Benjamini-Hochberg". Note that the correction is
+#'   performed _before_ filtering of codes to those contained in individual
+#'   data. Aka for as many tests as were passed in raw phewas results. If
+#'   different behavior is desired, the user must provide results pre-adjusted.
 #'
 #' @return List with `snp_name`, `individual_data`, and `phewas_results`
 #'   properties for use in ME app.
@@ -21,7 +27,7 @@
 #' @examples
 #' reconcile_data(phewas_table, id_to_snp, phenotype_id_pairs)
 #' @export
-reconcile_data <- function(phewas_results, id_to_snp, id_to_code) {
+reconcile_data <- function(phewas_results, id_to_snp, id_to_code, multiple_comparisons_adjustment) {
 
   phewas_checked <- meToolkit::checkPhewasFile(phewas_results)
   id_to_snp_checked <- meToolkit::checkGenomeFile(id_to_snp)
@@ -40,6 +46,13 @@ reconcile_data <- function(phewas_results, id_to_snp, id_to_code) {
   in_phenome_not_in_phewas <- setdiff(codes_in_phenome, codes_in_phewas)
 
   total_mismatched <- length(in_phewas_not_in_phenome) + length(in_phenome_not_in_phewas)
+
+  # Adjust p-value if requested
+  if (multiple_comparisons_adjustment != "none") {
+    phewas_checked <- dplyr::mutate(phewas_checked,
+                                    p_val = p.adjust(p_val, method = multiple_comparisons_adjustment))
+  }
+
 
   # remove bad codes from phewas and individual data if needed
   if (total_mismatched > 0) {
@@ -60,9 +73,3 @@ reconcile_data <- function(phewas_results, id_to_snp, id_to_code) {
     phewas_results = phewas_checked
   )
 }
-
-set_1 <- c('a', 'b', 'c')
-set_2 <- c('b', 'c')
-setdiff(set_1, set_2)
-setdiff(set_2, set_1)
-
