@@ -16,7 +16,42 @@
 manhattan_plot_and_table_UI <- function(id, height = NULL) {
   ns <- NS(id)
 
+
+  # position: absolute;
+  # right: 0;
+  # top: 0;
   tagList(
+    shiny::tags$style("
+                      #sig_threshold_selection {
+                        position: absolute;
+                        right: 5px;
+                        top: 7px;
+                      }
+
+                      #sig_threshold_selection .form-group {
+                        display: grid;
+                        grid-template-columns: 1fr 60px;
+                        grid-column-gap: 5px;
+                        align-items: center;
+                      }
+
+                      #sig_threshold_selection label {
+                       text-align: end;
+                       font-size: 0.8rem;
+                      }
+
+
+                      "),
+    shiny::tags$div(
+      id = "sig_threshold_selection",
+      shiny::selectInput(
+        ns("significance_threshold"),
+        label = "Significance Threshold Line",
+        choices = list("None", "0.05", "0.01"),
+        selected = "None",
+        selectize = FALSE
+      )
+    ),
     r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%')
   )
 }
@@ -45,18 +80,17 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
 #'
 #' @examples
 #' callModule(manhattan_plot_and_table,  'my_mod', selected_codes, app_state$currently_selected)
-manhattan_plot_and_table <- function(
-  input, output, session,
-  results_data,
-  selected_codes,
-  colors,
-  action_object ) {
-
+manhattan_plot_and_table <- function(input,
+                                     output,
+                                     session,
+                                     results_data,
+                                     selected_codes,
+                                     colors,
+                                     action_object) {
   message_path <- 'message_manhattan_plot_and_table'
 
   # send data and options to the 2d plot
   output$manhattan_plot_and_table <- r2d3::renderD3({
-
     r2d3::r2d3(
       data = results_data,
       script = system.file("d3/manhattan_plot/manhattan_plot.js", package = "meToolkit"),
@@ -76,7 +110,7 @@ manhattan_plot_and_table <- function(
       options = list(
         msg_loc = session$ns(message_path),
         selected = selected_codes(),
-        sig_bar_locs = c(0.05),
+        sig_bar_locs = input$significance_threshold,
         colors = colors
       )
     )
