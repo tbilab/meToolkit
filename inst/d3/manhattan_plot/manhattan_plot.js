@@ -289,7 +289,6 @@ function new_state(state){
     const default_bounds = tuples_equal(state.get('or_bounds'),
                                         [-Infinity, Infinity]);
 
-    //const no_codes_selected = state.get('selected_codes').length === 0;
     const no_change_from_default = arrays_equal(
       state.get('selected_codes'),
       default_selection
@@ -540,7 +539,8 @@ function draw_manhattan(data){
           point_sel
             .at(selected_point)
             .raise();
-        } else if(disabled){
+        } else
+        if(disabled){
           point_sel
             .at(disabled_point);
         } else {
