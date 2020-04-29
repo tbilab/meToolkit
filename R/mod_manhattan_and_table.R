@@ -89,6 +89,8 @@ manhattan_plot_and_table <- function(input,
                                      action_object) {
   message_path <- 'message_manhattan_plot_and_table'
 
+  timestamp <- Sys.time()
+
   # send data and options to the 2d plot
   output$manhattan_plot_and_table <- r2d3::renderD3({
     r2d3::r2d3(
@@ -100,7 +102,6 @@ manhattan_plot_and_table <- function(input,
         system.file("d3/helpers.js", package = "meToolkit"),
         system.file("d3/manhattan_plot/phewas_table.js", package = "meToolkit"),
         system.file("d3/manhattan_plot/clusterize.js", package = "meToolkit")
-
       ),
       css = c(
         system.file("d3/helpers.css", package = "meToolkit"),
@@ -111,7 +112,8 @@ manhattan_plot_and_table <- function(input,
         msg_loc = session$ns(message_path),
         selected = selected_codes(),
         sig_bar_locs = input$significance_threshold,
-        colors = colors
+        colors = colors,
+        timestamp = timestamp
       )
     )
   })
