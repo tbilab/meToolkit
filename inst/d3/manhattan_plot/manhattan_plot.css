@@ -35,6 +35,9 @@
   overflow-y: scroll;
 }
 
+.tick text {
+  fill: dimgrey;
+}
 
 /* ================================================== */
 /* Table */

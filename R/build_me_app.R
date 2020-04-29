@@ -32,11 +32,12 @@ build_me_app <- function(
   max_allowed_codes = 45,
   auto_run = FALSE,
   debug_mode = FALSE,
-  snp_colors = c('#bdbdbd','#fecc5c', '#a50f15')
+  snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'),
+  multiple_comparisons_adjustment = "none"
 ){
 
   # Setup data in the module-friendly combined format
-  data_for_shiny <- reconcile_data(phewas_results, genotypes, phenotypes)
+  data_for_shiny <- reconcile_data(phewas_results, genotypes, phenotypes, multiple_comparisons_adjustment)
 
   app_ui <- shiny::htmlTemplate(
     system.file("html_templates/empty_page.html", package = "meToolkit"),

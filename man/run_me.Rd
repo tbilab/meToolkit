@@ -4,7 +4,11 @@
 \alias{run_me}
 \title{Run ME app locally}
 \usage{
-run_me(preloaded_path = NULL, auto_run = FALSE)
+run_me(
+  preloaded_path = NULL,
+  auto_run = FALSE,
+  snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15")
+)
 }
 \arguments{
 \item{preloaded_path}{File path relative to app that preloaded data is
@@ -12,6 +16,9 @@ stored. Defaults to \code{NULL}.}
 
 \item{auto_run}{Do you want the app to run immediately or do you want the ui
 and server components of the app to run later? Defaults to \code{TRUE}.}
+
+\item{snp_colors}{Array of valid css color codes for 0, 1, and 2 copies of the
+minor allele in network plot.}
 }
 \value{
 Shiny app process
