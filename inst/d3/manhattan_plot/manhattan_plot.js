@@ -225,14 +225,14 @@ class App_State{
         // Update OR bounds
         this.modify_property('or_bounds', payload);
         // Calculate and update the newly selected codes
-        const currently_selected = this.get('selected_codes');
-        this.modify_property(
-          'selected_codes',
-          this.get('data')
-            .filter(d => currently_selected.includes(d.code) ) // filter to codes that are selected
-            .filter(d => (d.log_or > payload[0]) && (d.log_or < payload[1])) // filter out codes now outside boundaries
-            .map(d => d.code)
-        );
+        //const currently_selected = this.get('selected_codes');
+        //this.modify_property(
+        //  'selected_codes',
+        //  this.get('data')
+        //    .filter(d => currently_selected.includes(d.code) ) // filter to codes that are selected
+        //    .filter(d => (d.log_or > payload[0]) && (d.log_or < payload[1])) // filter out codes now outside boundaries
+        //    .map(d => d.code)
+        //);
         break;
       case 'table_selection':
         this.modify_property('selected_codes', payload);
@@ -257,8 +257,6 @@ let manhattan_plot, hist_brush;
 
 function new_state(state){
   const changed_props = state.fresh_properties();
-
-  // The flow of drawing the whole viz. Only refreshing components if they need to be.
 
   // From here on out we need data and sizes so let's check if we have data before proceeding
   const sizes = state.get('sizes');
@@ -391,7 +389,7 @@ function draw_manhattan(data){
   const point_size = 3;
   const outline = 1.5;
 
-  let currently_selected_points;
+  let currently_selected_points = [];
 
   const default_point = {
     r: d => point_size - (d.log_or > 0 ? 0: outline/2),
@@ -428,7 +426,6 @@ function draw_manhattan(data){
       cy: d => manhattan_scales.y(d.log_pval),
       strokeWidth: d => d.log_or > 0 ? 0 : outline,
     })
-    .at(default_point)
     .on('mouseover', function(d){
       if(d.disabled) return;
 
@@ -444,8 +441,7 @@ function draw_manhattan(data){
       app_state.pass_action('manhattan_click', d.code);
     });
 
-
-  // Draw a legend
+  // Draw legend
    main_viz
      .selectAppend('g.legend')
      .translate([margin.left, -margin.top + 5])
@@ -534,38 +530,42 @@ function draw_manhattan(data){
       .on('click', toggle_line);
   }
 
+  const update_plot = () => {
+     manhattan_points
+      .each(function({disabled, code}){
+        const selected = currently_selected_points.includes(code);
+        const point_sel = d3.select(this);
+
+        if(selected){
+          point_sel
+            .at(selected_point)
+            .raise();
+        } else if(disabled){
+          point_sel
+            .at(disabled_point);
+        } else {
+          point_sel
+            .at(default_point)
+            .raise();
+        }
+      });
+  };
+
   const highlight_codes = selected_codes => {
     currently_selected_points = selected_codes;
-
-    manhattan_points
-      .filter(d => selected_codes.includes(d.code))
-      .raise()
-      .at(selected_point);
-
-    // Make sure points that are not disabled but not highlighted are back at default settings
-    manhattan_points
-      .filter(d => !selected_codes.includes(d.code) && !d.disabled)
-      .at(default_point);
+    update_plot();
   };
 
   const disable_codes = or_bounds => {
-    const is_disabled = d => (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
-
-    // Disabled points
     manhattan_points
-      .filter(is_disabled)
-      .at(disabled_point)
-      .each(d => d.disabled = true);
+      .each(function(d){
+        d.disabled = (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
+      });
 
-    // Normal points
-    manhattan_points
-      .filter(d => !(is_disabled(d) || currently_selected_points.includes(d.code)))
-      .at(default_point)
-      .raise()
-      .each(d => d.disabled = false);
+    update_plot();
   };
 
-  highlight_codes([]);
+  update_plot();
 
   return {
     highlight: highlight_codes,
@@ -928,6 +928,7 @@ function initialize_histogram_brush(data, initial_position = null){
     const or_min = histogram_scales.x.invert(selection[0]);
     const or_max = histogram_scales.x.invert(selection[1]);
 
+    debugger;
     app_state.pass_action('hist_brush', [or_min, or_max]);
   }
 
