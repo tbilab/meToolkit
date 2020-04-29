@@ -480,14 +480,19 @@ function draw_manhattan(data){
     const significance_line = significance_thresh
       .selectAppend("line")
       .at({
-        x1: line_end_shrunk,
+        x1: line_end_extended,
         stroke: 'dimgrey',
         strokeWidth: 1,
       });
 
     const toggle_line = function(){
       const is_extended = significance_line.attr('x1') == line_end_extended;
-      significance_instructions.text(is_extended ? "Show": "Hide");
+
+      // Flip arrow to point opposite direction
+      significance_instructions
+        .transition()
+        .attr('transform', `rotate(${is_extended ? -180: 0} ${sig_line_indent/1.5} ${12})`)
+
       significance_line
         .transition()
         .attr(
@@ -497,13 +502,13 @@ function draw_manhattan(data){
     };
 
     const significance_instructions = significance_thresh.selectAppend('text.instructions')
-      .text("Show")
+      .html("&#8592;") // <- A left arrow
       .at({
-        x: -3,
-        y: 11,
-        fontSize: 10,
-        textAnchor: 'end',
-        fontStyle: 'italic'
+        x: sig_line_indent/1.5,
+        y: 12,
+        fontSize: 12,
+        textAnchor: 'middle',
+        dominantBaseline: "central",
       })
       .style("cursor", "pointer")
       .on('click', toggle_line)
