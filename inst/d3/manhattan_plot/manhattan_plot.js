@@ -7,7 +7,8 @@
 
 let viz_width = width,
     viz_height = height,
-    viz_data = data,
+    //viz_data = data,
+    loading_timestamp = null,
     default_selection = [];
 
 const margin = {left: 70, right: 15, top: 35, bottom: 20};
@@ -35,6 +36,8 @@ let or_bins;
 // ================================================================
 // positioning for tooltips and buttons so they can be placed relative
 // to the main div
+//div.html('');
+
 div.st({
   overflow: 'scroll',
   position: 'relative',
@@ -65,7 +68,6 @@ const reset_button = buttons.append('button')
   .style('margin-left', '0.5rem')
   .on('click', () => app_state.pass_action('reset_button', null));
 
-
 const main_svg = manhattan_viz
   .append('svg')
   .attr('id', 'main_viz');
@@ -83,7 +85,8 @@ const columns_to_show = [
 
 const table_div = div.append('div');
 
-process_new_data(data);
+let viz_data = process_new_data(data);
+
 const my_table = setup_table(
     table_div,
     options.colors.light_blue,
@@ -100,6 +103,7 @@ const tooltip = setup_tooltip(manhattan_viz, columns_to_show.map(d => d.id));
 const main_viz = main_svg
   .append('g')
   .attr("transform", `translate(${margin.left},${margin.top})`);
+
 
 const or_hist = or_svg
   .append('g')
@@ -347,11 +351,23 @@ const app_state = new App_State(initial_state, new_state);
 r2d3.onRender(function(data, svg, width, height, options) {
   default_selection = options.selected;
 
+  const new_data = loading_timestamp != options.timestamp;
+
+  if(new_data){
+    viz_data = process_new_data(data);
+
+    loading_timestamp = options.timestamp;
+    //debugger;
+
+    // Make sure we clear any left-over manhattan points so they get updated by d3
+    //main_viz.selectAll('circle.manhattan_points').remove();
+  }
+
   // Check if selection is different from current state and only reset if it is.
   const new_selection = !arrays_equal(default_selection, app_state.get('selected_codes'));
 
+  app_state.pass_action('new_sizes', [viz_width, viz_height]);
   if(new_selection){
-    app_state.pass_action('new_sizes', [viz_width, height]);
     app_state.pass_action('reset_button', null);
     app_state.pass_action('table_selection', default_selection);
     app_state.pass_action('set_sig_bars', options.sig_bar_locs);
@@ -369,7 +385,7 @@ r2d3.onRender(function(data, svg, width, height, options) {
 r2d3.onResize(function(width, height){
   viz_width = width;
   viz_height = height;
-  app_state.pass_action('new_sizes', [viz_width, height]);
+  app_state.pass_action('new_sizes', [viz_width, viz_height]);
 });
 
 
@@ -378,8 +394,11 @@ r2d3.onResize(function(width, height){
 // ================================================================
 
 function draw_manhattan(data){
+
+
   // Make sure that the neccesary info is provided before drawing.
   if(data === null) return;
+
   const point_size = 3;
   const outline = 1.5;
 
@@ -406,10 +425,13 @@ function draw_manhattan(data){
     stroke: options.colors.med_grey,
   };
 
+  //debugger;
   let manhattan_points = main_viz.selectAll('circle.manhattan_points')
-    .data(data, d => d.code);
+    .data(data);
 
-  manhattan_points = manhattan_points.enter()
+  manhattan_points.exit().remove();
+
+  manhattan_points.enter()
     .append('circle')
     .attr('class', 'manhattan_points')
     .merge(manhattan_points)
@@ -736,13 +758,14 @@ function size_viz([width, height]){
 }
 
 
-function process_new_data(data){
+function process_new_data(raw_data){
   // Keep track of ORs to deal with zeros.
   let min_seen_or = 1;
   let max_seen_or = 0;
 
+  const processed_data = raw_data.map(d => Object.create(d));
   // Add a log_pval and log_or field to all points and keep track of extents
-  data.forEach((d,i) => {
+  processed_data.forEach((d,i) => {
     d.log_pval = -Math.log10(d.p_val);
 
     if((d.OR < min_seen_or) && (d.OR !== 0)) min_seen_or = d.OR;
@@ -755,9 +778,11 @@ function process_new_data(data){
   // Place OR = 0 values to a value 10% or the or range below lowest seen value
   const filler_log_or = Math.log(min_seen_or*0.9);
 
-  data.forEach((d, i) => {
+  processed_data.forEach((d, i) => {
      d.log_or = d.OR > 0 ? Math.log(d.OR): filler_log_or;
   });
+
+  return processed_data;
 }
 // ================================================================
 // Brush setup functions.
