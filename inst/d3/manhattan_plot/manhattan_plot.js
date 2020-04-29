@@ -98,12 +98,10 @@ const my_table = setup_table(
 // Setup tooltip to show same info as table.
 const tooltip = setup_tooltip(manhattan_viz, columns_to_show.map(d => d.id));
 
-
 // Then we append a g element that has padding added to it to those svgs
 const main_viz = main_svg
   .append('g')
   .attr("transform", `translate(${margin.left},${margin.top})`);
-
 
 const or_hist = or_svg
   .append('g')
@@ -273,29 +271,25 @@ function new_state(state){
 
     reset_scales(viz_data, state.get('sizes'));
 
-    manhattan_plot = draw_manhattan(viz_data);
-    // Make sure to respect or bounds in drawn plot
-    manhattan_plot.disable(this.get('or_bounds'));
-
     initialize_manhattan_brush(viz_data);
+
+    manhattan_plot = draw_manhattan(viz_data);
+    manhattan_plot.disable(this.get('or_bounds'));     // Make sure to respect or bounds in drawn plot
+    manhattan_plot.draw_sig_line(this.get('sig_bars'));
 
     draw_histogram(viz_data);
 
     hist_brush = initialize_histogram_brush(data, this.get('or_bounds'));
 
-    manhattan_plot.draw_sig_line(this.get('sig_bars'));
   }
 
   if(state.has_changed('sig_bars')){
     manhattan_plot.draw_sig_line(this.get('sig_bars'));
   }
 
-
   if(state.has_changed('selected_codes') || state.has_changed('or_bounds')){
-
-    const default_bounds = tuples_equal(
-      state.get('or_bounds'),
-      [-Infinity, Infinity] );
+    const default_bounds = tuples_equal(state.get('or_bounds'),
+                                        [-Infinity, Infinity]);
 
     //const no_codes_selected = state.get('selected_codes').length === 0;
     const no_change_from_default = arrays_equal(
@@ -304,7 +298,6 @@ function new_state(state){
     );
     if(default_bounds && no_change_from_default){
       hide_reset();
-
     } else {
       show_reset();
     }
@@ -315,7 +308,6 @@ function new_state(state){
     manhattan_plot.highlight(state.get('selected_codes'));
     my_table.select_codes(state.get('selected_codes'));
   }
-
 
   if(state.has_changed('or_bounds')){
     manhattan_plot.disable(this.get('or_bounds'));
@@ -328,8 +320,6 @@ function new_state(state){
       state.get('data').forEach(d => d.disabled = false);
     }
   }
-
-
   // Make all the props completed.
   changed_props.forEach(p => state.mark_completed(p));
 }
@@ -351,31 +341,31 @@ const app_state = new App_State(initial_state, new_state);
 r2d3.onRender(function(data, svg, width, height, options) {
   default_selection = options.selected;
 
-  const new_data = loading_timestamp != options.timestamp;
+  const new_data = loading_timestamp != options.timestamp || options.timestamp === null;
+  const new_selection = !arrays_equal(default_selection, app_state.get('selected_codes'));
+  const new_sig_bars = app_state.get('sig_bars') !== options.sig_bar_locs;
 
   if(new_data){
+    // Get data in proper format
     viz_data = process_new_data(data);
-
+    // Update our timestamp so we can detect new data again
     loading_timestamp = options.timestamp;
-    //debugger;
-
-    // Make sure we clear any left-over manhattan points so they get updated by d3
-    //main_viz.selectAll('circle.manhattan_points').remove();
   }
 
-  // Check if selection is different from current state and only reset if it is.
-  const new_selection = !arrays_equal(default_selection, app_state.get('selected_codes'));
+  if(new_selection || new_data){
+    app_state.pass_action('new_sizes', [viz_width, viz_height]);
+  }
 
-  app_state.pass_action('new_sizes', [viz_width, viz_height]);
   if(new_selection){
     app_state.pass_action('reset_button', null);
     app_state.pass_action('table_selection', default_selection);
+  }
+
+  if(new_sig_bars || new_selection){
     app_state.pass_action('set_sig_bars', options.sig_bar_locs);
   }
 
-  if(app_state.get('sig_bars') !== options.sig_bar_locs){
-    app_state.pass_action('set_sig_bars', options.sig_bar_locs);
-  }
+  app_state.pass_action('new_sizes', [viz_width, viz_height]);
 });
 
 // ===============================================================
@@ -394,7 +384,6 @@ r2d3.onResize(function(width, height){
 // ================================================================
 
 function draw_manhattan(data){
-
 
   // Make sure that the neccesary info is provided before drawing.
   if(data === null) return;
@@ -425,13 +414,12 @@ function draw_manhattan(data){
     stroke: options.colors.med_grey,
   };
 
-  //debugger;
-  let manhattan_points = main_viz.selectAll('circle.manhattan_points')
+  const manhattan_g = main_viz.selectAppend('g.manhattan_plot');
+
+  let manhattan_points = manhattan_g.selectAll('circle.manhattan_points')
     .data(data);
 
-  manhattan_points.exit().remove();
-
-  manhattan_points.enter()
+   manhattan_points = manhattan_points.enter()
     .append('circle')
     .attr('class', 'manhattan_points')
     .merge(manhattan_points)
@@ -456,6 +444,7 @@ function draw_manhattan(data){
       app_state.pass_action('manhattan_click', d.code);
     });
 
+
   // Draw a legend
    main_viz
      .selectAppend('g.legend')
@@ -479,7 +468,6 @@ function draw_manhattan(data){
         .call(g => g.select(".tick:first-of-type").remove())
         .call(add_axis_label('Phecode', false))
     );
-
 
   // Add an extendable line to demostrate significance threshold
   const draw_sig_line = function(p_val){
@@ -546,26 +534,9 @@ function draw_manhattan(data){
       .on('click', toggle_line);
   }
 
-  const disable_codes = function(or_bounds) {
-
-    const is_disabled = function(d){
-      return (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1])
-    };
-
-    manhattan_points
-      .filter(is_disabled)
-      .at(disabled_point)
-      .each(d => d.disabled = true);
-
-    const non_disabled_points = manhattan_points
-      .filter(d => !is_disabled(d) && !currently_selected_points.includes(d.code))
-      .at(default_point)
-      .raise()
-      .each(d => d.disabled = false);
-  };
-
-  const highlight_codes = function(selected_codes){
+  const highlight_codes = selected_codes => {
     currently_selected_points = selected_codes;
+
     manhattan_points
       .filter(d => selected_codes.includes(d.code))
       .raise()
@@ -575,6 +546,23 @@ function draw_manhattan(data){
     manhattan_points
       .filter(d => !selected_codes.includes(d.code) && !d.disabled)
       .at(default_point);
+  };
+
+  const disable_codes = or_bounds => {
+    const is_disabled = d => (d.log_or < or_bounds[0]) || (d.log_or > or_bounds[1]);
+
+    // Disabled points
+    manhattan_points
+      .filter(is_disabled)
+      .at(disabled_point)
+      .each(d => d.disabled = true);
+
+    // Normal points
+    manhattan_points
+      .filter(d => !(is_disabled(d) || currently_selected_points.includes(d.code)))
+      .at(default_point)
+      .raise()
+      .each(d => d.disabled = false);
   };
 
   highlight_codes([]);
@@ -763,7 +751,7 @@ function process_new_data(raw_data){
   let min_seen_or = 1;
   let max_seen_or = 0;
 
-  const processed_data = raw_data.map(d => Object.create(d));
+  const processed_data = raw_data.map(d => ({...d}));
   // Add a log_pval and log_or field to all points and keep track of extents
   processed_data.forEach((d,i) => {
     d.log_pval = -Math.log10(d.p_val);
