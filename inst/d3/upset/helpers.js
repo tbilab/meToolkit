@@ -357,7 +357,7 @@ function create_pattern_interaction_layer(g, patterns, scales, sizes, callbacks)
   const pattern_rows = g.selectAll('.pattern_row')
     .data(patterns)
     .enter().append('g.pattern_row')
-    .attr('id', d => make_id_string(d, 'pattern'))
+    .attr('id', d => make_id_string(d.pattern, 'pattern'))
     .translate((d,i) => [-sizes.padding, scales.pattern_y(i)] )
     .selectAppend('rect')
       .classed('interaction_box', true)
@@ -381,7 +381,7 @@ function create_code_interaction_layer(g, marginals, scales, sizes, callbacks){
   const code_cols = g.selectAll('.code_col')
     .data(marginals)
     .enter().append('g.code_col')
-    .attr('id', d => make_id_string(d, 'code'))
+    .attr('id', d => make_id_string(d.code, 'code'))
     .translate((d,i) => [scales.matrix_width_scale(d.code), -sizes.padding])
     .selectAppend('rect')
       .classed('interaction_box', true)
@@ -509,7 +509,7 @@ function make_set_size_slider(g, set_size_x, sizes, starting_min_size, on_releas
 function create_info_panel(g, panel_size, side = 'left'){
   const panel = g.selectAppend('g.info');
 
-  // How much into the margins should the text fall?
+          // How much into the margins should the text fall?
   const shift = 20;
   const width = panel_size[0];
 
@@ -659,6 +659,6 @@ function draw_singleton_filter_toggle(g, starting_filtered, on_click){
 }
 
 
-function make_id_string(d, code_or_pattern){
-  return `${code_or_pattern}_${d[code_or_pattern].replace(/\./g, '')}`;
+function make_id_string(id, type){
+  return `${type}_${id.replace(/\./g, '')}`;
 }

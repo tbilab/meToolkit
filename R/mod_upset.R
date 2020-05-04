@@ -13,9 +13,7 @@
 #' upset_UI('my_mod')
 upset_UI <- function(id, div_class = 'upset_plot') {
   ns <- NS(id)
-  tagList(
-    r2d3::d3Output(ns('upset_plot'), height = '100%')
-  )
+  tagList(r2d3::d3Output(ns('upset_plot'), height = '100%'))
 }
 
 #' Server function of upset module
@@ -45,31 +43,30 @@ upset_UI <- function(id, div_class = 'upset_plot') {
 #'
 #' @examples
 #' callModule(upset, 'my_mod')
-upset <- function(
-  input, output, session,
-  individual_data,
-  all_patient_snps,
-  results_data,
-  colors,
-  action_object = NULL) {
-
+upset <- function(input,
+                  output,
+                  session,
+                  individual_data,
+                  all_patient_snps,
+                  results_data,
+                  colors,
+                  action_object = NULL) {
   message_path <- 'message_upset_plot'
-
 
   # What's the MA freq for all the data?
   overall_ma_freq <- mean(all_patient_snps$snp != 0)
 
   output$upset_plot <- r2d3::renderD3({
-
     # Turn wide individual data into a tidy list of phenotype presence
     tidy_phenotypes <- individual_data() %>%
-      tidyr::gather(code, value, -IID, -snp) %>%
+      tidyr::gather(code, value,-IID,-snp) %>%
       dplyr::filter(value != 0)
-
 
     # Get the code to color mappings for each pair
     present_codes <- colnames(individual_data()) %>%
-      {.[!(. %in% c('IID', 'snp'))]}
+      {
+        .[!(. %in% c('IID', 'snp'))]
+      }
     code_to_color <- results_data %>%
       dplyr::filter(code %in% present_codes) %>% {
         this <- .
@@ -97,25 +94,20 @@ upset <- function(
       )
 
     # Function that returns enrichment info for a given pattern
-    testEnrichment <- function(currentPattern){
-
+    testEnrichment <- function(currentPattern) {
       patient_to_pattern %>%
         dplyr::select(-snp) %>%
         dplyr::right_join(all_patient_snps, by = 'IID') %>%
-        dplyr::mutate(
-          hasPattern = dplyr::case_when(
-            pattern == currentPattern ~ 'yes',
-            TRUE ~ 'no'
-          )
-        ) %>%
+        dplyr::mutate(hasPattern = dplyr::case_when(pattern == currentPattern ~ 'yes',
+                                                    TRUE ~ 'no')) %>%
         dplyr::group_by(hasPattern) %>%
         dplyr::summarise(
           MaCarriers = sum(snp != 0),
           Total = n(),
-          PropMa = MaCarriers/Total
+          PropMa = MaCarriers / Total
         ) %>% {
-
-          RR_results <- meToolkit::calcRrCi(.$Total[2], .$MaCarriers[2], .$Total[1], .$MaCarriers[1])
+          RR_results <-
+            meToolkit::calcRrCi(.$Total[2], .$MaCarriers[2], .$Total[1], .$MaCarriers[1])
 
           tibble::tibble(
             pointEst = RR_results$PE,
@@ -136,7 +128,6 @@ upset <- function(
       stringr::str_split('-') %>%
       purrr::pluck(1) %>%
       unique()
-
 
     # Get summary of basic values after we filtered codes
     code_marginal_data <- tidy_phenotypes %>%
@@ -172,7 +163,7 @@ upset <- function(
   }) # End renderD3
 
 
-  if(!is.null(action_object)){
+  if (!is.null(action_object)) {
     observeEvent(input[[message_path]], {
       validate(need(input[[message_path]], message = FALSE))
       action_object(input[[message_path]])
