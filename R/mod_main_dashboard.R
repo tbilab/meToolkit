@@ -22,6 +22,7 @@ main_dashboard_UI <- function(id, snp_colors) {
       manhattan_plot = meToolkit::manhattan_plot_and_table_UI(ns('manhattan_plot_main_dashboard')),
       upset_title = 'Comorbidity Upset Plot',
       upset = meToolkit::upset_UI(ns('upset_plot_main_dashboard')),
+      upset_help_button = shiny::actionButton(ns('upset_help'), label = "?"),
       network_title = 'Subject-Phecode Bipartite Network',
       network = meToolkit::network_plot_UI(ns('network_plot_main_dashboard'),
                                            snp_colors = snp_colors),
@@ -356,6 +357,12 @@ main_dashboard <- function(input,
       "show_back_button",
       "<span class='back-arrow'>&#10554;</span> Return to data loader"
     )
-
   }
+
+  # Help button logic
+  observeEvent(input$upset_help, {
+    print("Upset help requested")
+    session$sendCustomMessage("show_help_modal", "upset")
+  })
+
 }
