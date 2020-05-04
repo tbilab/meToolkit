@@ -28,24 +28,34 @@ const highlights = {
     const highlight_type = Object.keys(d).includes('pattern') ? 'pattern' : 'code';
     const value = d[highlight_type];
     const already_highlighted = this.values.has(value);
+    const multiple_selected = this.values.size > 1;
 
     // User has switched the type of highlight they are doing from code->pattern or vis-versa
     if(highlight_type !== this.type) {
       this.reset_to(value);         // Reset to just this current value
       this.type = highlight_type;   // Update current highlight type
-    } else if(already_highlighted && !multiselect_mode) {
+    } else if(already_highlighted && multiselect_mode) {
+      this.values.delete(value);
+    } else if(already_highlighted && multiple_selected) {
       this.reset_to(value);
     } else if(already_highlighted){
-      this.values.delete(value);
+      this.values.clear();
     } else {
       this.add(value, multiselect_mode);
     }
   },
-  dump: function(){
-    return [...this.values];
+  dump_unique_codes: function(){
+    const unique_codes = new Set();
+
+    this.values.forEach(pattern => pattern
+      .split("-")
+      .forEach(code => unique_codes.add(code))
+    );
+
+    return [...unique_codes];
   },
   as_element_ids: function(){
-    return this.dump().map(id => `#${make_id_string(id, this.type)}`);
+    return [...this.values].map(id => `#${make_id_string(id, this.type)}`);
   }
 };
 
@@ -374,7 +384,6 @@ r2d3.onRender((data, svg, width, height, options) => {
   viz_svg = svg;
   viz_options = options;
   draw_upset();
-
 });
 
 r2d3.onResize((width,height) => {
@@ -397,7 +406,7 @@ function highlight_or_reset_patterns(pass_message = true){
       .at(selected_interaction_box));
 
   if(pass_message){
-    send_to_shiny('pattern_highlight', highlights.dump(), viz_options.msg_loc || 'no_shiny');
+    send_to_shiny('pattern_highlight', highlights.dump_unique_codes(), viz_options.msg_loc || 'no_shiny');
   }
 }
 
