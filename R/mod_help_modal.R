@@ -11,8 +11,36 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
 
   ns <- NS(id)
 
-  modal_class <-
+  modal_css <- "
+    .help_page {
+      width: 80%;
+      max-width: 850px;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      right: 0;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 2.4rem;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid black;
+      padding: 10px;
+      box-shadow: 0px 0px 200px black;
+    }
+
+    .help_page.hidden {
+      display: none;
+    }
+
+    .help_page img {
+      max-width: 100%;
+    }
+  "
   shiny::tagList(
+    shiny::tags$style(modal_css),
     shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?"),
     shiny::div(
       id = ns('modal'),
