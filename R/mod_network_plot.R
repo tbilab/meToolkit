@@ -57,7 +57,7 @@ network_plot_UI <- function(
         id = ns("network"),
         title = "Help for the subject-phecode bipartite netework",
         help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/network_help_page.png",
-        more_link = "coming_soon"
+        more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#subject-phecode-bipartite-network"
       )
     ),
     shiny::div(

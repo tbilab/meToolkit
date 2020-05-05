@@ -22,7 +22,7 @@ upset_UI <- function(id, div_class = 'upset_plot') {
         id = ns("upset"),
         title = "Help for the upset plot",
         help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/upset_help_page.png",
-        more_link = "coming_soon"
+        more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#comorbidity-upset-plot"
       )
     ),
     shiny::div(class = "template-section-body",

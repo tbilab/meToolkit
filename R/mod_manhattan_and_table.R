@@ -53,7 +53,7 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
         id = ns("phewas"),
         title = "Help for ineractive phewas manhattan plot",
         help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/phewas_help_page.png",
-        more_link = "coming_soon"
+        more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#interactive-phewas-manhattan-plot"
       ),
     ),
     r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%')
