@@ -90,11 +90,17 @@
 
 
   .help_page {
-    --modal-width: calc(min(80%, 800px));
+    width: 80%;
+    max-width: 850px;
     position: absolute;
+    z-index: 1000;
     top: 0;
+    left: 0;
+    right: 0;
     width: var(--modal-width);
-    margin-left: calc(50% - var(--modal-width) / 2);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 2.4rem;
     background: white;
     border-radius: 10px;
@@ -105,6 +111,10 @@
 
   .help_page.hidden {
     display: none;
+  }
+
+  .help_page img {
+    max-width: 100%;
   }
 }
 
