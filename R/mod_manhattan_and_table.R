@@ -22,37 +22,37 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
   # top: 0;
   tagList(
     shiny::tags$style("
-                      #sig_threshold_selection {
-                        position: absolute;
-                        right: 5px;
-                        top: 7px;
-                      }
+      #sig_threshold_selection {
+        text-align: center;
+      }
 
-                      #sig_threshold_selection .form-group {
-                        display: grid;
-                        grid-template-columns: 1fr 60px;
-                        grid-column-gap: 5px;
-                        align-items: center;
-                      }
+      #sig_threshold_selection label {
+       font-size: 0.8rem;
+      }
 
-                      #sig_threshold_selection label {
-                       text-align: end;
-                       font-size: 0.8rem;
-                      }
-
-
-                      "),
-    shiny::tags$div(
-      id = "sig_threshold_selection",
-      shiny::selectInput(
-        ns("significance_threshold"),
-        label = "Significance Threshold Line",
-        choices = list("None", "0.05", "0.01"),
-        selected = "None",
-        selectize = FALSE
-      )
+      #sig_threshold_selection select {
+        width: 60px;
+      }
+    "),
+    shiny::div(
+      class = "title-bar",
+      shiny::h3("Interactive Phewas Manhattan Plot", class = "template-section-title"),
+      shiny::tags$div(
+        id = "sig_threshold_selection",
+        shiny::selectInput(
+          ns("significance_threshold"),
+          label = "Signficance Threshold:",
+          choices = list("None", "0.05", "0.01"),
+          selected = "None",
+          selectize = FALSE
+        )
+      ),
+      shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
     ),
-    r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%')
+    r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%'),
+    shiny::div(class = "manhattan-help-page help_page hidden",
+               shiny::h1("Help for the Phewas results panel"),
+               shiny::actionButton(ns("close_help"), label = "Close"))
   )
 }
 
