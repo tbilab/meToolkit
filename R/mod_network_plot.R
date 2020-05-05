@@ -53,7 +53,12 @@ network_plot_UI <- function(
     shiny::div(
       class = "title-bar",
       shiny::h3("Subject-Phecode Bipartite Network", class = "template-section-title"),
-      shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
+      help_modal_UI(
+        id = ns("network"),
+        title = "Help for the subject-phecode bipartite netework",
+        help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/network_help_page.png",
+        more_link = "coming_soon"
+      )
     ),
     shiny::div(
       id = "network_module-control-panel",
@@ -180,11 +185,5 @@ network_plot <- function(
     action_object(to_return)
   })
 
-  observeEvent(input$open_help, {
-    session$sendCustomMessage("show_help_modal", "network")
-  })
-
-  observeEvent(input$close_help, {
-    session$sendCustomMessage("hide_help_modal", "network")
-  })
+  shiny::callModule(help_modal, "network")
 }

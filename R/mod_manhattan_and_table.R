@@ -49,12 +49,14 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
         selected = "None",
         selectize = FALSE
       ),
-      shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
+      help_modal_UI(
+        id = ns("phewas"),
+        title = "Help for ineractive phewas manhattan plot",
+        help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/phewas_help_page.png",
+        more_link = "coming_soon"
+      ),
     ),
-    r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%'),
-    shiny::div(class = "manhattan-help-page help_page hidden",
-               shiny::h1("Help for the Phewas results panel"),
-               shiny::actionButton(ns("close_help"), label = "Close"))
+    r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%')
   )
 }
 
@@ -119,6 +121,8 @@ manhattan_plot_and_table <- function(input,
       )
     )
   })
+
+  shiny::callModule(help_modal, "phewas")
 
   # If we've received a message, package it into the returned reactive value
   observeEvent(input[[message_path]], {

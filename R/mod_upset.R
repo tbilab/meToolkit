@@ -24,7 +24,6 @@ upset_UI <- function(id, div_class = 'upset_plot') {
         help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/upset_help_page.png",
         more_link = "coming_soon"
       )
-      # shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
     ),
     shiny::div(class = "template-section-body",
                r2d3::d3Output(ns('upset_plot'), height = '100%')),
