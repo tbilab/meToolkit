@@ -22,31 +22,32 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
   # top: 0;
   tagList(
     shiny::tags$style("
-      #sig_threshold_selection {
-        text-align: center;
+      #phewas_panel select {
+        width: 50px;
       }
 
-      #sig_threshold_selection label {
-       font-size: 0.8rem;
-      }
-
-      #sig_threshold_selection select {
-        width: 60px;
+      #phewas_panel .form-group{
+        width: auto;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        font-size: 0.8rem;
       }
     "),
     shiny::div(
+      id = "phewas_panel",
       class = "title-bar",
       shiny::h3("Interactive Phewas Manhattan Plot", class = "template-section-title"),
-      shiny::tags$div(
-        id = "sig_threshold_selection",
-        shiny::selectInput(
-          ns("significance_threshold"),
-          label = "Signficance Threshold:",
-          choices = list("None", "0.05", "0.01"),
-          selected = "None",
-          selectize = FALSE
-        )
+      shiny::selectInput(
+        ns("significance_threshold"),
+        label = "Signficance Threshold:",
+        choices = list("None", "0.05", "0.01"),
+        selected = "None",
+        selectize = FALSE
       ),
+      # shiny::tags$div(
+      #   id = "sig_threshold_selection",
+      # ),
       shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
     ),
     r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%'),
