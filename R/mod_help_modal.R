@@ -37,6 +37,13 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
     .help_page img {
       max-width: 100%;
     }
+    .title-bar-help-btn {
+      border-radius: 50%;
+      width: 2rem;
+      height: 2rem;
+      text-align: center;
+      padding: 0;
+    }
   "
   shiny::tagList(
     shiny::tags$style(modal_css),
