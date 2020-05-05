@@ -23,7 +23,7 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
   tagList(
     shiny::tags$style("
       #phewas_panel select {
-        width: 50px;
+        width: 60px;
       }
 
       #phewas_panel .form-group{
