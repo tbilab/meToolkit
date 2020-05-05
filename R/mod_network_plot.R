@@ -30,28 +30,19 @@ network_plot_UI <- function(
       justify-items: stretch;
     }
 
-    .minor-allele-checkbox {
-      grid-area: 1 / 1 / 2 / 2;
-      text-align: left;
-    }
-
-    .minor-allele-legend {
-      grid-area: 1 / 2 / 2 / 3;
-      text-align: right;
+    #network_module-control-panel {
+      height: 30px;
+      display: flex;
+      justify-content: space-between;
     }
 
     .network_module-network-controls {
-      padding: 0.25rem;;
-      border-bottom: 1px solid #e4e0e0;
+      padding: 3px;
       align-self: center;
     }
 
-    .network_module-network_holder {
-      grid-area: 2 / 1 / 3 / 3;
-      min-height: 0;
-      max-height: 100%;
-      height: 100%;
-      position: relative;
+    #network_plot_holder {
+      height: calc(100% - var(--section-title-height) - 30px);
     }
     "
 
@@ -67,14 +58,14 @@ network_plot_UI <- function(
   }
 
   shiny::tagList(
+    shiny::tags$style(module_css),
     shiny::div(
       class = "title-bar",
       shiny::h3("Subject-Phecode Bipartite Network", class = "template-section-title"),
       shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
     ),
-    div(
-      class = 'network_module-network-plot',
-      shiny::tags$style(module_css),
+    shiny::div(
+      id = "network_module-control-panel",
       div(
         class = 'network_module-network-controls minor-allele-checkbox',
         checkboxInput(ns("snp_filter"),
@@ -87,9 +78,10 @@ network_plot_UI <- function(
         span(style = rounded_span(snp_colors[1]), "0"),
         span(style = rounded_span(snp_colors[2]), "1"),
         span(style = rounded_span(snp_colors[3]), "2")
-      ),
-      div(class = 'network_module-network_holder',
-          r2d3::d3Output(ns("plot"), height = '100%'))
+      )
+    ),
+    shiny::div(id = "network_plot_holder",
+      r2d3::d3Output(ns("plot"), height = '100%')
     ),
     shiny::div(
       class = "network-help-page help_page hidden",
