@@ -33,6 +33,10 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
         height: 100%;
         font-size: 0.8rem;
       }
+
+      #phewas_panel label {
+        padding-right: 4px;
+      }
     "),
     shiny::div(
       id = "phewas_panel",
@@ -40,14 +44,11 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
       shiny::h3("Interactive Phewas Manhattan Plot", class = "template-section-title"),
       shiny::selectInput(
         ns("significance_threshold"),
-        label = "Signficance Threshold:",
+        label = "Signficance Threshold",
         choices = list("None", "0.05", "0.01"),
         selected = "None",
         selectize = FALSE
       ),
-      # shiny::tags$div(
-      #   id = "sig_threshold_selection",
-      # ),
       shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
     ),
     r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%'),
