@@ -8,7 +8,6 @@
 #' @return NULL
 #' @export
 help_modal_UI <- function(id, title, help_img_url, more_link) {
-
   ns <- NS(id)
 
   modal_css <- "
@@ -48,7 +47,12 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
       shiny::h1(title),
       shiny::div(shiny::img(src = help_img_url)),
       shiny::actionButton(ns("close_help"), label = "Close"),
-      shiny::a(href = more_link, style="padding-left: 2rem;", "See here for more information")
+      shiny::a(
+        "See here for more information",
+        href = more_link,
+        style = "padding-left: 2rem;",
+        target = "_blank"
+      )
     )
   )
 }
