@@ -18,20 +18,11 @@ network_plot_UI <- function(
 ) {
   ns <- NS(id)
 
-  module_css <- "
-    .network_module-network-plot {
-      height: 100%;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: 2rem 1fr;
-      grid-column-gap: 0px;
-      grid-row-gap: 0px;
-      align-content: end;
-      justify-items: stretch;
-    }
+  height_of_controls <- 30
 
+  module_css <- glue::glue("
     #network_module-control-panel {
-      height: 30px;
+      height: {height_of_controls}px;
       display: flex;
       justify-content: space-between;
     }
@@ -42,9 +33,9 @@ network_plot_UI <- function(
     }
 
     #network_plot_holder {
-      height: calc(100% - var(--section-title-height) - 30px);
+      height: calc(100% - var(--section-title-height) - [[height_of_controls]]px);
     }
-    "
+    ",  .open = "[[", .close = "]]")
 
   # CSS Styles
   rounded_span <- function(color){
