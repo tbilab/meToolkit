@@ -13,7 +13,20 @@
 #' upset_UI('my_mod')
 upset_UI <- function(id, div_class = 'upset_plot') {
   ns <- NS(id)
-  tagList(r2d3::d3Output(ns('upset_plot'), height = '100%'))
+
+  shiny::tagList(
+    shiny::div(
+      class = "title-bar",
+      shiny::h3("Upset Plot", class = "template-section-title"),
+      shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
+    ),
+    shiny::div(class = "template-section-body",
+               r2d3::d3Output(ns('upset_plot'), height = '100%')),
+
+    shiny::div(class = "upset-help-page help_page hidden",
+               shiny::h1("Help for the upset plot"),
+               shiny::actionButton(ns("close_help"), label = "Close"))
+  )
 }
 
 #' Server function of upset module
@@ -162,6 +175,13 @@ upset <- function(input,
     )
   }) # End renderD3
 
+  observeEvent(input$open_help, {
+    session$sendCustomMessage("show_help_modal", "upset")
+  })
+
+  observeEvent(input$close_help, {
+    session$sendCustomMessage("hide_help_modal", "upset")
+  })
 
   if (!is.null(action_object)) {
     observeEvent(input[[message_path]], {

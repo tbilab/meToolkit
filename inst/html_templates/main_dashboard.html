@@ -82,12 +82,10 @@
 
 
   .title-bar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    justify-content: space-between;
     border-bottom: 1px solid dimgrey;
-  }
-  .title-bar-help-btn {
-    text-align: end;
+    padding: 3px;
   }
 
 
@@ -116,6 +114,10 @@
   Shiny.addCustomMessageHandler("show_help_modal", function(which_modal) {
     $(`.${which_modal}-help-page`).removeClass('hidden');
   });
+
+  Shiny.addCustomMessageHandler("hide_help_modal", function(which_modal) {
+    $(`.${which_modal}-help-page`).addClass('hidden');
+  });
 </script>
 
 <div class = 'app-header'>
@@ -133,13 +135,7 @@
     </div>
   </div>
   <div class = 'template-upset-plot template-section'>
-     <div class = 'title-bar'>
-        <h3 class = 'template-section-title'>{{ upset_title }}</h3>
-        <div class = 'title-bar-help-btn'>{{ upset_help_button }}</div>
-     </div>
-     <div class = 'template-section-body'>
       {{ upset }}
-     </div>
   </div>
   <div class = 'template-network-plot template-section'>
     <h3 class = 'template-section-title'>{{ network_title }}</h3>
@@ -148,7 +144,4 @@
     </div>
   </div>
 
-  <div class = 'upset-help-page help_page hidden'>
-    <h1> Help for Upset Plot</h1>
-  </div>
 </div>
