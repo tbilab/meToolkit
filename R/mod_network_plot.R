@@ -66,28 +66,38 @@ network_plot_UI <- function(
       background: {color};")
   }
 
-  div(class = 'network_module-network-plot',
-    shiny::tags$style(module_css),
-    div(
-      class = 'network_module-network-controls minor-allele-checkbox',
-      checkboxInput(
-        ns("snp_filter"),
-        label = "Just minor-allele carriers",
-        value = FALSE
-      )
+  shiny::tagList(
+    shiny::div(
+      class = "title-bar",
+      shiny::h3("Subject-Phecode Bipartite Network", class = "template-section-title"),
+      shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
     ),
     div(
-      class = 'network_module-network-controls minor-allele-legend',
-      span('Copies of minor allele:'),
-      span(style=rounded_span(snp_colors[1]), "0"),
-      span(style=rounded_span(snp_colors[2]), "1"),
-      span(style=rounded_span(snp_colors[3]), "2")
+      class = 'network_module-network-plot',
+      shiny::tags$style(module_css),
+      div(
+        class = 'network_module-network-controls minor-allele-checkbox',
+        checkboxInput(ns("snp_filter"),
+                      label = "Just minor-allele carriers",
+                      value = FALSE)
+      ),
+      div(
+        class = 'network_module-network-controls minor-allele-legend',
+        span('Copies of minor allele:'),
+        span(style = rounded_span(snp_colors[1]), "0"),
+        span(style = rounded_span(snp_colors[2]), "1"),
+        span(style = rounded_span(snp_colors[3]), "2")
+      ),
+      div(class = 'network_module-network_holder',
+          r2d3::d3Output(ns("plot"), height = '100%'))
     ),
-    div(
-      class = 'network_module-network_holder',
-      r2d3::d3Output(ns("plot"), height = '100%')
+    shiny::div(
+      class = "network-help-page help_page hidden",
+      shiny::h1("Help for the network plot"),
+      shiny::actionButton(ns("close_help"), label = "Close")
     )
   )
+
 }
 
 #' Server function of snp info panel
@@ -182,5 +192,13 @@ network_plot <- function(
       payload = input$snp_filter
     )
     action_object(to_return)
+  })
+
+  observeEvent(input$open_help, {
+    session$sendCustomMessage("show_help_modal", "network")
+  })
+
+  observeEvent(input$close_help, {
+    session$sendCustomMessage("hide_help_modal", "network")
   })
 }
