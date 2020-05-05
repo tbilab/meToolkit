@@ -11,11 +11,11 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
   ns <- NS(id)
 
   modal_css <- "
-    .help_page {
+    .help_page .content {
       width: 80%;
       max-width: 850px;
       position: fixed;
-      z-index: 1000;
+      z-index: 100;
       top: 0;
       left: 0;
       right: 0;
@@ -25,24 +25,46 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
       margin-top: 2.4rem;
       background: white;
       border-radius: 10px;
-      border: 1px solid black;
       padding: 10px;
       box-shadow: 0px 0px 200px black;
+    }
+
+    .help_page::before {
+      content: \"\";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 99;
+      background: #0000007d;
+      backdrop-filter: blur(4px);
     }
 
     .help_page.hidden {
       display: none;
     }
 
+    .help_page.hidden::before {
+      content: none;
+    }
+
     .help_page img {
       max-width: 100%;
     }
+
     .title-bar-help-btn {
       border-radius: 50%;
       width: 2rem;
       height: 2rem;
       text-align: center;
       padding: 0;
+    }
+
+    .help_bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
   "
   shiny::tagList(
@@ -51,14 +73,20 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
     shiny::div(
       id = ns('modal'),
       class = "help_page hidden",
-      shiny::h1(title),
-      shiny::div(shiny::img(src = help_img_url)),
-      shiny::actionButton(ns("close_help"), label = "Close"),
-      shiny::a(
-        "See here for more information",
-        href = more_link,
-        style = "padding-left: 2rem;",
-        target = "_blank"
+      shiny::div(
+        class = "content",
+        shiny::h1(title),
+        shiny::div(shiny::img(src = help_img_url)),
+        shiny::div(
+          class = "help_bottom",
+          shiny::actionButton(ns("close_help"), label = "Close"),
+          shiny::a(
+            "🔎More information",
+            href = more_link,
+            style = "padding-left: 2rem;",
+            target = "_blank"
+          )
+        )
       )
     )
   )
