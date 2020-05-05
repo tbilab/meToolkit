@@ -17,7 +17,7 @@ upset_UI <- function(id, div_class = 'upset_plot') {
   shiny::tagList(
     shiny::div(
       class = "title-bar",
-      shiny::h3("Upset Plot", class = "template-section-title"),
+      shiny::h3("Comorbidity Upset Plot", class = "template-section-title"),
       shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
     ),
     shiny::div(class = "template-section-body",
