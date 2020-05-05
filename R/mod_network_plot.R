@@ -77,6 +77,9 @@ network_plot_UI <- function(
     shiny::div(
       class = "network-help-page help_page hidden",
       shiny::h1("Help for the network plot"),
+      shiny::div(
+        shiny::img(src = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/network_help_page.png")
+      ),
       shiny::actionButton(ns("close_help"), label = "Close")
     )
   )

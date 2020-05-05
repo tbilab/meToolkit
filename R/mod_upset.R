@@ -18,19 +18,16 @@ upset_UI <- function(id, div_class = 'upset_plot') {
     shiny::div(
       class = "title-bar",
       shiny::h3("Comorbidity Upset Plot", class = "template-section-title"),
-      shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
+      help_modal_UI(
+        id = ns("upset"),
+        title = "Help for the upset plot",
+        help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/upset_help_page.png",
+        more_link = "coming_soon"
+      )
+      # shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?")
     ),
     shiny::div(class = "template-section-body",
                r2d3::d3Output(ns('upset_plot'), height = '100%')),
-
-    shiny::div(
-      class = "upset-help-page help_page hidden",
-      shiny::h1("Help for the upset plot"),
-      shiny::div(
-        shiny::img(src = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/upset_help_page.png")
-      ),
-      shiny::actionButton(ns("close_help"), label = "Close")
-    )
   )
 }
 
@@ -180,13 +177,8 @@ upset <- function(input,
     )
   }) # End renderD3
 
-  observeEvent(input$open_help, {
-    session$sendCustomMessage("show_help_modal", "upset")
-  })
-
-  observeEvent(input$close_help, {
-    session$sendCustomMessage("hide_help_modal", "upset")
-  })
+  # Sets up response to help button
+  shiny::callModule(help_modal, 'upset')
 
   if (!is.null(action_object)) {
     observeEvent(input[[message_path]], {

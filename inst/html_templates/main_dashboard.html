@@ -122,11 +122,11 @@
 
 <script>
   Shiny.addCustomMessageHandler("show_help_modal", function(which_modal) {
-    $(`.${which_modal}-help-page`).removeClass('hidden');
+    $(`#${which_modal}`).removeClass('hidden');
   });
 
   Shiny.addCustomMessageHandler("hide_help_modal", function(which_modal) {
-    $(`.${which_modal}-help-page`).addClass('hidden');
+    $(`#${which_modal}`).addClass('hidden');
   });
 </script>
 
