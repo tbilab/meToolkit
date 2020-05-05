@@ -23,9 +23,14 @@ upset_UI <- function(id, div_class = 'upset_plot') {
     shiny::div(class = "template-section-body",
                r2d3::d3Output(ns('upset_plot'), height = '100%')),
 
-    shiny::div(class = "upset-help-page help_page hidden",
-               shiny::h1("Help for the upset plot"),
-               shiny::actionButton(ns("close_help"), label = "Close"))
+    shiny::div(
+      class = "upset-help-page help_page hidden",
+      shiny::h1("Help for the upset plot"),
+      shiny::div(
+        shiny::img(src = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/upset_help_page.png")
+      ),
+      shiny::actionButton(ns("close_help"), label = "Close")
+    )
   )
 }
 
@@ -175,13 +180,20 @@ upset <- function(input,
     )
   }) # End renderD3
 
+  # help_image <- png::readPNG(system.file("figures/upset_help_page.png", package = "meToolkit"))
   observeEvent(input$open_help, {
     session$sendCustomMessage("show_help_modal", "upset")
+    # Send a pre-rendered image, and don't delete the image after sending it
+    # output$help_image <- shiny::renderPlot({
+    #   grid::grid.raster(help_image)
+    # })
   })
 
   observeEvent(input$close_help, {
     session$sendCustomMessage("hide_help_modal", "upset")
   })
+
+
 
   if (!is.null(action_object)) {
     observeEvent(input[[message_path]], {
