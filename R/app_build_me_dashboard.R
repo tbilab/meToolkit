@@ -19,13 +19,13 @@
 #' @export
 #'
 #' @examples
-#' my_ME_app <- build_me_app(
+#' my_ME_app <- build_me_dashboard(
 #'   phewas_table,
 #'   id_to_snp,
 #'   phenotype_id_pairs
 #' )
 #' shinyApp(my_ME_app$ui, my_ME_app$server)
-build_me_app <- function(
+build_me_dashboard <- function(
   phewas_results,
   genotypes,
   phenotypes,

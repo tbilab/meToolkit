@@ -4,7 +4,7 @@ reference:
   desc: These built an entire me app from either preloaded data or data uploaded in csv form.
   contents:
   - build_me_w_loader
-  - build_me_app
+  - build_me_dashboard
 - title: Shiny Modules
   desc: The shiny modules that make up a ME app. If building a customized app these are the building blocks.
   contents:

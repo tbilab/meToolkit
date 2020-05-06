@@ -57,7 +57,7 @@ Any other columns included will be displayed in the app as additional informatio
 
 ## App API
 
-If you are starting an ME application with preloaded data from the R package API, the format of these files remains almost the same, with the exception being R dataframes are passed directly to the function `build_me_app()`.  For more detailed information see the application documentation either in the ‘reference’ tab of this website or by accessing the package documentation in your R console with `?meToolkit:: build_me_app`.
+If you are starting an ME application with preloaded data from the R package API, the format of these files remains almost the same, with the exception being R dataframes are passed directly to the function `build_me_dashboard()`.  For more detailed information see the application documentation either in the ‘reference’ tab of this website or by accessing the package documentation in your R console with `?meToolkibuild_me_dashboard_app`.
 
 
 
@@ -101,10 +101,10 @@ meToolkit::build_me_w_loader()
 ```
 
 __Customizing with R API__
-The `meToolkit` package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function `meToolkit::build_me_app()`.
+The `meToolkit` package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function `meToolkit::build_me_dashboard()`.
 
 ```r
-my_ME_app <- build_me_app(
+my_ME_app <- build_me_dashboard(
   phewas_table,
   id_to_snp,
   phenotype_id_pairs

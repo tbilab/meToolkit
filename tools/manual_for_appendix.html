@@ -189,7 +189,7 @@ body {
 </div>
 <div id="app-api" class="section level2">
 <h2><span class="header-section-number">1.4</span> App API</h2>
-<p>If you are starting an ME application with preloaded data from the R package API, the format of these files remains almost the same, with the exception being R dataframes are passed directly to the function <code>build_me_app()</code>. For more detailed information see the application documentation either in the ‘reference’ tab of this website or by accessing the package documentation in your R console with <code>?meToolkit:: build_me_app</code>.</p>
+<p>If you are starting an ME application with preloaded data from the R package API, the format of these files remains almost the same, with the exception being R dataframes are passed directly to the function <code>build_me_dashboard()</code>. For more detailed information see the application documentation either in the ‘reference’ tab of this website or by accessing the package documentation in your R console with <code>?meToolkibuild_me_dashboard_app</code>.</p>
 </div>
 <div id="data-loading-screen" class="section level2">
 <h2><span class="header-section-number">1.5</span> Data Loading Screen</h2>
@@ -216,8 +216,8 @@ If data privacy is a concern, the app can be run entirely locally on any compute
 <p>Once the package is installed the app can be launched with the data loading interface using the command</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">meToolkit<span class="op">::</span><span class="kw">build_me_w_loader</span>()</a></code></pre></div>
 <p><strong>Customizing with R API</strong>
-The <code>meToolkit</code> package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function <code>meToolkit::build_me_app()</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">my_ME_app &lt;-<span class="st"> </span><span class="kw">build_me_app</span>(</a>
+The <code>meToolkit</code> package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function <code>meToolkit::build_me_dashboard()</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">my_ME_app &lt;-<span class="st"> </span><span class="kw">build_me_dashboard</span>(</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">  phewas_table,</a>
 <a class="sourceLine" id="cb3-3" data-line-number="3">  id_to_snp,</a>
 <a class="sourceLine" id="cb3-4" data-line-number="4">  phenotype_id_pairs</a>

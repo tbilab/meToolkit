@@ -4,7 +4,7 @@
 #' data loading screen. Optionally data can be preloaded.
 #'
 #' @inheritParams data_loader
-#' @inheritParams build_me_app
+#' @inheritParams build_me_dashboard
 #'
 #' @return Shiny app process
 #' @export
