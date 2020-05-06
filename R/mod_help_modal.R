@@ -59,6 +59,8 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
       height: 2rem;
       text-align: center;
       padding: 0;
+      margin-top: 2px;
+      margin-right: 2px;
     }
 
     .help_bottom {
