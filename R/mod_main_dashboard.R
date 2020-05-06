@@ -353,7 +353,7 @@ main_dashboard <- function(input,
     # Enable back button
     show_back_button_messenger(
       "show_back_button",
-      "<span class='back-arrow'>&#10554;</span> Return to data loader"
+      "<i class=\"fa fa-undo\" aria-hidden=\"true\"></i> Return to data loader"
     )
   }
 
