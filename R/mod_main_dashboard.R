@@ -24,7 +24,7 @@ main_dashboard_UI <- function(id, snp_colors) {
       network = meToolkit::network_plot_UI(ns('network_plot_main_dashboard'),
                                            snp_colors = snp_colors),
       info_panel = meToolkit::info_panel_UI(ns('info_panel_main_dashboard')),
-      subject_download_btn = shiny::downloadButton(ns("subject_download_btn"), "Download ids of current selection")
+      subject_download_btn = shiny::downloadButton(ns("subject_download_btn"), "Selected subjects")
     )
   )
 }
