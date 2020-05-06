@@ -224,6 +224,9 @@ By clicking on a row corresponding to a given comorbidity pattern of codes, all 
    
 Highlights for both codes and patterns are reset when either another pattern is selected of the column/row is selected again. 
 
+__Multi-Select Mode__
+By holding down the shift key while selecting codes or patterns, multiple entities can be selected at once. The resulting subject-level data shown will be those with all of the selected codes or patterns present. 
+
 ## Info Panel
 
 ```{r, echo = FALSE}
