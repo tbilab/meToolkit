@@ -13,17 +13,21 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-embed_png <- function(image_title, dpi = NULL) {
+embed_png <- function(image_title, dpi = NULL, width = "100%") {
   
   base_path <- system.file("figures/", package = "meToolkit")
   full_path <- paste0(base_path, image_title)
   meta <- attr(png::readPNG(full_path, native = TRUE, info = TRUE), "info")
   if (!is.null(dpi)) meta$dpi <- rep(dpi, 2)
-  knitr::asis_output(paste0(
-    "<img src='", full_path, "'",
-    " width=100%",
-    " />"
-  ))
+  knitr::asis_output(
+    glue::glue(
+      "
+      <div style=\"text-align: center;\">
+      <img src=\"{full_path}\" width={width} />
+      </div>
+      "
+    )
+  )
 }
 
 library(meToolkit)
@@ -122,6 +126,12 @@ embed_png("main_dashboard.png")
 ## Application state and reading this manual
 
 The state of the app is primarily driven by the list of currently selected phenotypes. At load this is small number of the most significant results from the Phewas analysis, but by interacting with the application the user changes this state.  
+
+At anytime a csv of all the subjects that have one or more of the currently selected phenotypes can be downloaded using the "Selected subjects" button at the top right of the app. 
+
+```{r, echo = FALSE}
+embed_png("subject_download_btn.png", width = "40%")
+```
 
 Other state information includes, subjects that are to be highlighted or phenotypes that are to be ‘inverted’ (see ‘Subject-Phecode Bipartite Network’ section for details.)
 
