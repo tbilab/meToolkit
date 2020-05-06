@@ -20,3 +20,13 @@ reference:
   - manhattan_plot_and_table
   - info_panel_UI
   - info_panel
+- title: Helpers
+  desc: Functions that help with data cleaning or statistical testing
+  contents:
+  - calc_pattern_risk_ratio
+  - normalize_phecodes
+- title: Simulation
+  desc: Functions to simulate the data used in the ME apps
+  contents:
+  - sim_individual_data
+  - sim_phewas_results
