@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Build ME app from data — build_me_app • meToolkit</title>
+<title>Run main ME dashboard interface from supplied data — build_me_app • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,7 @@
 
 
 
-<meta property="og:title" content="Build ME app from data — build_me_app" />
+<meta property="og:title" content="Run main ME dashboard interface from supplied data — build_me_app" />
 <meta property="og:description" content="Takes as input the three basic components of an ME app and either runs an ME
 app immediately or returns a list containing the ui and server parts of an
 entire app. This makes it easy to deploy a custom app with a few lines of
@@ -106,7 +106,7 @@ code." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Build ME app from data</h1>
+    <h1>Run main ME dashboard interface from supplied data</h1>
     
     <div class="hidden name"><code>build_me_app.Rd</code></div>
     </div>
@@ -180,7 +180,7 @@ returns a list containing elements: <code>ui</code> for the shiny app ui functio
   <span class='no'>phewas_table</span>,
   <span class='no'>id_to_snp</span>,
   <span class='no'>phenotype_id_pairs</span>
-)</div><div class='output co'>#&gt; <span class='error'>Error in is.data.frame(x): object 'phewas_table' not found</span></div><div class='input'><span class='fu'>shinyApp</span>(<span class='no'>my_ME_app</span>$<span class='no'>ui</span>, <span class='no'>my_ME_app</span>$<span class='no'>server</span>)</div><div class='output co'>#&gt; <span class='error'>Error in shinyApp(my_ME_app$ui, my_ME_app$server): could not find function "shinyApp"</span></div></pre>
+)</div><div class='output co'>#&gt; <span class='error'>Error in is.data.frame(x): object 'phewas_table' not found</span></div><div class='input'><span class='fu'>shinyApp</span>(<span class='no'>my_ME_app</span>$<span class='no'>ui</span>, <span class='no'>my_ME_app</span>$<span class='no'>server</span>)</div><div class='output co'>#&gt; <span class='error'>Error in shinyApp(my_ME_app$ui, my_ME_app$server): object 'my_ME_app' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

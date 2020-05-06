@@ -115,267 +115,102 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-full-apps" class="hasAnchor"><a href="#section-full-apps" class="anchor"></a>Full Apps</h2>
+          <p class="section-desc"><p>These built an entire me app from either preloaded data or data uploaded in csv form.</p></p>
         </th>
       </tr>
       <tr>
         
         <td>
-          <p><code><a href="buildColorPalette.html">buildColorPalette()</a></code> </p>
+          <p><code><a href="run_me.html">run_me()</a></code> </p>
         </td>
-        <td><p>Build Color Palette</p></td>
+        <td><p>Run a ME app with data loading screen</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="build_me_app.html">build_me_app()</a></code> </p>
         </td>
-        <td><p>Build ME app from data</p></td>
-      </tr><tr>
+        <td><p>Run main ME dashboard interface from supplied data</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-shiny-modules" class="hasAnchor"><a href="#section-shiny-modules" class="anchor"></a>Shiny Modules</h2>
+          <p class="section-desc"><p>The shiny modules that make up a ME app. If building a customized app these are the building blocks.</p></p>
+        </th>
+      </tr>
+      <tr>
         
         <td>
-          <p><code><a href="calcRrCi.html">calcRrCi()</a></code> </p>
+          <p><code><a href="main_dashboard_UI.html">main_dashboard_UI()</a></code> </p>
         </td>
-        <td><p>Calculate risk ratio confidence interval</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="checkGenomeFile.html">checkGenomeFile()</a></code> </p>
-        </td>
-        <td><p>Checks genome input dataframe for correct form</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="checkPhenomeFile.html">checkPhenomeFile()</a></code> </p>
-        </td>
-        <td><p>Check uploaded phenome file for correctness</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="checkPhewasFile.html">checkPhewasFile()</a></code> </p>
-        </td>
-        <td><p>Check uploaded phewas file for correctness</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="codeFilter.html">codeFilter()</a></code> </p>
-        </td>
-        <td><p>Filter codes.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="data_loader.html">data_loader()</a></code> </p>
-        </td>
-        <td><p>Server function of upset module</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="data_loader_UI.html">data_loader_UI()</a></code> </p>
-        </td>
-        <td><p>UI function of upset module</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="deleteCodes.html">deleteCodes()</a></code> </p>
-        </td>
-        <td><p>Delete Phecodes from a selected phecodes list with warning.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="detect_id_column.html">detect_id_column()</a></code> </p>
-        </td>
-        <td><p>Detect Id column in data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="embed_snp_codes_in_url.html">embed_snp_codes_in_url()</a></code> </p>
-        </td>
-        <td><p>Embed snp id and selected codes in app URL</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="extract_snp_codes_from_url.html">extract_snp_codes_from_url()</a></code> </p>
-        </td>
-        <td><p>Extract SNP and Codes from URL query string</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="extract_snp_codes_from_url_string.html">extract_snp_codes_from_url_string()</a></code> </p>
-        </td>
-        <td><p>Extract SNP and Codes from raw URL query string</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gather_snp_annotations.html">gather_snp_annotations()</a></code> </p>
-        </td>
-        <td><p>Gather snp annotation information</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="help_modal.html">help_modal()</a></code> </p>
-        </td>
-        <td><p>Help Modal Server</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="help_modal_UI.html">help_modal_UI()</a></code> </p>
-        </td>
-        <td><p>Help Modal UI</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="info_panel.html">info_panel()</a></code> </p>
-        </td>
-        <td><p>SNP info panel: Server function</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="info_panel_UI.html">info_panel_UI()</a></code> </p>
-        </td>
-        <td><p>SNP info panel: UI function</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="invertCodes.html">invertCodes()</a></code> </p>
-        </td>
-        <td><p>Invert currently selected codes Only inverts codes that were not preivously
-inverted. If a code is 'inverted' after it's already inverted it simple
-reverts back to normal.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="isolateCodes.html">isolateCodes()</a></code> </p>
-        </td>
-        <td><p>Isolate currently viewed codes</p></td>
+        <td><p>Main Multimorbidity Explorer Dashboard: UI</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="main_dashboard.html">main_dashboard()</a></code> </p>
         </td>
-        <td><p>Main Multimorbidity Explorer Dashboard: Server function</p></td>
+        <td><p>Main Multimorbidity Explorer Dashboard: Server</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="main_dashboard_UI.html">main_dashboard_UI()</a></code> </p>
+          <p><code><a href="data_loader_UI.html">data_loader_UI()</a></code> </p>
         </td>
-        <td><p>Main Multimorbidity Explorer Dashboard: UI function</p></td>
+        <td><p>Data loading screen: UI</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="makeDescriptionPalette.html">makeDescriptionPalette()</a></code> </p>
+          <p><code><a href="data_loader.html">data_loader()</a></code> </p>
         </td>
-        <td><p>Create Description Color Palette</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="makeNetworkData.html">makeNetworkData()</a></code> </p>
-        </td>
-        <td><p>Convert phenotype dataframe to a data list that works with network plotting
-functions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="manhattan_plot_and_table.html">manhattan_plot_and_table()</a></code> </p>
-        </td>
-        <td><p>Server function of manhattan plot module.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="manhattan_plot_and_table_UI.html">manhattan_plot_and_table_UI()</a></code> </p>
-        </td>
-        <td><p>Interactive manhattan plot and table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mergePhenomeGenome.html">mergePhenomeGenome()</a></code> </p>
-        </td>
-        <td><p>Merge a tidy phenome dataframe with a tidy genome(single snp) genome
-dataframe.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="network_plot.html">network_plot()</a></code> </p>
-        </td>
-        <td><p>Server function of snp info panel</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="network_plot_UI.html">network_plot_UI()</a></code> </p>
-        </td>
-        <td><p>Interactive individual-level data network diagram of patients to codes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="normalizePhecode.html">normalizePhecode()</a></code> </p>
-        </td>
-        <td><p>Normalize a phecode vector to padded character</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pretty_popup.html">pretty_popup()</a></code> </p>
-        </td>
-        <td><p>Reveal hidden element</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="reconcile_data.html">reconcile_data()</a></code> </p>
-        </td>
-        <td><p>Combine and reconcile the three main data components needed for ME app and
-return in app-friendly format</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="reveal_element.html">reveal_element()</a></code> </p>
-        </td>
-        <td><p>Reveal hidden element</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="run_me.html">run_me()</a></code> </p>
-        </td>
-        <td><p>Run ME app locally</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="simIndividualData.html">simIndividualData()</a></code> </p>
-        </td>
-        <td><p>Generate sample individual level data based upon some phewas results</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="simPhewasResults.html">simPhewasResults()</a></code> </p>
-        </td>
-        <td><p>Simulate PheWAS results</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="subsetToCodes.html">subsetToCodes()</a></code> </p>
-        </td>
-        <td><p>Subset phenotype data to a given list of phecodes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="upset.html">upset()</a></code> </p>
-        </td>
-        <td><p>Server function of upset module</p></td>
+        <td><p>Data loading screen: Server</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="upset_UI.html">upset_UI()</a></code> </p>
         </td>
-        <td><p>UI function of upset module</p></td>
+        <td><p>Upset plot of multimorbidity patterns: UI</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="use_pretty_popup.html">use_pretty_popup()</a></code> </p>
+          <p><code><a href="upset.html">upset()</a></code> </p>
         </td>
-        <td><p>Use pretty popup function</p></td>
+        <td><p>Upset plot of multimorbidity patterns: Server</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="use_reveal_element.html">use_reveal_element()</a></code> </p>
+          <p><code><a href="network_plot_UI.html">network_plot_UI()</a></code> </p>
         </td>
-        <td><p>Use reveal_element function</p></td>
+        <td><p>Subject-level network diagram: UI</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="network_plot.html">network_plot()</a></code> </p>
+        </td>
+        <td><p>Subject-level network diagram: Server</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="manhattan_plot_and_table_UI.html">manhattan_plot_and_table_UI()</a></code> </p>
+        </td>
+        <td><p>Interactive manhattan plot and table: UI</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="manhattan_plot_and_table.html">manhattan_plot_and_table()</a></code> </p>
+        </td>
+        <td><p>Interactive manhattan plot and table: Server</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="info_panel_UI.html">info_panel_UI()</a></code> </p>
+        </td>
+        <td><p>SNP info panel: UI</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="info_panel.html">info_panel()</a></code> </p>
+        </td>
+        <td><p>SNP info panel: Server</p></td>
       </tr>
     </tbody>
     </table>
@@ -384,7 +219,8 @@ return in app-friendly format</p></td>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-full-apps">Full Apps</a></li>
+      <li><a href="#section-shiny-modules">Shiny Modules</a></li>
     </ul>
   </div>
 </div>

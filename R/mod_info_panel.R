@@ -1,4 +1,4 @@
-#' SNP info panel: UI function
+#' SNP info panel: UI
 #'
 #' @param id Unique id of module
 #'
@@ -17,7 +17,7 @@ info_panel_UI <- function(id) {
   )
 }
 
-#' SNP info panel: Server function
+#' SNP info panel: Server
 #'
 #' @inheritParams main_dashboard
 #' @param snp_name String of the snp name

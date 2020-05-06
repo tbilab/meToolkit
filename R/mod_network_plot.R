@@ -1,4 +1,4 @@
-#' Interactive individual-level data network diagram of patients to codes
+#' Subject-level network diagram: UI
 #'
 #' @seealso \code{\link{network_plot}}
 #' @param id Unique id of module
@@ -93,7 +93,7 @@ network_plot_UI <- function(id, snp_colors) {
   )
 }
 
-#' Server function of snp info panel
+#' Subject-level network diagram: Server
 #'
 #' @seealso \code{\link{network_plot_UI}}
 #' @param input,output,session Auto-filled by callModule | ignore

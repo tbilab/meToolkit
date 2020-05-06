@@ -1,7 +1,7 @@
-#' Run ME app locally
+#' Run a ME app with data loading screen
 #'
 #' Function to spawn a shiny app instance for Multimorbidity Explorer app with
-#' data loading screen.
+#' data loading screen. Optionally data can be preloaded.
 #'
 #' @inheritParams data_loader
 #' @inheritParams build_me_app

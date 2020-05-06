@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_main_dashboard.R
 \name{main_dashboard_UI}
 \alias{main_dashboard_UI}
-\title{Main Multimorbidity Explorer Dashboard: UI function}
+\title{Main Multimorbidity Explorer Dashboard: UI}
 \usage{
 main_dashboard_UI(id, snp_colors)
 }
@@ -16,7 +16,7 @@ minor allele in network plot.}
 HTML component of shiny module
 }
 \description{
-Main Multimorbidity Explorer Dashboard: UI function
+Main Multimorbidity Explorer Dashboard: UI
 }
 \examples{
 main_dashboard_UI('my_app', snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'))

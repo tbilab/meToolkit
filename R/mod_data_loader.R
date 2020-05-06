@@ -1,4 +1,4 @@
-#' UI function of upset module
+#' Data loading screen: UI
 #'
 #' @param id String with unique id of module in app
 #' @param app_title Name of your app. Defaults to "Multimorbidity Explorer"
@@ -49,7 +49,7 @@ data_loader_UI <-
     )
   }
 
-#' Server function of upset module
+#' Data loading screen: Server
 #'
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param preloaded_path File path relative to app that preloaded data is

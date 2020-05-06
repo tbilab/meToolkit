@@ -1,4 +1,4 @@
-#' UI function of upset module
+#' Upset plot of multimorbidity patterns: UI
 #'
 #'
 #' @seealso \code{\link{upset}}
@@ -27,7 +27,7 @@ upset_UI <- function(id) {
   )
 }
 
-#' Server function of upset module
+#' Upset plot of multimorbidity patterns: Server
 #'
 #' Generates an Upset plot to view patterns within comorbidity patterns.
 #' Contains marginal charts on individual code counts, comorbidity counts, along

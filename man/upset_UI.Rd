@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_upset.R
 \name{upset_UI}
 \alias{upset_UI}
-\title{UI function of upset module}
+\title{Upset plot of multimorbidity patterns: UI}
 \usage{
 upset_UI(id)
 }
@@ -13,7 +13,7 @@ upset_UI(id)
 HTML component of shiny module
 }
 \description{
-UI function of upset module
+Upset plot of multimorbidity patterns: UI
 }
 \examples{
 upset_UI('my_mod')

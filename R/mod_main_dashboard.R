@@ -1,4 +1,4 @@
-#' Main Multimorbidity Explorer Dashboard: UI function
+#' Main Multimorbidity Explorer Dashboard: UI
 #'
 #'
 #' @seealso \code{\link{main_dashboard}}
@@ -29,7 +29,7 @@ main_dashboard_UI <- function(id, snp_colors) {
   )
 }
 
-#' Main Multimorbidity Explorer Dashboard: Server function
+#' Main Multimorbidity Explorer Dashboard: Server
 #'
 #' Generates a full dashboard page containing various visualizations for
 #' investigating comobidity patterns in individual level data and how they

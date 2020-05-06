@@ -1,1 +1,22 @@
 destination: docs
+reference:
+- title: Full Apps
+  desc: These built an entire me app from either preloaded data or data uploaded in csv form.
+  contents:
+  - run_me
+  - build_me_app
+- title: Shiny Modules
+  desc: The shiny modules that make up a ME app. If building a customized app these are the building blocks.
+  contents:
+  - main_dashboard_UI
+  - main_dashboard
+  - data_loader_UI
+  - data_loader
+  - upset_UI
+  - upset
+  - network_plot_UI
+  - network_plot
+  - manhattan_plot_and_table_UI
+  - manhattan_plot_and_table
+  - info_panel_UI
+  - info_panel

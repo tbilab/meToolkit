@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_me.R
 \name{run_me}
 \alias{run_me}
-\title{Run ME app locally}
+\title{Run a ME app with data loading screen}
 \usage{
 run_me(
   preloaded_path = NULL,
@@ -25,7 +25,7 @@ Shiny app process
 }
 \description{
 Function to spawn a shiny app instance for Multimorbidity Explorer app with
-data loading screen.
+data loading screen. Optionally data can be preloaded.
 }
 \examples{
 \dontrun{

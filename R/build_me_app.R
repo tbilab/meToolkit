@@ -1,4 +1,4 @@
-#' Build ME app from data
+#' Run main ME dashboard interface from supplied data
 #'
 #' Takes as input the three basic components of an ME app and either runs an ME
 #' app immediately or returns a list containing the ui and server parts of an

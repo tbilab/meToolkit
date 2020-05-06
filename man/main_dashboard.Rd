@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_main_dashboard.R
 \name{main_dashboard}
 \alias{main_dashboard}
-\title{Main Multimorbidity Explorer Dashboard: Server function}
+\title{Main Multimorbidity Explorer Dashboard: Server}
 \usage{
 main_dashboard(
   input,

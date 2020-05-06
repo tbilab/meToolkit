@@ -1,4 +1,4 @@
-#' Interactive manhattan plot and table
+#' Interactive manhattan plot and table: UI
 #'
 #' For selecting codes for further visualization in app.
 #'
@@ -55,7 +55,7 @@ manhattan_plot_and_table_UI <- function(id) {
   )
 }
 
-#' Server function of manhattan plot module.
+#' Interactive manhattan plot and table: Server
 #'
 #' Draw an interactive manhattan plot and table that can be used to send
 #' selections for codes to the rest of the app.

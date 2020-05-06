@@ -2,7 +2,7 @@
 % Please edit documentation in R/build_me_app.R
 \name{build_me_app}
 \alias{build_me_app}
-\title{Build ME app from data}
+\title{Run main ME dashboard interface from supplied data}
 \usage{
 build_me_app(
   phewas_results,

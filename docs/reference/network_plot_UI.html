@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Interactive individual-level data network diagram of patients to codes — network_plot_UI • meToolkit</title>
+<title>Subject-level network diagram: UI — network_plot_UI • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Interactive individual-level data network diagram of patients to codes — network_plot_UI" />
-<meta property="og:description" content="Interactive individual-level data network diagram of patients to codes" />
+<meta property="og:title" content="Subject-level network diagram: UI — network_plot_UI" />
+<meta property="og:description" content="Subject-level network diagram: UI" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,13 +103,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Interactive individual-level data network diagram of patients to codes</h1>
+    <h1>Subject-level network diagram: UI</h1>
     
     <div class="hidden name"><code>network_plot_UI.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Interactive individual-level data network diagram of patients to codes</p>
+    <p>Subject-level network diagram: UI</p>
     </div>
 
     <pre class="usage"><span class='fu'>network_plot_UI</span>(<span class='no'>id</span>, <span class='no'>snp_colors</span>)</pre>
@@ -138,7 +138,123 @@ allele.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'>network_plot_UI</span>(<span class='st'>'mycomorbiditynetwork_plot'</span>, <span class='kw'>snp_colors</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'#bdbdbd'</span>,<span class='st'>'#fecc5c'</span>, <span class='st'>'#a50f15'</span>))</div><div class='output co'>#&gt; <span class='error'>Error in NS(id): could not find function "NS"</span></div></pre>
+<span class='fu'>network_plot_UI</span>(<span class='st'>'mycomorbiditynetwork_plot'</span>, <span class='kw'>snp_colors</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'#bdbdbd'</span>,<span class='st'>'#fecc5c'</span>, <span class='st'>'#a50f15'</span>))</div><div class='output co'>#&gt; &lt;style&gt;#network_module-control-panel {
+#&gt;   height: {height_of_controls}px;
+#&gt;   display: flex;
+#&gt;   justify-content: space-between;
+#&gt; }
+#&gt; 
+#&gt; .network_module-network-controls {
+#&gt;   padding: 3px;
+#&gt;   align-self: center;
+#&gt; }
+#&gt; 
+#&gt; #network_plot_holder {
+#&gt;   height: calc(100% - var(--section-title-height) - 30px);
+#&gt; }&lt;/style&gt;
+#&gt; &lt;div class="title-bar"&gt;
+#&gt;   &lt;h3 class="template-section-title"&gt;Subject-Phecode Bipartite Network&lt;/h3&gt;
+#&gt;   &lt;style&gt;
+#&gt;     .help_page .content {
+#&gt;       width: 80%;
+#&gt;       max-width: 850px;
+#&gt;       position: fixed;
+#&gt;       z-index: 100;
+#&gt;       top: 0;
+#&gt;       left: 0;
+#&gt;       right: 0;
+#&gt;       max-width: 800px;
+#&gt;       margin-left: auto;
+#&gt;       margin-right: auto;
+#&gt;       margin-top: 2.4rem;
+#&gt;       background: white;
+#&gt;       border-radius: 10px;
+#&gt;       padding: 10px;
+#&gt;       box-shadow: 0px 0px 200px black;
+#&gt;     }
+#&gt; 
+#&gt;     .help_page::before {
+#&gt;       content: "";
+#&gt;       position: fixed;
+#&gt;       top: 0;
+#&gt;       left: 0;
+#&gt;       width: 100vw;
+#&gt;       height: 100vh;
+#&gt;       z-index: 99;
+#&gt;       background: #0000007d;
+#&gt;       backdrop-filter: blur(4px);
+#&gt;     }
+#&gt; 
+#&gt;     .help_page.hidden {
+#&gt;       display: none;
+#&gt;     }
+#&gt; 
+#&gt;     .help_page.hidden::before {
+#&gt;       content: none;
+#&gt;     }
+#&gt; 
+#&gt;     .help_page img {
+#&gt;       max-width: 100%;
+#&gt;     }
+#&gt; 
+#&gt;     .title-bar-help-btn {
+#&gt;       border-radius: 50%;
+#&gt;       width: 2rem;
+#&gt;       height: 2rem;
+#&gt;       text-align: center;
+#&gt;       padding: 0;
+#&gt;       margin-top: 2px;
+#&gt;       margin-right: 2px;
+#&gt;     }
+#&gt; 
+#&gt;     .help_bottom {
+#&gt;       display: flex;
+#&gt;       justify-content: space-between;
+#&gt;       align-items: center;
+#&gt;     }
+#&gt;   &lt;/style&gt;
+#&gt;   &lt;button class="btn btn-default action-button title-bar-help-btn" id="mycomorbiditynetwork_plot-network-open_help" type="button"&gt;?&lt;/button&gt;
+#&gt;   &lt;div id="mycomorbiditynetwork_plot-network-modal" class="help_page hidden"&gt;
+#&gt;     &lt;div class="content"&gt;
+#&gt;       &lt;h1&gt;Help for the subject-phecode bipartite netework&lt;/h1&gt;
+#&gt;       &lt;div&gt;
+#&gt;         &lt;img src="https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/network_help_page.png"/&gt;
+#&gt;       &lt;/div&gt;
+#&gt;       &lt;div class="help_bottom"&gt;
+#&gt;         &lt;button id="mycomorbiditynetwork_plot-network-close_help" type="button" class="btn btn-default action-button"&gt;Close&lt;/button&gt;
+#&gt;         &lt;a href="https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#subject-phecode-bipartite-network" style="padding-left: 2rem;" target="_blank"&gt;🔎More information&lt;/a&gt;
+#&gt;       &lt;/div&gt;
+#&gt;     &lt;/div&gt;
+#&gt;   &lt;/div&gt;
+#&gt; &lt;/div&gt;
+#&gt; &lt;div id="network_module-control-panel"&gt;
+#&gt;   &lt;div class="network_module-network-controls minor-allele-checkbox"&gt;
+#&gt;     &lt;div class="form-group shiny-input-container"&gt;
+#&gt;       &lt;div class="checkbox"&gt;
+#&gt;         &lt;label&gt;
+#&gt;           &lt;input id="mycomorbiditynetwork_plot-snp_filter" type="checkbox"/&gt;
+#&gt;           &lt;span&gt;Just minor-allele carriers&lt;/span&gt;
+#&gt;         &lt;/label&gt;
+#&gt;       &lt;/div&gt;
+#&gt;     &lt;/div&gt;
+#&gt;   &lt;/div&gt;
+#&gt;   &lt;div class="network_module-network-controls minor-allele-legend"&gt;
+#&gt;     &lt;span&gt;Copies of minor allele:&lt;/span&gt;
+#&gt;     &lt;span style="border-radius: 50%;&amp;#10;font-family: Monaco;&amp;#10;font-size: 0.9rem;&amp;#10;padding: 1px 6px;&amp;#10;color: white;&amp;#10;background: #bdbdbd;"&gt;0&lt;/span&gt;
+#&gt;     &lt;span style="border-radius: 50%;&amp;#10;font-family: Monaco;&amp;#10;font-size: 0.9rem;&amp;#10;padding: 1px 6px;&amp;#10;color: white;&amp;#10;background: #fecc5c;"&gt;1&lt;/span&gt;
+#&gt;     &lt;span style="border-radius: 50%;&amp;#10;font-family: Monaco;&amp;#10;font-size: 0.9rem;&amp;#10;padding: 1px 6px;&amp;#10;color: white;&amp;#10;background: #a50f15;"&gt;2&lt;/span&gt;
+#&gt;   &lt;/div&gt;
+#&gt; &lt;/div&gt;
+#&gt; &lt;div id="network_plot_holder"&gt;
+#&gt;   &lt;div id="mycomorbiditynetwork_plot-plot" style="width:100%; height:100%; " class="r2d3 html-widget html-widget-output"&gt;&lt;/div&gt;
+#&gt; &lt;/div&gt;
+#&gt; &lt;div class="network-help-page help_page hidden"&gt;
+#&gt;   &lt;h1&gt;Help for the network plot&lt;/h1&gt;
+#&gt;   &lt;div&gt;
+#&gt;     &lt;img src="https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/network_help_page.png"/&gt;
+#&gt;   &lt;/div&gt;
+#&gt;   &lt;button id="mycomorbiditynetwork_plot-close_help" type="button" class="btn btn-default action-button"&gt;Close&lt;/button&gt;
+#&gt; &lt;/div&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

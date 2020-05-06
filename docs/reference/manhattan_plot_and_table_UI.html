@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Interactive manhattan plot and table — manhattan_plot_and_table_UI • meToolkit</title>
+<title>Interactive manhattan plot and table: UI — manhattan_plot_and_table_UI • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,7 @@
 
 
 
-<meta property="og:title" content="Interactive manhattan plot and table — manhattan_plot_and_table_UI" />
+<meta property="og:title" content="Interactive manhattan plot and table: UI — manhattan_plot_and_table_UI" />
 <meta property="og:description" content="For selecting codes for further visualization in app." />
 <meta name="twitter:card" content="summary" />
 
@@ -103,7 +103,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Interactive manhattan plot and table</h1>
+    <h1>Interactive manhattan plot and table: UI</h1>
     
     <div class="hidden name"><code>manhattan_plot_and_table_UI.Rd</code></div>
     </div>
@@ -131,7 +131,107 @@
     <div class='dont-index'><p><code><a href='manhattan_plot_and_table.html'>manhattan_plot_and_table</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>manhattan_plot_and_table_UI</span>(<span class='st'>'my_mod'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in NS(id): could not find function "NS"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>manhattan_plot_and_table_UI</span>(<span class='st'>'my_mod'</span>)</div><div class='output co'>#&gt; &lt;style&gt;
+#&gt;     #phewas_panel select {
+#&gt;       width: 60px;
+#&gt;     }
+#&gt; 
+#&gt;     #phewas_panel .form-group{
+#&gt;       width: auto;
+#&gt;       display: flex;
+#&gt;       align-items: center;
+#&gt;       height: 100%;
+#&gt;       font-size: 0.8rem;
+#&gt;     }
+#&gt; 
+#&gt;     #phewas_panel label {
+#&gt;       padding-right: 4px;
+#&gt;     }
+#&gt;   &lt;/style&gt;
+#&gt; &lt;div id="phewas_panel" class="title-bar"&gt;
+#&gt;   &lt;h3 class="template-section-title"&gt;Interactive Phewas Manhattan Plot&lt;/h3&gt;
+#&gt;   &lt;div class="form-group shiny-input-container"&gt;
+#&gt;     &lt;label class="control-label" for="my_mod-significance_threshold"&gt;Signficance Threshold&lt;/label&gt;
+#&gt;     &lt;div&gt;
+#&gt;       &lt;select id="my_mod-significance_threshold" class="form-control"&gt;&lt;option value="None" selected&gt;None&lt;/option&gt;
+#&gt; &lt;option value="0.05"&gt;0.05&lt;/option&gt;
+#&gt; &lt;option value="0.01"&gt;0.01&lt;/option&gt;&lt;/select&gt;
+#&gt;     &lt;/div&gt;
+#&gt;   &lt;/div&gt;
+#&gt;   &lt;style&gt;
+#&gt;     .help_page .content {
+#&gt;       width: 80%;
+#&gt;       max-width: 850px;
+#&gt;       position: fixed;
+#&gt;       z-index: 100;
+#&gt;       top: 0;
+#&gt;       left: 0;
+#&gt;       right: 0;
+#&gt;       max-width: 800px;
+#&gt;       margin-left: auto;
+#&gt;       margin-right: auto;
+#&gt;       margin-top: 2.4rem;
+#&gt;       background: white;
+#&gt;       border-radius: 10px;
+#&gt;       padding: 10px;
+#&gt;       box-shadow: 0px 0px 200px black;
+#&gt;     }
+#&gt; 
+#&gt;     .help_page::before {
+#&gt;       content: "";
+#&gt;       position: fixed;
+#&gt;       top: 0;
+#&gt;       left: 0;
+#&gt;       width: 100vw;
+#&gt;       height: 100vh;
+#&gt;       z-index: 99;
+#&gt;       background: #0000007d;
+#&gt;       backdrop-filter: blur(4px);
+#&gt;     }
+#&gt; 
+#&gt;     .help_page.hidden {
+#&gt;       display: none;
+#&gt;     }
+#&gt; 
+#&gt;     .help_page.hidden::before {
+#&gt;       content: none;
+#&gt;     }
+#&gt; 
+#&gt;     .help_page img {
+#&gt;       max-width: 100%;
+#&gt;     }
+#&gt; 
+#&gt;     .title-bar-help-btn {
+#&gt;       border-radius: 50%;
+#&gt;       width: 2rem;
+#&gt;       height: 2rem;
+#&gt;       text-align: center;
+#&gt;       padding: 0;
+#&gt;       margin-top: 2px;
+#&gt;       margin-right: 2px;
+#&gt;     }
+#&gt; 
+#&gt;     .help_bottom {
+#&gt;       display: flex;
+#&gt;       justify-content: space-between;
+#&gt;       align-items: center;
+#&gt;     }
+#&gt;   &lt;/style&gt;
+#&gt;   &lt;button class="btn btn-default action-button title-bar-help-btn" id="my_mod-phewas-open_help" type="button"&gt;?&lt;/button&gt;
+#&gt;   &lt;div id="my_mod-phewas-modal" class="help_page hidden"&gt;
+#&gt;     &lt;div class="content"&gt;
+#&gt;       &lt;h1&gt;Help for ineractive phewas manhattan plot&lt;/h1&gt;
+#&gt;       &lt;div&gt;
+#&gt;         &lt;img src="https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/phewas_help_page.png"/&gt;
+#&gt;       &lt;/div&gt;
+#&gt;       &lt;div class="help_bottom"&gt;
+#&gt;         &lt;button id="my_mod-phewas-close_help" type="button" class="btn btn-default action-button"&gt;Close&lt;/button&gt;
+#&gt;         &lt;a href="https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#interactive-phewas-manhattan-plot" style="padding-left: 2rem;" target="_blank"&gt;🔎More information&lt;/a&gt;
+#&gt;       &lt;/div&gt;
+#&gt;     &lt;/div&gt;
+#&gt;   &lt;/div&gt;
+#&gt; &lt;/div&gt;
+#&gt; &lt;div id="my_mod-manhattan_plot_and_table" style="width:100%; height:100%; " class="r2d3 html-widget html-widget-output"&gt;&lt;/div&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

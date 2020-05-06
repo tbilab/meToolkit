@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_network_plot.R
 \name{network_plot}
 \alias{network_plot}
-\title{Server function of snp info panel}
+\title{Subject-level network diagram: Server}
 \usage{
 network_plot(
   input,
@@ -47,7 +47,7 @@ list with the type \code{"isolation, deletion, snp_filtering"} to the
 passed \code{action_object} for updating app state.
 }
 \description{
-Server function of snp info panel
+Subject-level network diagram: Server
 }
 \examples{
 callModule(info_panel, 'info_panel', snp_name, individual_data, subset_maf)

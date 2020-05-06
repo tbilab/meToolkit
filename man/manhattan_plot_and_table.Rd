@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_manhattan_and_table.R
 \name{manhattan_plot_and_table}
 \alias{manhattan_plot_and_table}
-\title{Server function of manhattan plot module.}
+\title{Interactive manhattan plot and table: Server}
 \usage{
 manhattan_plot_and_table(
   input,
