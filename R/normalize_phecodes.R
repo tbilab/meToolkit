@@ -10,8 +10,8 @@
 #' @export
 #'
 #' @examples
-#' normalizePhecode(c(8, 8.1, 9.2))
-normalizePhecode <- function(codes){
+#' normalize_phecodes(c(8, 8.1, 9.2))
+normalize_phecodes <- function(codes){
 
   stringr::str_pad(
     sprintf('%3.2f', as.numeric(codes)),

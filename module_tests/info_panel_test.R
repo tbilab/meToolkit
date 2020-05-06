@@ -10,7 +10,7 @@ individual_data <- cached_data$individual_data
 desired_codes <- colnames(individual_data)[-c(1, ncol(individual_data))] %>%
   sample(5)
 
-curr_ind_data <- subsetToCodes(
+curr_ind_data <- subset_to_codes(
   individual_data,
   desired_codes = desired_codes
 )

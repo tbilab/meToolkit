@@ -12,12 +12,12 @@
 #'   corresponding to cases with one or more of the desired codes.
 #'
 #' @examples
-#' subsetToCodes(myPhenotypes, c('001.00', '002.00'), codes_to_invert = c('001.00'))
+#' subset_to_codes(myPhenotypes, c('001.00', '002.00'), codes_to_invert = c('001.00'))
 #' @export
-subsetToCodes <- function(data, desired_codes, codes_to_invert = c()) {
+subset_to_codes <- function(data, desired_codes, codes_to_invert = c()) {
     # Normalize phecodes in case it hasn't been done already
-    desired_codes <- desired_codes %>% meToolkit::normalizePhecode()
-    codes_to_invert <- codes_to_invert %>% meToolkit::normalizePhecode()
+    desired_codes <- desired_codes %>% meToolkit::normalize_phecodes()
+    codes_to_invert <- codes_to_invert %>% meToolkit::normalize_phecodes()
 
     # are we going to invert any of these codes?
     inverting_codes <- length(codes_to_invert) > 0

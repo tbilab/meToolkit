@@ -2,7 +2,7 @@
 #'
 #' Produces a dataframe that can be used for testing out
 #' functions in package on simulated data. Usually paired with
-#' \code{meToolkit::simIndividualData()}.
+#' \code{meToolkit::sim_individual_data()}.
 #'
 #'
 #' @param n_codes How many phecodes should be simulated for the results?
@@ -18,9 +18,9 @@
 #'   p-value.
 #'
 #' @examples
-#' simPhewasResults(n_codes = 100, n_categories = 11)
+#' sim_phewas_results(n_codes = 100, n_categories = 11)
  #' @export
-simPhewasResults <- function(n_codes, n_categories){
+sim_phewas_results <- function(n_codes, n_categories){
 
   # Parameters used in generating p-values from a beta distribution.
   alpha <- 1

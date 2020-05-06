@@ -116,7 +116,7 @@ main_dashboard <- function(input,
 
   # Add colors to codes in results data.
   phewas_results <-
-    meToolkit::buildColorPalette(phewas_results, category)
+    meToolkit::build_color_palette(phewas_results, category)
 
   # Get available codes sorted by p-value
   available_codes <- phewas_results %>%
@@ -172,7 +172,7 @@ main_dashboard <- function(input,
 
     individual_data %>%
       dplyr::filter((snp > 0) | keep_everyone) %>%
-      meToolkit::subsetToCodes(
+      meToolkit::subset_to_codes(
         desired_codes = state$selected_codes(),
         codes_to_invert = state$inverted_codes()
       )
@@ -180,7 +180,7 @@ main_dashboard <- function(input,
 
   # Network representation of the current data for use in the network plot(s)
   curr_network_data <- shiny::reactive({
-    meToolkit::makeNetworkData(
+    meToolkit::setup_network_data(
       data = curr_ind_data(),
       phecode_info = phewas_results,
       inverted_codes = state$inverted_codes(),
@@ -273,8 +273,19 @@ main_dashboard <- function(input,
         invert = {
           currently_inverted <- state$inverted_codes()
           requested_inversion <- extract_codes(action_payload)
-          new_inverted_list <-
-            meToolkit::invertCodes(requested_inversion, currently_inverted)
+
+          # codes that have been inverted and are now being reverted to normal
+          already_inverted_codes <- intersect(currently_inverted, requested_inversion)
+
+          # codes that are being freshly inverted
+          newly_inverted_codes <- requested_inversion[!(requested_inversion %in% already_inverted_codes)]
+
+          # codes that are unchanged/ stay inverted
+          unchanged_codes <- currently_inverted[!(currently_inverted %in% already_inverted_codes)]
+
+          # return the list of codes that should be inverted
+          new_inverted_list <- c(newly_inverted_codes, unchanged_codes)
+
           state$inverted_codes(new_inverted_list)
         },
         stop("Unknown input")
@@ -336,7 +347,7 @@ main_dashboard <- function(input,
     current_individual_data = curr_ind_data
   )
 
-  # Multicode selecter input
+  # Multicode selector input
   shiny::observeEvent(input$filter_to_desired, {
     codes_desired <- input$desired_codes
     action_object_message <-  list(type = 'selection',
@@ -371,6 +382,5 @@ main_dashboard <- function(input,
       write.csv(curr_ind_data(), file)
     }
   )
-
-
 }
+

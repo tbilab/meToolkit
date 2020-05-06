@@ -1,4 +1,4 @@
-context("test-subsettocodes")
+context("test-subset_to_codes")
 
 library(tibble)
 library(meToolkit)
@@ -25,7 +25,7 @@ sample_phenotypes['snp'] <- rbinom(n = 10, prob = 0.5, size = 2)
 
 test_that("subsetting", {
 
-  simple_subset <- subsetToCodes(sample_phenotypes, c('001.00', '002.00'))
+  simple_subset <- subset_to_codes(sample_phenotypes, c('001.00', '002.00'))
 
   expect_equal(ncol(simple_subset), 4)
 
@@ -36,7 +36,7 @@ test_that("subsetting", {
 
 test_that("Inverting", {
 
-  simple_invert <- subsetToCodes(
+  simple_invert <- subset_to_codes(
     sample_phenotypes,
     c('001.00', '002.00', '005.00'),
     codes_to_invert = c('002.00')
@@ -51,7 +51,7 @@ test_that("Inverting", {
 
 test_that("Handles non-normalized codes", {
 
-  unnormed_codes <- subsetToCodes(
+  unnormed_codes <- subset_to_codes(
     sample_phenotypes,
     c('1.0', '02.00', '005')
   )

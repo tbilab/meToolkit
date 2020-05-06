@@ -9,8 +9,8 @@ library(tidyverse)
 data("fake_phewas_results")
 phewas_results <- fake_phewas_results %>%
   head() %>%
-  mutate(code = meToolkit::normalizePhecode(code)) %>%
-  meToolkit::buildColorPalette(category)
+  mutate(code = meToolkit::normalize_phecodes(code)) %>%
+  meToolkit::build_color_palette(category)
 
 # Some constants
 snp_prev <- 0.15
@@ -20,7 +20,7 @@ snp_filter <- FALSE
 
 generate_random_data <- function(n_patients = 1000){
   individual_data <- phewas_results %>%
-    meToolkit::simIndividualData(n_patients, snp_prev) %>% {
+    meToolkit::sim_individual_data(n_patients, snp_prev) %>% {
       right_join(
         .$phenotypes, .$snp_status,
         by = 'id'
@@ -42,7 +42,7 @@ generate_random_data <- function(n_patients = 1000){
     filter(value != 0) %>%
     pull(code)
 
-  network_data <- meToolkit::makeNetworkData(individual_data, phewas_results, inverted_codes)
+  network_data <- meToolkit::setup_network_data(individual_data, phewas_results, inverted_codes)
 
   cases_with_edges <- network_data$edges %>%
     pull(source) %>%

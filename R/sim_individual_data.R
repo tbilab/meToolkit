@@ -20,13 +20,13 @@
 #' @export
 #'
 #' @examples
-#' simIndividualData(fake_phewas_results, 10, 0.15)
-simIndividualData <- function(phewas_results, num_patients, snp_prev){
+#' sim_individual_data(fake_phewas_results, 10, 0.15)
+sim_individual_data <- function(phewas_results, num_patients, snp_prev){
     # Get needed statistics out of the phewas results
     code_stats <- phewas_results %>%
       dplyr::mutate(
         # Force codes to be normalized
-        code = meToolkit::normalizePhecode(code),
+        code = meToolkit::normalize_phecodes(code),
         prob_wo_snp = code_proportion / (1 + snp_prev*(OR - 1)),
         prob_w_snp = OR*prob_wo_snp
       ) %>%

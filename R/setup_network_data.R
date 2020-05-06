@@ -35,8 +35,8 @@
 #' @export
 #'
 #' @examples
-#' makeNetworkData(data, phewas_results)
-makeNetworkData <- function(
+#' setup_network_data(data, phewas_results)
+setup_network_data <- function(
   data,
   phecode_info,
   inverted_codes = c(),

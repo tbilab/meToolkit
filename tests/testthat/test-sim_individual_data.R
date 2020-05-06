@@ -1,14 +1,14 @@
 library(tidyverse)
-context("test-simindividualdata")
+context("test-sim_individual_data")
 
 # Load packaged fake phewas results dataframe with 1,578 phecodes
 data("fake_phewas_results")
 
-simulated_data_10 <- meToolkit::simIndividualData(fake_phewas_results, 10, 0.15)
-simulated_data_100 <- meToolkit::simIndividualData(fake_phewas_results, 100, 0.15)
-simulated_data_50_codes <- meToolkit::simIndividualData(fake_phewas_results %>% head(50), 10, 0.15)
-simulated_data_high_snp <- meToolkit::simIndividualData(fake_phewas_results, 100, 0.95)
-simulated_data_low_snp <- meToolkit::simIndividualData(fake_phewas_results, 100, 0.05)
+simulated_data_10 <- meToolkit::sim_individual_data(fake_phewas_results, 10, 0.15)
+simulated_data_100 <- meToolkit::sim_individual_data(fake_phewas_results, 100, 0.15)
+simulated_data_50_codes <- meToolkit::sim_individual_data(fake_phewas_results %>% head(50), 10, 0.15)
+simulated_data_high_snp <- meToolkit::sim_individual_data(fake_phewas_results, 100, 0.95)
+simulated_data_low_snp <- meToolkit::sim_individual_data(fake_phewas_results, 100, 0.05)
 
 test_that("Returned phenotype dataframe is the correct size", {
   expect_equal(

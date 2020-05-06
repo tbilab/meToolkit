@@ -1,6 +1,6 @@
 library(tidyverse)
 library(meToolkit)
-context("test-buildcolorpalette")
+context("test-build_color_palette")
 
 test_that("Throws an error when too many unique categories are requested", {
 
@@ -19,13 +19,13 @@ test_that("Color mappings are deterministic", {
     category = rep(head(letters,5), 4),
     values = rnorm(4*5)
   ) %>%
-    buildColorPalette(category)
+    build_color_palette(category)
 
   df2 <- tibble(
     category = rep(tail(letters,5), 4),
     values = rnorm(4*5)
   ) %>%
-    buildColorPalette(category)
+    build_color_palette(category)
 
   first_five_colors <- c("#d54c3b","#73d54a","#7245ce","#cad149","#ce4ec8")
 
@@ -43,7 +43,7 @@ test_that("Two dataframes with the same categories present will map the same col
     color_by_me = rep(head(letters,5), 4),
     values = rnorm(4*5)
   ) %>%
-    buildColorPalette(color_by_me) %>%
+    build_color_palette(color_by_me) %>%
     reduce_to_mappings()
 
   mapping_b <- tibble(
@@ -51,7 +51,7 @@ test_that("Two dataframes with the same categories present will map the same col
     values = rnorm(6*5)
   ) %>%
     sample_n(size = nrow(.), replace = FALSE) %>%
-    buildColorPalette(color_by_me) %>%
+    build_color_palette(color_by_me) %>%
     reduce_to_mappings()
 
   expect_equal(mapping_a, mapping_b)

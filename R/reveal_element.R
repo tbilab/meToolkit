@@ -7,7 +7,6 @@
 #'
 #' @return Injected javascript function in head of HTML that Shiny uses to
 #'   reveal elements.
-#' @export
 #'
 #' @examples
 #' shiny::tagList(use_reveal_element(),h1('Hi there', id = 'hi_message', class = 'hidden'))
@@ -37,7 +36,6 @@ use_reveal_element <- function(){
 #'   revealed.
 #'
 #' @return Desired element shown in UI of shiny app.
-#' @export
 #'
 #' @examples
 #' reveal_element(session, 'hi_message')

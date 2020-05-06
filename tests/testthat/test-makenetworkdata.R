@@ -1,5 +1,5 @@
 library(tidyverse)
-context("test-makenetworkdata")
+context("test-setup_network_data")
 
 df <- tibble(
   IID = c('a', 'b', 'c', 'd', 'e'),
@@ -33,7 +33,7 @@ vertices <- tibble(
   inverted   = c(       NA,       NA,         NA,         NA,       NA,  FALSE,   FALSE,   FALSE)
 )
 
-results <- meToolkit::makeNetworkData(df, phecode_info)
+results <- meToolkit::setup_network_data(df, phecode_info)
 
 test_that("Correct edges dataframe returned", {
   expect_equal(results$edges, edges)
@@ -45,14 +45,14 @@ test_that("Correct vertices dataframe returned", {
 
 
 test_that("Deals with inverted codes properly", {
-  results_inv <- meToolkit::makeNetworkData(df, phecode_info, inverted_codes = c('p2'))
+  results_inv <- meToolkit::setup_network_data(df, phecode_info, inverted_codes = c('p2'))
   vertices_inv <- vertices %>% mutate(inverted = c(       NA,       NA,         NA,         NA,       NA,  FALSE,   TRUE,   FALSE))
 
   expect_equal(results_inv$vertices, vertices_inv)
 })
 
 test_that("Size changes reflected", {
-  results_sized <- meToolkit::makeNetworkData(df, phecode_info, case_size = 2, code_size = 10)
+  results_sized <- meToolkit::setup_network_data(df, phecode_info, case_size = 2, code_size = 10)
   vertices_sized <- vertices %>% mutate( size = c(2,2,2,2,2,10,10,10))
 
   expect_equal(results_sized$vertices, vertices_sized)

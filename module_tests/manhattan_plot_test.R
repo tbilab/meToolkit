@@ -9,7 +9,7 @@ data("fake_phewas_results")
 
 phewas_results <- fake_phewas_results %>%
   mutate(
-    code = meToolkit::normalizePhecode(code),
+    code = meToolkit::normalize_phecodes(code),
     tooltip = paste(
       "</br><i>Code</i>", code,
       "</br><i>Description</i>", description,
@@ -19,7 +19,7 @@ phewas_results <- fake_phewas_results %>%
     )
   ) %>%
   select(-code_proportion) %>%
-  meToolkit::buildColorPalette(category)
+  meToolkit::build_color_palette(category)
 
 first_selected <- phewas_results %>%
   arrange(p_val) %>%

@@ -34,7 +34,11 @@ reconcile_data <- function(phewas_results, id_to_snp, id_to_code, multiple_compa
   id_to_code_checked <- meToolkit::checkPhenomeFile(id_to_code)
 
   # first spread the phenome data to a wide format
-  individual_data <- meToolkit::mergePhenomeGenome(id_to_code_checked, id_to_snp_checked$data)
+  individual_data <- id_to_code_checked %>%
+    dplyr::mutate(value = 1) %>%
+    tidyr::spread(code, value, fill = 0) %>%
+    dplyr::left_join(id_to_snp_checked$data, by = 'id') %>%
+    dplyr::mutate(snp = ifelse(is.na(snp), 0, snp))
 
   # These are codes that are not shared between the phewas and phenome data. We will remove them
   phenome_cols <- colnames(individual_data)

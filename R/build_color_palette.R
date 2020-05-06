@@ -12,8 +12,8 @@
 #' @export
 #'
 #' @examples
-#' df %>% buildColorPalette(Category)
-buildColorPalette <- function(df, indexCol){
+#' df %>% build_color_palette(Category)
+build_color_palette <- function(df, indexCol){
 
   indexCol_quo <- rlang::enquo(indexCol)
 
