@@ -20,9 +20,7 @@ main_dashboard_UI <- function(id, snp_colors) {
       app_title = 'Phewas Multimorbidity Explorer',
       manhattan_plot_title = 'Interactive Phewas Manhattan Plot',
       manhattan_plot = meToolkit::manhattan_plot_and_table_UI(ns('manhattan_plot_main_dashboard')),
-      upset_title = 'Comorbidity Upset Plot',
       upset = meToolkit::upset_UI(ns('upset_plot_main_dashboard')),
-      network_title = 'Subject-Phecode Bipartite Network',
       network = meToolkit::network_plot_UI(ns('network_plot_main_dashboard'),
                                            snp_colors = snp_colors),
       info_panel = meToolkit::info_panel_UI(ns('info_panel_main_dashboard'))
@@ -356,6 +354,7 @@ main_dashboard <- function(input,
       "show_back_button",
       "<span class='back-arrow'>&#10554;</span> Return to data loader"
     )
-
   }
+
+
 }

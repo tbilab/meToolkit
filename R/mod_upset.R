@@ -3,17 +3,28 @@
 #'
 #' @seealso \code{\link{upset}}
 #' @param id String with unique id of module in app
-#' @param div_class A character string containing a class name for the entire
-#'   plot to be wrapped in. This can then be used to style with external css.
-#'   Defaults to 'upset_plot'.
 #' @return HTML component of shiny module
 #' @export
 #'
 #' @examples
 #' upset_UI('my_mod')
-upset_UI <- function(id, div_class = 'upset_plot') {
+upset_UI <- function(id) {
   ns <- NS(id)
-  tagList(r2d3::d3Output(ns('upset_plot'), height = '100%'))
+
+  shiny::tagList(
+    shiny::div(
+      class = "title-bar",
+      shiny::h3("Comorbidity Upset Plot", class = "template-section-title"),
+      help_modal_UI(
+        id = ns("upset"),
+        title = "Help for the upset plot",
+        help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/upset_help_page.png",
+        more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#comorbidity-upset-plot"
+      )
+    ),
+    shiny::div(class = "template-section-body",
+               r2d3::d3Output(ns('upset_plot'), height = '100%')),
+  )
 }
 
 #' Server function of upset module
@@ -59,7 +70,7 @@ upset <- function(input,
   output$upset_plot <- r2d3::renderD3({
     # Turn wide individual data into a tidy list of phenotype presence
     tidy_phenotypes <- individual_data() %>%
-      tidyr::gather(code, value,-IID,-snp) %>%
+      tidyr::gather(code, value, -IID, -snp) %>%
       dplyr::filter(value != 0)
 
     # Get the code to color mappings for each pair
@@ -162,6 +173,8 @@ upset <- function(input,
     )
   }) # End renderD3
 
+  # Sets up response to help button
+  shiny::callModule(help_modal, 'upset')
 
   if (!is.null(action_object)) {
     observeEvent(input[[message_path]], {

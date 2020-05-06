@@ -5,52 +5,51 @@
 #'
 #' @seealso \code{\link{manhattan_plot_and_table}}
 #' @param id String with unique id of module in app
-#' @param height How tall we want this module to be in pixels (defaults to
-#'   `NULL`). If not provided the div must be styled to have a height using css.
-#'   (See `div_class` argument for targeting.)
 #' @return UI component of interactive manhattan plot
 #' @export
 #'
 #' @examples
 #' manhattan_plot_and_table_UI('my_mod')
-manhattan_plot_and_table_UI <- function(id, height = NULL) {
+manhattan_plot_and_table_UI <- function(id) {
   ns <- NS(id)
 
+  module_css <- "
+    #phewas_panel select {
+      width: 60px;
+    }
 
-  # position: absolute;
-  # right: 0;
-  # top: 0;
+    #phewas_panel .form-group{
+      width: auto;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      font-size: 0.8rem;
+    }
+
+    #phewas_panel label {
+      padding-right: 4px;
+    }
+  "
+
   tagList(
-    shiny::tags$style("
-                      #sig_threshold_selection {
-                        position: absolute;
-                        right: 5px;
-                        top: 7px;
-                      }
-
-                      #sig_threshold_selection .form-group {
-                        display: grid;
-                        grid-template-columns: 1fr 60px;
-                        grid-column-gap: 5px;
-                        align-items: center;
-                      }
-
-                      #sig_threshold_selection label {
-                       text-align: end;
-                       font-size: 0.8rem;
-                      }
-
-
-                      "),
-    shiny::tags$div(
-      id = "sig_threshold_selection",
+    shiny::tags$style(module_css),
+    shiny::div(
+      id = "phewas_panel",
+      class = "title-bar",
+      shiny::h3("Interactive Phewas Manhattan Plot", class = "template-section-title"),
       shiny::selectInput(
         ns("significance_threshold"),
-        label = "Significance Threshold Line",
+        label = "Signficance Threshold",
         choices = list("None", "0.05", "0.01"),
         selected = "None",
         selectize = FALSE
-      )
+      ),
+      help_modal_UI(
+        id = ns("phewas"),
+        title = "Help for ineractive phewas manhattan plot",
+        help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/phewas_help_page.png",
+        more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#interactive-phewas-manhattan-plot"
+      ),
     ),
     r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%')
   )
@@ -118,10 +117,12 @@ manhattan_plot_and_table <- function(input,
     )
   })
 
+  # Enable opening and closing of modal
+  shiny::callModule(help_modal, "phewas")
+
   # If we've received a message, package it into the returned reactive value
   observeEvent(input[[message_path]], {
     validate(need(input[[message_path]], message = FALSE))
     action_object(input[[message_path]])
   })
-
 }

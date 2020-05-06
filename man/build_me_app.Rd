@@ -11,7 +11,8 @@ build_me_app(
   max_allowed_codes = 45,
   auto_run = FALSE,
   debug_mode = FALSE,
-  snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15")
+  snp_colors = c("#bdbdbd", "#fecc5c", "#a50f15"),
+  multiple_comparisons_adjustment = "none"
 )
 }
 \arguments{
@@ -30,6 +31,13 @@ recorded in logs. Defaults to off.}
 
 \item{snp_colors}{Array of valid css color codes for 0, 1, and 2 copies of the
 minor allele in network plot.}
+
+\item{multiple_comparisons_adjustment}{What type of multiple comparisons
+adjustment should be done to the phewas results? Options include "None",
+"Bonferroni", and "Benjamini-Hochberg". Note that the correction is
+performed \emph{before} filtering of codes to those contained in individual
+data. Aka for as many tests as were passed in raw phewas results. If
+different behavior is desired, the user must provide results pre-adjusted.}
 }
 \value{
 If \code{auto_run = TRUE}, starts an ME app with your data, otherwise

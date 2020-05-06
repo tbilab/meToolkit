@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <!-- template.html -->
 
 <style>
@@ -61,24 +62,34 @@
   .template-upset-plot     { grid-area: 1 / 4 / 3 / 6; }
   .template-network-plot   { grid-area: 3 / 4 / 5 / 6; }
 
-  .template-manhattan-plot {
+  .template-manhattan-plot,
+  .template-upset-plot .template-section-body{
     position: relative;
   }
 
   .template-section-title {
-    height: var(--section-title-height);
     margin-top: 0;
     margin-bottom: 0;
     padding-left: 5px;
     line-height: var(--section-title-height);
-    border-bottom: 1px solid dimgrey;
   }
 
   .template-section-body {
     height: calc(100% - var(--section-title-height));
   }
 
+  .title-bar {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #69696926;
+    padding: 2px;
+    margin-bottom: 2px;
+    height: var(--section-title-height);
+  }
+}
+
 </style>
+
 
 <div class = 'app-header'>
   <h2 class = 'app-title'> {{ app_title }} </h2>
@@ -89,21 +100,13 @@
     {{ info_panel }}
   </div>
   <div class = 'template-manhattan-plot template-section'>
-    <h3 class = 'template-section-title'>{{ manhattan_plot_title }}</h3>
-    <div class = 'template-section-body'>
-      {{ manhattan_plot }}
-    </div>
+    {{ manhattan_plot }}
   </div>
   <div class = 'template-upset-plot template-section'>
-     <h3 class = 'template-section-title'>{{ upset_title }}</h3>
-     <div class = 'template-section-body'>
-      {{ upset }}
-     </div>
+    {{ upset }}
   </div>
   <div class = 'template-network-plot template-section'>
-    <h3 class = 'template-section-title'>{{ network_title }}</h3>
-    <div class = 'template-section-body'>
-      {{ network }}
-    </div>
+    {{ network }}
   </div>
+
 </div>
