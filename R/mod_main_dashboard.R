@@ -23,7 +23,8 @@ main_dashboard_UI <- function(id, snp_colors) {
       upset = meToolkit::upset_UI(ns('upset_plot_main_dashboard')),
       network = meToolkit::network_plot_UI(ns('network_plot_main_dashboard'),
                                            snp_colors = snp_colors),
-      info_panel = meToolkit::info_panel_UI(ns('info_panel_main_dashboard'))
+      info_panel = meToolkit::info_panel_UI(ns('info_panel_main_dashboard')),
+      subject_download_btn = shiny::downloadButton(ns("subject_download_btn"), "Download ids of current selection")
     )
   )
 }
@@ -355,6 +356,21 @@ main_dashboard <- function(input,
       "<span class='back-arrow'>&#10554;</span> Return to data loader"
     )
   }
+
+  output$subject_download_btn <- downloadHandler(
+    filename = function() {
+
+      codes_present <- colnames(curr_ind_data()) %>%
+        tail(-2) %>%
+        stringr::str_remove("\\.") %>%
+        paste(collapse = "_")
+
+      paste("subject_data-", codes_present, ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(curr_ind_data(), file)
+    }
+  )
 
 
 }
