@@ -70,7 +70,8 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
     }
   "
   # Javascript code that opens and closes this particular modal
-  modal_toggle_js <- glue::glue("
+  modal_toggle_js <- glue::glue(
+    "
     Shiny.addCustomMessageHandler('{ns('show_modal')}', function(msg) {{
       $('#{ns('modal')}').removeClass('hidden');
     }});
@@ -78,7 +79,8 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
     Shiny.addCustomMessageHandler('{ns('hide_modal')}', function(msg) {{
       $('#{ns('modal')}').addClass('hidden');
     }});
-  ")
+  "
+  )
 
   shiny::tagList(
     shiny::tags$head(shiny::tags$script(modal_toggle_js)),
@@ -112,9 +114,7 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
 #'
 #' @return NULL
 #' @export
-help_modal <- function(input,
-                       output,
-                       session) {
+help_modal <- function(input, output, session) {
   observeEvent(input$open_help, {
     session$sendCustomMessage(session$ns("show_modal"), "")
   })

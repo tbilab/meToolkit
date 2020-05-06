@@ -12,15 +12,13 @@
 #' @examples
 #'
 #' network_plot_UI('mycomorbiditynetwork_plot', snp_colors = c('#bdbdbd','#fecc5c', '#a50f15'))
-network_plot_UI <- function(
-  id,
-  snp_colors
-) {
+network_plot_UI <- function(id, snp_colors) {
   ns <- NS(id)
 
   height_of_controls <- 30
 
-  module_css <- glue::glue("
+  module_css <- glue::glue(
+    "
     #network_module-control-panel {
       height: {height_of_controls}px;
       display: flex;
@@ -35,17 +33,23 @@ network_plot_UI <- function(
     #network_plot_holder {
       height: calc(100% - var(--section-title-height) - [[height_of_controls]]px);
     }
-    ",  .open = "[[", .close = "]]")
+    ",
+    .open = "[[",
+    .close = "]]"
+  )
 
   # CSS Styles
-  rounded_span <- function(color){
-    glue::glue("
+  rounded_span <- function(color) {
+    glue::glue(
+      "
       border-radius: 50%;
       font-family: Monaco;
       font-size: 0.9rem;
       padding: 1px 6px;
       color: white;
-      background: {color};")
+      background: {color};
+      "
+    )
   }
 
   shiny::tagList(
@@ -77,8 +81,7 @@ network_plot_UI <- function(
       )
     ),
     shiny::div(id = "network_plot_holder",
-      r2d3::d3Output(ns("plot"), height = '100%')
-    ),
+               r2d3::d3Output(ns("plot"), height = '100%')),
     shiny::div(
       class = "network-help-page help_page hidden",
       shiny::h1("Help for the network plot"),
@@ -88,7 +91,6 @@ network_plot_UI <- function(
       shiny::actionButton(ns("close_help"), label = "Close")
     )
   )
-
 }
 
 #' Server function of snp info panel
@@ -118,21 +120,22 @@ network_plot_UI <- function(
 #'
 #' @examples
 #' callModule(info_panel, 'info_panel', snp_name, individual_data, subset_maf)
-network_plot <- function(
-  input, output, session,
-  network_data,
-  highlighted_codes,
-  snp_filter,
-  viz_type = 'free',
-  update_freq = 15,
-  action_object ) {
-
+network_plot <- function(input,
+                         output,
+                         session,
+                         network_data,
+                         highlighted_codes,
+                         snp_filter,
+                         viz_type = 'free',
+                         update_freq = 15,
+                         action_object) {
   message_path <- 'message_network_plot'
 
   # send data and options to the 2d plot
   output$plot <- r2d3::renderD3({
     validate(need(network_data(), message = FALSE))
-    json_for_network <- jsonlite::toJSON(network_data());
+    json_for_network <- jsonlite::toJSON(network_data())
+
 
     r2d3::r2d3(
       data = json_for_network,
@@ -174,16 +177,14 @@ network_plot <- function(
   # If the snp filter toggle has been changed, send the message
   # to the reactive value
   observeEvent(input$snp_filter, {
-
     # Check to see if the snp filter is different than current state
     validate(need(input$snp_filter != snp_filter(), message = FALSE))
 
-    to_return <- list(
-      type = 'snp_filter_change',
-      payload = input$snp_filter
-    )
+    to_return <- list(type = 'snp_filter_change',
+                      payload = input$snp_filter)
     action_object(to_return)
   })
 
+  # Enable opening and closing of help modal
   shiny::callModule(help_modal, "network")
 }
