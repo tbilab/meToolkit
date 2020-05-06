@@ -3,15 +3,12 @@
 #'
 #' @seealso \code{\link{upset}}
 #' @param id String with unique id of module in app
-#' @param div_class A character string containing a class name for the entire
-#'   plot to be wrapped in. This can then be used to style with external css.
-#'   Defaults to 'upset_plot'.
 #' @return HTML component of shiny module
 #' @export
 #'
 #' @examples
 #' upset_UI('my_mod')
-upset_UI <- function(id, div_class = 'upset_plot') {
+upset_UI <- function(id) {
   ns <- NS(id)
 
   shiny::tagList(
@@ -73,7 +70,7 @@ upset <- function(input,
   output$upset_plot <- r2d3::renderD3({
     # Turn wide individual data into a tidy list of phenotype presence
     tidy_phenotypes <- individual_data() %>%
-      tidyr::gather(code, value,-IID,-snp) %>%
+      tidyr::gather(code, value, -IID, -snp) %>%
       dplyr::filter(value != 0)
 
     # Get the code to color mappings for each pair
