@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reveal hidden element — reveal_element • meToolkit</title>
+<title>Normalize a phecode vector to padded character — normalize_phecodes • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,10 @@
 
 
 
-<meta property="og:title" content="Reveal hidden element — reveal_element" />
-<meta property="og:description" content="Targets a given UI element and toggles it from hidden to visable." />
+<meta property="og:title" content="Normalize a phecode vector to padded character — normalize_phecodes" />
+<meta property="og:description" content="Across ME we work with the phecodes that are provided in a million different
+formats. This takes any format (float, string) and converts it to a 0-padded
+character." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,47 +105,40 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Reveal hidden element</h1>
+    <h1>Normalize a phecode vector to padded character</h1>
     
-    <div class="hidden name"><code>reveal_element.Rd</code></div>
+    <div class="hidden name"><code>normalize_phecodes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Targets a given UI element and toggles it from hidden to visable.</p>
+    <p>Across ME we work with the phecodes that are provided in a million different
+formats. This takes any format (float, string) and converts it to a 0-padded
+character.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='no'>target_id</span>)</pre>
+    <pre class="usage"><span class='fu'>normalize_phecodes</span>(<span class='no'>codes</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>session</th>
-      <td><p>The session variable from your server or module function.</p></td>
-    </tr>
-    <tr>
-      <th>target_id</th>
-      <td><p>Unique character string of the id if your element to be
-revealed.</p></td>
+      <th>codes</th>
+      <td><p>A vector of phecodes in whatever format your heart desires. E.g. <code>8.00</code>, <code>8</code>, <code>0008.0</code>, ...</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Desired element shown in UI of shiny app.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>use_reveal_element</p></div>
+    <p>A vector of 0-padded phecodes.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='st'>'hi_message'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in reveal_element(session, "hi_message"): could not find function "reveal_element"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>normalize_phecodes</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>8</span>, <span class='fl'>8.1</span>, <span class='fl'>9.2</span>))</div><div class='output co'>#&gt; [1] "008.00" "008.10" "009.20"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

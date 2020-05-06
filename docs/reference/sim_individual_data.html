@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reveal hidden element — reveal_element • meToolkit</title>
+<title>Generate sample individual level data based upon some phewas results — sim_individual_data • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,10 @@
 
 
 
-<meta property="og:title" content="Reveal hidden element — reveal_element" />
-<meta property="og:description" content="Targets a given UI element and toggles it from hidden to visable." />
+<meta property="og:title" content="Generate sample individual level data based upon some phewas results — sim_individual_data" />
+<meta property="og:description" content="This function will take the results of a phewas study (most importantly a
+code, case and control numbers, and an OR) and simulate as many individual
+datapoints as you desire." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,47 +105,59 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Reveal hidden element</h1>
+    <h1>Generate sample individual level data based upon some phewas results</h1>
     
-    <div class="hidden name"><code>reveal_element.Rd</code></div>
+    <div class="hidden name"><code>sim_individual_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Targets a given UI element and toggles it from hidden to visable.</p>
+    <p>This function will take the results of a phewas study (most importantly a
+code, case and control numbers, and an OR) and simulate as many individual
+datapoints as you desire.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='no'>target_id</span>)</pre>
+    <pre class="usage"><span class='fu'>sim_individual_data</span>(<span class='no'>phewas_results</span>, <span class='no'>num_patients</span>, <span class='no'>snp_prev</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>session</th>
-      <td><p>The session variable from your server or module function.</p></td>
+      <th>phewas_results</th>
+      <td><p>Phewas results. Needs a column <code>code</code> with the id
+of a given phecode, <code>code_proportion</code>: with the proportion of
+individuals that have the code in the entire population, and <code>OR</code>: the
+odds ratio of having a code given having the snp of interest.</p></td>
     </tr>
     <tr>
-      <th>target_id</th>
-      <td><p>Unique character string of the id if your element to be
-revealed.</p></td>
+      <th>num_patients</th>
+      <td><p>How many patients should be simulated.</p></td>
+    </tr>
+    <tr>
+      <th>snp_prev</th>
+      <td><p>The overall population prevalence of the snp you want to
+simulate.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Desired element shown in UI of shiny app.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <p>list with following components</p><dl class='dl-horizontal'>
+<dt>snp_status</dt><dd><p>tibble
+with patient <code>ID</code> and snp status (<code>snp</code>)</p></dd> <dt>phenotypes</dt><dd><p>wide
+tibble with an <code>ID</code> column and a column for each code provided in the
+<code>phewas_resuts</code> input. Cell values are if the patient had that given
+code.</p></dd> 
+</dl>
 
-    <div class='dont-index'><p>use_reveal_element</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='st'>'hi_message'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in reveal_element(session, "hi_message"): could not find function "reveal_element"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>sim_individual_data</span>(<span class='no'>fake_phewas_results</span>, <span class='fl'>10</span>, <span class='fl'>0.15</span>)</div><div class='output co'>#&gt; <span class='error'>Error in n(): could not find function "n"</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reveal hidden element — reveal_element • meToolkit</title>
+<title>Simulate PheWAS results — sim_phewas_results • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,10 @@
 
 
 
-<meta property="og:title" content="Reveal hidden element — reveal_element" />
-<meta property="og:description" content="Targets a given UI element and toggles it from hidden to visable." />
+<meta property="og:title" content="Simulate PheWAS results — sim_phewas_results" />
+<meta property="og:description" content="Produces a dataframe that can be used for testing out
+functions in package on simulated data. Usually paired with
+meToolkit::sim_individual_data()." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,47 +105,64 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Reveal hidden element</h1>
+    <h1>Simulate PheWAS results</h1>
     
-    <div class="hidden name"><code>reveal_element.Rd</code></div>
+    <div class="hidden name"><code>sim_phewas_results.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Targets a given UI element and toggles it from hidden to visable.</p>
+    <p>Produces a dataframe that can be used for testing out
+functions in package on simulated data. Usually paired with
+<code><a href='sim_individual_data.html'>meToolkit::sim_individual_data()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='no'>target_id</span>)</pre>
+    <pre class="usage"><span class='fu'>sim_phewas_results</span>(<span class='no'>n_codes</span>, <span class='no'>n_categories</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>session</th>
-      <td><p>The session variable from your server or module function.</p></td>
+      <th>n_codes</th>
+      <td><p>How many phecodes should be simulated for the results?</p></td>
     </tr>
     <tr>
-      <th>target_id</th>
-      <td><p>Unique character string of the id if your element to be
-revealed.</p></td>
+      <th>n_categories</th>
+      <td><p>How many categories should the phecodes be grouped into?
+Can't be more than 26.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Desired element shown in UI of shiny app.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>use_reveal_element</p></div>
+    <p>A dataframe with columns: <code>code</code>: a unique phecode id (numbers
+of the form x.00), <code>p_val</code>: P-value drawn from a beta distribution
+peaked near zero, <code>category</code>: A simulated category (just a letter
+currently) that fills in order with last group category having less codes
+in it if there is not an even division of codes to categories.
+<code>tooltip</code>: Simple two line html tooltip of the code name and simulated
+p-value.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='st'>'hi_message'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in reveal_element(session, "hi_message"): could not find function "reveal_element"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>sim_phewas_results</span>(<span class='kw'>n_codes</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>n_categories</span> <span class='kw'>=</span> <span class='fl'>11</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 100 x 4</span><span>
+#&gt;    code   p_val category tooltip                                                
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;glue&gt;</span><span>                                                 
+#&gt; </span><span style='color: #555555;'> 1</span><span> 1.00  0.017</span><span style='text-decoration: underline;'>6</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 1.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'> 2</span><span> 2.00  0.157  a        &lt;strong&gt; Code: &lt;/strong&gt; 2.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'> 3</span><span> 3.00  0.156  a        &lt;strong&gt; Code: &lt;/strong&gt; 3.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'> 4</span><span> 4.00  0.234  a        &lt;strong&gt; Code: &lt;/strong&gt; 4.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'> 5</span><span> 5.00  0.043</span><span style='text-decoration: underline;'>1</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 5.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'> 6</span><span> 6.00  0.051</span><span style='text-decoration: underline;'>8</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 6.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'> 7</span><span> 7.00  0.225  a        &lt;strong&gt; Code: &lt;/strong&gt; 7.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'> 8</span><span> 8.00  0.120  a        &lt;strong&gt; Code: &lt;/strong&gt; 8.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'> 9</span><span> 9.00  0.362  a        &lt;strong&gt; Code: &lt;/strong&gt; 9.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/s…
+#&gt; </span><span style='color: #555555;'>10</span><span> 10.00 0.055</span><span style='text-decoration: underline;'>5</span><span> a        &lt;strong&gt; Code: &lt;/strong&gt; 10.00&lt;/br&gt;&lt;strong&gt;P-Value: &lt;/…
+#&gt; </span><span style='color: #555555;'># … with 90 more rows</span><span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

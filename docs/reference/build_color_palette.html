@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reveal hidden element — reveal_element • meToolkit</title>
+<title>Build Color Palette — build_color_palette • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,10 @@
 
 
 
-<meta property="og:title" content="Reveal hidden element — reveal_element" />
-<meta property="og:description" content="Targets a given UI element and toggles it from hidden to visable." />
+<meta property="og:title" content="Build Color Palette — build_color_palette" />
+<meta property="og:description" content="Takes a dataframe and a column to build a color palette for and returns the
+dataframe with a color column added with a unique color for each
+category." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,47 +105,45 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Reveal hidden element</h1>
+    <h1>Build Color Palette</h1>
     
-    <div class="hidden name"><code>reveal_element.Rd</code></div>
+    <div class="hidden name"><code>build_color_palette.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Targets a given UI element and toggles it from hidden to visable.</p>
+    <p>Takes a dataframe and a column to build a color palette for and returns the
+dataframe with a <code>color</code> column added with a unique color for each
+category.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='no'>target_id</span>)</pre>
+    <pre class="usage"><span class='fu'>build_color_palette</span>(<span class='no'>df</span>, <span class='no'>indexCol</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>session</th>
-      <td><p>The session variable from your server or module function.</p></td>
+      <th>df</th>
+      <td><p>Dataframe of rows to be colored.</p></td>
     </tr>
     <tr>
-      <th>target_id</th>
-      <td><p>Unique character string of the id if your element to be
-revealed.</p></td>
+      <th>indexCol</th>
+      <td><p>Unquoted name of column to be used for deciding each row's
+color.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Desired element shown in UI of shiny app.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>use_reveal_element</p></div>
+    <p><code>df</code> with an added <code>color</code> column.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='st'>'hi_message'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in reveal_element(session, "hi_message"): could not find function "reveal_element"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'>build_color_palette</span>(<span class='no'>Category</span>)</div><div class='output co'>#&gt; <span class='error'>Error in UseMethod("pull"): no applicable method for 'pull' applied to an object of class "function"</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

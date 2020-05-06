@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reveal hidden element — reveal_element • meToolkit</title>
+<title>Subset phenotype data to a given list of phecodes — subset_to_codes • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Reveal hidden element — reveal_element" />
-<meta property="og:description" content="Targets a given UI element and toggles it from hidden to visable." />
+<meta property="og:title" content="Subset phenotype data to a given list of phecodes — subset_to_codes" />
+<meta property="og:description" content="Removes individuals who have none of the requested codes" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,47 +103,49 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Reveal hidden element</h1>
+    <h1>Subset phenotype data to a given list of phecodes</h1>
     
-    <div class="hidden name"><code>reveal_element.Rd</code></div>
+    <div class="hidden name"><code>subset_to_codes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Targets a given UI element and toggles it from hidden to visable.</p>
+    <p>Removes individuals who have none of the requested codes</p>
     </div>
 
-    <pre class="usage"><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='no'>target_id</span>)</pre>
+    <pre class="usage"><span class='fu'>subset_to_codes</span>(<span class='no'>data</span>, <span class='no'>desired_codes</span>, <span class='kw'>codes_to_invert</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>session</th>
-      <td><p>The session variable from your server or module function.</p></td>
+      <th>data</th>
+      <td><p>A wide phenotype file with columns IID, snp, and all the
+normalized phecode names</p></td>
     </tr>
     <tr>
-      <th>target_id</th>
-      <td><p>Unique character string of the id if your element to be
-revealed.</p></td>
+      <th>desired_codes</th>
+      <td><p>Character vector of the phecodes to be extracted</p></td>
+    </tr>
+    <tr>
+      <th>codes_to_invert</th>
+      <td><p>Character vector of phecodes that the user has
+requested be inverted (e.g. not having the code is considered 'having' it.)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Desired element shown in UI of shiny app.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>use_reveal_element</p></div>
+    <p>A wide dataframe with just the columns desired and only rows
+corresponding to cases with one or more of the desired codes.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>reveal_element</span>(<span class='no'>session</span>, <span class='st'>'hi_message'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in reveal_element(session, "hi_message"): could not find function "reveal_element"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>subset_to_codes</span>(<span class='no'>myPhenotypes</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'001.00'</span>, <span class='st'>'002.00'</span>), <span class='kw'>codes_to_invert</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'001.00'</span>))</div><div class='output co'>#&gt; <span class='error'>Error in eval(lhs, parent, parent): object 'myPhenotypes' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
