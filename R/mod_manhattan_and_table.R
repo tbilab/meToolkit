@@ -5,39 +5,34 @@
 #'
 #' @seealso \code{\link{manhattan_plot_and_table}}
 #' @param id String with unique id of module in app
-#' @param height How tall we want this module to be in pixels (defaults to
-#'   `NULL`). If not provided the div must be styled to have a height using css.
-#'   (See `div_class` argument for targeting.)
 #' @return UI component of interactive manhattan plot
 #' @export
 #'
 #' @examples
 #' manhattan_plot_and_table_UI('my_mod')
-manhattan_plot_and_table_UI <- function(id, height = NULL) {
+manhattan_plot_and_table_UI <- function(id) {
   ns <- NS(id)
 
+  module_css <- "
+    #phewas_panel select {
+      width: 60px;
+    }
 
-  # position: absolute;
-  # right: 0;
-  # top: 0;
+    #phewas_panel .form-group{
+      width: auto;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      font-size: 0.8rem;
+    }
+
+    #phewas_panel label {
+      padding-right: 4px;
+    }
+  "
+
   tagList(
-    shiny::tags$style("
-      #phewas_panel select {
-        width: 60px;
-      }
-
-      #phewas_panel .form-group{
-        width: auto;
-        display: flex;
-        align-items: center;
-        height: 100%;
-        font-size: 0.8rem;
-      }
-
-      #phewas_panel label {
-        padding-right: 4px;
-      }
-    "),
+    shiny::tags$style(module_css),
     shiny::div(
       id = "phewas_panel",
       class = "title-bar",
@@ -122,6 +117,7 @@ manhattan_plot_and_table <- function(input,
     )
   })
 
+  # Enable opening and closing of modal
   shiny::callModule(help_modal, "phewas")
 
   # If we've received a message, package it into the returned reactive value
@@ -129,5 +125,4 @@ manhattan_plot_and_table <- function(input,
     validate(need(input[[message_path]], message = FALSE))
     action_object(input[[message_path]])
   })
-
 }
