@@ -118,7 +118,7 @@ upset <- function(input,
           PropMa = MaCarriers / Total
         ) %>% {
           RR_results <-
-            meToolkit::calcRrCi(.$Total[2], .$MaCarriers[2], .$Total[1], .$MaCarriers[1])
+            meToolkit::calc_pattern_risk_ratio(.$Total[2], .$MaCarriers[2], .$Total[1], .$MaCarriers[1])
 
           tibble::tibble(
             pointEst = RR_results$PE,

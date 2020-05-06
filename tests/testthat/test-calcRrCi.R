@@ -1,4 +1,4 @@
-context("test-calcRrCi")
+context("test-calc_pattern_risk_ratio")
 
 test_that("Gets expected RR interval", {
   set.seed(42)
@@ -7,7 +7,7 @@ test_that("Gets expected RR interval", {
     lower = 0.6169498,
     upper = 3.434385
   )
-  RR_results <- calcRrCi(
+  RR_results <- calc_pattern_risk_ratio(
     pattern_n=120, pattern_snp=5,
     other_n=2000, other_snp=56,
     CI_size = 0.95
