@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Interactive manhattan plot and table: UI — manhattan_plot_and_table_UI • meToolkit</title>
+<title>Run a ME app with data loading screen — build_me_w_loader • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,9 @@
 
 
 
-<meta property="og:title" content="Interactive manhattan plot and table: UI — manhattan_plot_and_table_UI" />
-<meta property="og:description" content="For selecting codes for further visualization in app." />
+<meta property="og:title" content="Run a ME app with data loading screen — build_me_w_loader" />
+<meta property="og:description" content="Function to spawn a shiny app instance for Multimorbidity Explorer app with
+data loading screen. Optionally data can be preloaded." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -103,42 +104,56 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Interactive manhattan plot and table: UI</h1>
+    <h1>Run a ME app with data loading screen</h1>
     
-    <div class="hidden name"><code>manhattan_plot_and_table_UI.Rd</code></div>
+    <div class="hidden name"><code>build_me_w_loader.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>For selecting codes for further visualization in app.</p>
+    <p>Function to spawn a shiny app instance for Multimorbidity Explorer app with
+data loading screen. Optionally data can be preloaded.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>manhattan_plot_and_table_UI</span>(<span class='no'>id</span>)</pre>
+    <pre class="usage"><span class='fu'>build_me_w_loader</span>(
+  <span class='kw'>preloaded_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>auto_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>snp_colors</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"#bdbdbd"</span>, <span class='st'>"#fecc5c"</span>, <span class='st'>"#a50f15"</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>id</th>
-      <td><p>String with unique id of module in app</p></td>
+      <th>preloaded_path</th>
+      <td><p>File path relative to app that preloaded data is
+stored. Defaults to <code>NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>auto_run</th>
+      <td><p>Do you want the app to run immediately or do you want the ui
+and server components of the app to run later? Defaults to <code>TRUE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>snp_colors</th>
+      <td><p>Array of valid css color codes for 0, 1, and 2 copies of the
+minor allele in network plot.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>UI component of interactive manhattan plot</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='manhattan_plot_and_table.html'>manhattan_plot_and_table</a></code></p></div>
+    <p>Shiny app process</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>manhattan_plot_and_table_UI</span>(<span class='st'>'my_mod'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in NS(id): could not find function "NS"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw pkg'>meToolkit</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/meToolkit/man/build_me_w_loader.html'>build_me_w_loader</a></span>()
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
