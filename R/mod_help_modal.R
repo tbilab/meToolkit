@@ -67,7 +67,19 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
       align-items: center;
     }
   "
+  # Javascript code that opens and closes this particular modal
+  modal_toggle_js <- glue::glue("
+    Shiny.addCustomMessageHandler('{ns('show_modal')}', function(msg) {{
+      $('#{ns('modal')}').removeClass('hidden');
+    }});
+
+    Shiny.addCustomMessageHandler('{ns('hide_modal')}', function(msg) {{
+      $('#{ns('modal')}').addClass('hidden');
+    }});
+  ")
+
   shiny::tagList(
+    shiny::tags$head(shiny::tags$script(modal_toggle_js)),
     shiny::tags$style(modal_css),
     shiny::actionButton(ns('open_help'), class = "title-bar-help-btn", label = "?"),
     shiny::div(
@@ -102,10 +114,10 @@ help_modal <- function(input,
                        output,
                        session) {
   observeEvent(input$open_help, {
-    session$sendCustomMessage("show_help_modal", session$ns("modal"))
+    session$sendCustomMessage(session$ns("show_modal"), "")
   })
 
   observeEvent(input$close_help, {
-    session$sendCustomMessage("hide_help_modal", session$ns("modal"))
+    session$sendCustomMessage(session$ns("hide_modal"), "")
   })
 }

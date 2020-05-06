@@ -86,20 +86,10 @@
     margin-bottom: 2px;
     height: var(--section-title-height);
   }
-
 }
 
 </style>
 
-<script>
-  Shiny.addCustomMessageHandler("show_help_modal", function(which_modal) {
-    $(`#${which_modal}`).removeClass('hidden');
-  });
-
-  Shiny.addCustomMessageHandler("hide_help_modal", function(which_modal) {
-    $(`#${which_modal}`).addClass('hidden');
-  });
-</script>
 
 <div class = 'app-header'>
   <h2 class = 'app-title'> {{ app_title }} </h2>
