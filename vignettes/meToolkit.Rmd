@@ -13,8 +13,10 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-embed_png <- function(path, dpi = NULL) {
-  full_path <- paste0('', path)
+embed_png <- function(image_title, dpi = NULL) {
+  
+  base_path <- system.file("figures/", package = "meToolkit")
+  full_path <- paste0(base_path, image_title)
   meta <- attr(png::readPNG(full_path, native = TRUE, info = TRUE), "info")
   if (!is.null(dpi)) meta$dpi <- rep(dpi, 2)
   knitr::asis_output(paste0(
@@ -130,7 +132,7 @@ The application state is saved in the URL of the page. To return to a pre-determ
 ## Interactive Phewas Manhattan Plot
 
 ```{r, echo = FALSE}
-embed_png("manhattan_plot.png")
+embed_png("phewas_help_page.png")
 ```
 
 
@@ -181,7 +183,7 @@ The reset button allows the user undo all code changes they have made since the 
 ## Comorbidity Upset Plot
 
 ```{r, echo = FALSE}
-embed_png("upset_plot.png")
+embed_png("upset_help_page.png")
 ```
 
 
@@ -251,7 +253,7 @@ The info panel has no app-level state interaction capabilities.
 ## Subject-Phecode Bipartite Network
 
 ```{r, echo = FALSE}
-embed_png("network_plot.png")
+embed_png("network_help_page.png")
 ```
 
 ### Purpose 
