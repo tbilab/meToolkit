@@ -118,8 +118,16 @@ entire app. This makes it easy to deploy a custom app with a few lines of
 code.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>build_me_app</span>(<span class='no'>phewas_results</span>, <span class='no'>genotypes</span>, <span class='no'>phenotypes</span>,
-  <span class='kw'>max_allowed_codes</span> <span class='kw'>=</span> <span class='fl'>45</span>, <span class='kw'>auto_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>debug_mode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>build_me_app</span>(
+  <span class='no'>phewas_results</span>,
+  <span class='no'>genotypes</span>,
+  <span class='no'>phenotypes</span>,
+  <span class='kw'>max_allowed_codes</span> <span class='kw'>=</span> <span class='fl'>45</span>,
+  <span class='kw'>auto_run</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>debug_mode</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>snp_colors</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"#bdbdbd"</span>, <span class='st'>"#fecc5c"</span>, <span class='st'>"#a50f15"</span>),
+  <span class='kw'>multiple_comparisons_adjustment</span> <span class='kw'>=</span> <span class='st'>"none"</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,6 +152,20 @@ and server components of the app to run later? Defaults to <code>TRUE</code>.</p
       <th>debug_mode</th>
       <td><p>Boolean controlling if changes in app state should be
 recorded in logs. Defaults to off.</p></td>
+    </tr>
+    <tr>
+      <th>snp_colors</th>
+      <td><p>Array of valid css color codes for 0, 1, and 2 copies of the
+minor allele in network plot.</p></td>
+    </tr>
+    <tr>
+      <th>multiple_comparisons_adjustment</th>
+      <td><p>What type of multiple comparisons
+adjustment should be done to the phewas results? Options include "None",
+"Bonferroni", and "Benjamini-Hochberg". Note that the correction is
+performed <em>before</em> filtering of codes to those contained in individual
+data. Aka for as many tests as were passed in raw phewas results. If
+different behavior is desired, the user must provide results pre-adjusted.</p></td>
     </tr>
     </table>
 
@@ -178,7 +200,7 @@ returns a list containing elements: <code>ui</code> for the shiny app ui functio
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

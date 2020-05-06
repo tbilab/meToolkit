@@ -13,20 +13,11 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-embed_png <- function(image_title, dpi = NULL, width = "100%") {
-  
-  base_path <- system.file("figures/", package = "meToolkit")
-  full_path <- paste0(base_path, image_title)
-  meta <- attr(png::readPNG(full_path, native = TRUE, info = TRUE), "info")
-  if (!is.null(dpi)) meta$dpi <- rep(dpi, 2)
+embed_png <- function(image_title, width = "100%") {
   knitr::asis_output(
-    glue::glue(
-      "
-      <div style=\"text-align: center;\">
-      <img src=\"{full_path}\" width={width} />
-      </div>
-      "
-    )
+    glue::glue("<div style=\"text-align: center;\">",
+                 "<img src=\"{image_title}\" width={width} />",
+               "</div>")
   )
 }
 
