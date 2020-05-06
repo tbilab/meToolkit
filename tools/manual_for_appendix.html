@@ -214,7 +214,7 @@ The first is to go to the hosted example at prod.tbilab.org/multimorbidity_explo
 If data privacy is a concern, the app can be run entirely locally on any computer with R installed and the ability to install packages. To run locally install the <code>meToolkit</code> package from github using the <code>devtools</code> package…</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&#39;tbilab/meToolkit&#39;</span>)</a></code></pre></div>
 <p>Once the package is installed the app can be launched with the data loading interface using the command</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">meToolkit<span class="op">::</span><span class="kw">run_me</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">meToolkit<span class="op">::</span><span class="kw">build_me_w_loader</span>()</a></code></pre></div>
 <p><strong>Customizing with R API</strong>
 The <code>meToolkit</code> package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function <code>meToolkit::build_me_app()</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">my_ME_app &lt;-<span class="st"> </span><span class="kw">build_me_app</span>(</a>

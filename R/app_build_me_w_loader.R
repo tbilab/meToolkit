@@ -11,9 +11,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' meToolkit::run_me()
+#' meToolkit::build_me_w_loader()
 #' }
-run_me <-
+build_me_w_loader <-
   function(preloaded_path = NULL,
            auto_run = FALSE,
            snp_colors = c('#bdbdbd', '#fecc5c', '#a50f15')) {

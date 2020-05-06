@@ -4,7 +4,7 @@
 
 A package to build Phewas Multimorbidity Explorer (ME) apps. 
 
-The main function in this package `meToolkit::run_me()` spins up a fully contained and self-hosted copy of an ME app for data privacy. 
+The main function in this package `meToolkit::build_me_w_loader()` spins up a fully contained and self-hosted copy of an ME app for data privacy. 
 
 In addition to, multiple functions are provided allowing the user to customize their app from pre-loading data to configuring the individual charts included. 
 

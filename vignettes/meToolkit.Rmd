@@ -90,7 +90,7 @@ devtools::install_github('tbilab/meToolkit')
 
 Once the package is installed the app can be launched with the data loading interface using the command
 ```r
-meToolkit::run_me()
+meToolkit::build_me_w_loader()
 ```
 
 __Customizing with R API__
