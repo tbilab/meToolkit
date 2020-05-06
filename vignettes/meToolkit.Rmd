@@ -60,7 +60,7 @@ If you are starting an ME application with preloaded data from the R package API
 
 ## Data Loading Screen
 ```{r, echo = FALSE}
-embed_png("loading_page.png")
+embed_png("data_loading_screen.png")
 ```
 
 
@@ -157,6 +157,9 @@ A range selector is overlaid. This can be dragged to control which points are sh
 
 __Phewas Table__
 Below the manhattan plot and odds ratio histogram is a table corresponding to all the provided results. This table contains columns for the code name, odds ratio, p-value, code description, and code category.  The table can be sorted by all column values in addition to being searched for both code name and description. 
+
+__Significance Threshold Line__
+An optional line denoting statistical significance at the 95% or 99% levels is available by using the dropdown menu at the top of the panel labeled "Significance Threshold." When a value is chosen it will appear on the y-axis of the plot. The line defaults to extending across the plot but can be reduced to just a dash on the y-axis by clicking on the left arrow underneath the "P = 0.__" text on the y-axis. 
 
 
 ### Filtering codes
