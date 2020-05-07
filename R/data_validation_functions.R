@@ -17,8 +17,7 @@ checkGenomeFile <- function(genome, separate = TRUE){
   colnames(genome) <- tolower(colnames(genome))
 
   # Make sure ID column is in and in the format we want.
-  genome <- meToolkit::detect_id_column(genome)
-
+  genome <- detect_id_column(genome)
 
   two_columns <- length(colnames(genome)) == 2
   if(!two_columns) stop("File needs to be just two columns.", call. = FALSE)
@@ -65,7 +64,7 @@ checkPhenomeFile <- function(phenome){
   colnames(phenome) <-  tolower(colnames(phenome))
 
   # Make sure ID column is in and in the format we want.
-  phenome <- meToolkit::detect_id_column(phenome)
+  phenome <- detect_id_column(phenome)
 
   has_code <- 'code' %in% colnames(phenome)
   if(!has_code) stop("Missing Code column.", call. = FALSE)
@@ -99,5 +98,43 @@ checkPhewasFile <- function(phewas){
   }
 
   phewas
+}
+
+detect_id_column <- function(data, possible_id_cols = c('iid', 'id', 'grid'), final_id_name = 'id'){
+
+  # Get boolean of columns that match id options
+  is_id_col <- colnames(data) %in% possible_id_cols
+
+  # Do any match columns?
+  has_id_col <- any(is_id_col)
+
+  if(!has_id_col){
+    stop(
+      paste(
+        "Missing id column. Make sure your data has a column with one of the following names:",
+        paste(possible_id_cols, collapse = ', ')
+      ),
+      call. = FALSE
+    )
+  }
+
+  # Which column matches id?
+  id_col_loc <- which(is_id_col)
+
+  if(length(id_col_loc) > 1){
+    stop(
+      paste(
+        "Multiple id columns in data. Make sure to only include",
+        "one column with a name in the following list:",
+        paste(possible_id_cols, collapse = ', ')
+      ),
+      call. = FALSE
+    )
+  }
+
+  # Set the id column to standard value
+  colnames(data)[id_col_loc] <- final_id_name
+
+  data
 }
 
