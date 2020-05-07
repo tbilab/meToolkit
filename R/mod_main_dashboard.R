@@ -121,8 +121,23 @@ main_dashboard <- function(input,
   }
 
   # Add colors to codes in results data.
-  phewas_results <-
-    meToolkit::build_color_palette(phewas_results, category)
+  # Exported from http://tools.medialab.sciences-po.fr/iwanthue/
+  available_colors <- c(
+    "#d54c3b","#73d54a","#7245ce","#cad149","#ce4ec8","#76d58b",
+    "#562d7b","#d4983d","#857ccb","#59803d","#cb4c86","#77cdc0",
+    "#792f39","#ccc795","#3c2a46","#97b7dc","#98653a","#5a7684",
+    "#d395a5","#3a412b")
+
+  # By sorting here we ensure the same colors will always map to the same
+  # index/categories even if the dataframe is in a different order/has different
+  # numbers of rows. As long as the same unique categories exist.
+  cat_to_color <- phewas_results %>%
+    dplyr::distinct(category) %>%
+    dplyr::arrange(category) %>%
+    dplyr::mutate(color = head(available_colors, dplyr::n()))
+
+  phewas_results <- phewas_results %>%
+    dplyr::right_join(cat_to_color, by = "category")
 
   # Get available codes sorted by p-value
   available_codes <- phewas_results %>%
