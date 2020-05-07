@@ -193,7 +193,7 @@ main_dashboard <- function(input,
 
     individual_data %>%
       dplyr::filter((snp > 0) | keep_everyone) %>%
-      meToolkit::subset_to_codes(
+      subset_to_codes(
         desired_codes = state$selected_codes(),
         codes_to_invert = state$inverted_codes()
       )
@@ -201,7 +201,7 @@ main_dashboard <- function(input,
 
   # Network representation of the current data for use in the network plot(s)
   curr_network_data <- shiny::reactive({
-    meToolkit::setup_network_data(
+    setup_network_data(
       data = curr_ind_data(),
       phecode_info = phewas_results,
       inverted_codes = state$inverted_codes(),
@@ -402,4 +402,7 @@ main_dashboard <- function(input,
     }
   )
 }
+
+
+
 
