@@ -47,7 +47,17 @@ info_panel <- function(
   cohort_maf <- mean(all_individual_data$snp > 0)
 
   # Grab annotation info from internal table
-  annotations <- meToolkit::gather_snp_annotations(snp_name)
+  snp_info <- dplyr::filter(meToolkit::snp_annotations, rsid == snp_name | name == snp_name)
+
+  if (nrow(snp_info) == 0) {
+    # If we couldn't find anything for this snp just return null
+    annotations <- NULL
+  } else {
+    annotations <- snp_info %>%
+        tidyr::gather() %>%
+        dplyr::filter(!is.na(value)) %>%
+        dplyr::mutate(key = stringr::str_replace_all(key, '_', ' '))
+  }
 
   output$info_banner_metoolkit <- r2d3::renderD3({
 
