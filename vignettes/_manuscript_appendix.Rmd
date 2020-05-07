@@ -10,42 +10,44 @@ output:
     self_contained: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-
-embed_png <- function(path, dpi = NULL) {
-  full_path <- paste0('manual_figures/', path)
-  meta <- attr(png::readPNG(full_path, native = TRUE, info = TRUE), "info")
-  if (!is.null(dpi)) meta$dpi <- rep(dpi, 2)
-  knitr::asis_output(paste0(
-    "<img src='", full_path, "'",
-    " width=100%",
-    " />"
-  ))
-}
-
-library(meToolkit)
-```
-
-```{css}
+```{css, echo = FALSE}
 body {
   font-size: 13px;
 }
 ```
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 
-# Data
+embed_png <- function(image_title, width = "100%") {
+  
+  knitr::asis_output(
+    glue::glue("<div style=\"text-align: center;\">",
+                 "<img src=\"{image_title}\" width={width} />",
+               "</div>")
+  )
+}
+
+library(meToolkit)
+```
+
+
+Data
 In order to use the app you will need three tables of data: two sets of individual-level data and one model results table. If using the app in data loading mode these are provided as `.csv` files. 
 
-## Individual phenomes
+
+__Individual phenomes__
 The first set of individual data you will need is a table containing pairs of patient-id to phecode-id (or ICD9/ICD10). This table is just two columns, so a patient `p1` with phecodes `a`, `b`, and `c` would  have three lines in the table, `p1, a`, `p1, b`, and `p1, c`. 
 
 The patient id column should be titled either `grid`, `id`, or `iid` (case insensitive) and the phenotype id column should be titled `code`. 
 
-## Individual SNP info
+__Individual SNP info__
 The next set of individual data comes in the form of presence of the minor allele for each patient. Again the table is two columns, with the first being patient-id and the second being the integer (`0,1`, or `2`) corresponding to how many copies of the minor allele the patient had. (Note that it is possible to omit rows for patients with no copies of the minor allele and the application will assume those patients had zero copies. Like the individual phenomes table, the title of the patient id needs to be `grid`, `id`, or `iid`, and the title of the second column should be the rsid of the SNP of interest, which the app uses to infer the SNP id. 
 
-## PheWas results
+__PheWas results__
 The last set of data needed is the results of the PheWas study you wish to analyze. This takes the form of a table with the following columns. 
 - `code`: PheCode, ICD9, or ICD10 code 
 - `OR`: Odds ratio for test with SNP
@@ -55,7 +57,7 @@ The last set of data needed is the results of the PheWas study you wish to analy
 
 Any other columns included will be displayed in the app as additional information when investigating a single SNP via tooltips, but is not necessary. 
 
-## App API
+__App API__
 
 If you are starting an ME application with preloaded data from the R package API, the format of these files remains almost the same, with the exception being R dataframes are passed directly to the function `build_me_dashboard()`.  For more detailed information see the application documentation either in the ‘reference’ tab of this website or by accessing the package documentation in your R console with `?meToolkibuild_me_dashboard_app`.
 
@@ -63,7 +65,7 @@ If you are starting an ME application with preloaded data from the R package API
 
 ## Data Loading Screen
 ```{r, echo = FALSE}
-embed_png("loading_page.png")
+embed_png("data_loading_screen.png")
 ```
 
 
@@ -72,6 +74,7 @@ When the app is first loaded the user is greeted by the data-loading screen. Thi
 As each file is uploaded the app will check to make sure the files match the required format and inform the user of malformed data if it is uploaded. 
 
 Once all data is loaded, the user is automatically sent  to the main dashboard. 
+
 
 
 ## Preloading data
@@ -125,6 +128,12 @@ embed_png("main_dashboard.png")
 
 The state of the app is primarily driven by the list of currently selected phenotypes. At load this is small number of the most significant results from the Phewas analysis, but by interacting with the application the user changes this state.  
 
+At anytime a csv of all the subjects that have one or more of the currently selected phenotypes can be downloaded using the "Selected subjects" button at the top right of the app. 
+
+```{r, echo = FALSE}
+embed_png("subject_download_btn.png", width = "40%")
+```
+
 Other state information includes, subjects that are to be highlighted or phenotypes that are to be ‘inverted’ (see ‘Subject-Phecode Bipartite Network’ section for details.)
 
 Throughout the following sections the functionality of each panel of the dashboard is broken into two parts: what the panel shows and how interactivity works within the context of the panel, along with how that panel can interact with the main application state (the __App Interaction__) subsection for each panel. 
@@ -134,7 +143,7 @@ The application state is saved in the URL of the page. To return to a pre-determ
 ## Interactive Phewas Manhattan Plot
 
 ```{r, echo = FALSE}
-embed_png("manhattan_plot.png")
+embed_png("phewas_help_page.png")
 ```
 
 
@@ -159,6 +168,9 @@ A range selector is overlaid. This can be dragged to control which points are sh
 
 __Phewas Table__
 Below the manhattan plot and odds ratio histogram is a table corresponding to all the provided results. This table contains columns for the code name, odds ratio, p-value, code description, and code category.  The table can be sorted by all column values in addition to being searched for both code name and description. 
+
+__Significance Threshold Line__
+An optional line denoting statistical significance at the 95% or 99% levels is available by using the dropdown menu at the top of the panel labeled "Significance Threshold." When a value is chosen it will appear on the y-axis of the plot. The line defaults to extending across the plot but can be reduced to just a dash on the y-axis by clicking on the left arrow underneath the "P = 0.__" text on the y-axis. 
 
 
 ### Filtering codes
@@ -185,7 +197,7 @@ The reset button allows the user undo all code changes they have made since the 
 ## Comorbidity Upset Plot
 
 ```{r, echo = FALSE}
-embed_png("upset_plot.png")
+embed_png("upset_help_page.png")
 ```
 
 
@@ -223,6 +235,9 @@ By clicking on a row corresponding to a given comorbidity pattern of codes, all 
    
 Highlights for both codes and patterns are reset when either another pattern is selected of the column/row is selected again. 
 
+__Multi-Select Mode__
+By holding down the shift key while selecting codes or patterns, multiple entities can be selected at once. The resulting subject-level data shown will be those with all of the selected codes or patterns present. 
+
 ## Info Panel
 
 ```{r, echo = FALSE}
@@ -255,7 +270,7 @@ The info panel has no app-level state interaction capabilities.
 ## Subject-Phecode Bipartite Network
 
 ```{r, echo = FALSE}
-embed_png("network_plot.png")
+embed_png("network_help_page.png")
 ```
 
 ### Purpose 
