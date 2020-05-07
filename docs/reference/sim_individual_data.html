@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate sample individual level data based upon some phewas results — sim_individual_data • meToolkit</title>
+<title>Generate sample individual level data based upon a PheWAS results set — sim_individual_data • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,11 @@
 
 
 
-<meta property="og:title" content="Generate sample individual level data based upon some phewas results — sim_individual_data" />
-<meta property="og:description" content="This function will take the results of a phewas study (most importantly a
+<meta property="og:title" content="Generate sample individual level data based upon a PheWAS results set — sim_individual_data" />
+<meta property="og:description" content="This function will take the results of a PheWAS study (most importantly a
 code, case and control numbers, and an OR) and simulate as many individual
-datapoints as you desire." />
+datapoints as you desire. Should only be used for testing of apps and not any
+real simulation studies." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -105,15 +106,16 @@ datapoints as you desire." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate sample individual level data based upon some phewas results</h1>
+    <h1>Generate sample individual level data based upon a PheWAS results set</h1>
     
     <div class="hidden name"><code>sim_individual_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function will take the results of a phewas study (most importantly a
+    <p>This function will take the results of a PheWAS study (most importantly a
 code, case and control numbers, and an OR) and simulate as many individual
-datapoints as you desire.</p>
+datapoints as you desire. Should only be used for testing of apps and not any
+real simulation studies.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sim_individual_data</span>(<span class='no'>phewas_results</span>, <span class='no'>num_patients</span>, <span class='no'>snp_prev</span>)</pre>
@@ -124,9 +126,9 @@ datapoints as you desire.</p>
     <tr>
       <th>phewas_results</th>
       <td><p>Phewas results. Needs a column <code>code</code> with the id
-of a given phecode, <code>code_proportion</code>: with the proportion of
-individuals that have the code in the entire population, and <code>OR</code>: the
-odds ratio of having a code given having the snp of interest.</p></td>
+of a given phecode, and <code>OR</code>: the odds ratio of having a code given
+having the snp of interest. Optionally, individuals that have the code in
+the entire population can be provided with column <code>code_proportion</code>.</p></td>
     </tr>
     <tr>
       <th>num_patients</th>
@@ -151,7 +153,61 @@ code.</p></dd>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>sim_individual_data</span>(<span class='no'>fake_phewas_results</span>, <span class='fl'>10</span>, <span class='fl'>0.15</span>)</div><div class='output co'>#&gt; <span class='error'>Error in n(): could not find function "n"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='no'>simulated_phewas</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_phewas_results.html'>sim_phewas_results</a></span>(<span class='kw'>n_codes</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>n_categories</span> <span class='kw'>=</span> <span class='fl'>11</span>)
+<span class='fu'>sim_individual_data</span>(<span class='no'>simulated_phewas</span>, <span class='fl'>10</span>, <span class='fl'>0.15</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: NAs produced</span></div><div class='output co'>#&gt; $snp_status
+#&gt; <span style='color: #555555;'># A tibble: 10 x 2</span><span>
+#&gt;    id      snp
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> r1        0
+#&gt; </span><span style='color: #555555;'> 2</span><span> r10       0
+#&gt; </span><span style='color: #555555;'> 3</span><span> r2        1
+#&gt; </span><span style='color: #555555;'> 4</span><span> r3        0
+#&gt; </span><span style='color: #555555;'> 5</span><span> r4        1
+#&gt; </span><span style='color: #555555;'> 6</span><span> r5        1
+#&gt; </span><span style='color: #555555;'> 7</span><span> r6        0
+#&gt; </span><span style='color: #555555;'> 8</span><span> r7        0
+#&gt; </span><span style='color: #555555;'> 9</span><span> r8        0
+#&gt; </span><span style='color: #555555;'>10</span><span> r9        0
+#&gt; 
+#&gt; $phenotypes
+#&gt; </span><span style='color: #555555;'># A tibble: 10 x 101</span><span>
+#&gt;    id    `001.00` `002.00` `003.00` `004.00` `005.00` `006.00` `007.00` `008.00`
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> r1           1        0        1        0        0        0        0        1
+#&gt; </span><span style='color: #555555;'> 2</span><span> r10          0        0        1        0        0        0        0        0
+#&gt; </span><span style='color: #555555;'> 3</span><span> r2          </span><span style='color: #BB0000;'>NA</span><span>        1       </span><span style='color: #BB0000;'>NA</span><span>       </span><span style='color: #BB0000;'>NA</span><span>        0        1        1        1
+#&gt; </span><span style='color: #555555;'> 4</span><span> r3           0        0        0        0        0        0        1        0
+#&gt; </span><span style='color: #555555;'> 5</span><span> r4          </span><span style='color: #BB0000;'>NA</span><span>        0       </span><span style='color: #BB0000;'>NA</span><span>       </span><span style='color: #BB0000;'>NA</span><span>        1        1        0        0
+#&gt; </span><span style='color: #555555;'> 6</span><span> r5          </span><span style='color: #BB0000;'>NA</span><span>        1       </span><span style='color: #BB0000;'>NA</span><span>       </span><span style='color: #BB0000;'>NA</span><span>        1        0        1        1
+#&gt; </span><span style='color: #555555;'> 7</span><span> r6           0        0        1        0        0        0        0        0
+#&gt; </span><span style='color: #555555;'> 8</span><span> r7           0        0        0        0        0        1        0        1
+#&gt; </span><span style='color: #555555;'> 9</span><span> r8           0        0        0        0        0        0        0        0
+#&gt; </span><span style='color: #555555;'>10</span><span> r9           1        1        0        0        0        0        0        0
+#&gt; </span><span style='color: #555555;'># … with 92 more variables: `009.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `010.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `011.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `012.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `013.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `014.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `015.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `016.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `017.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `018.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `019.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `020.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `021.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `022.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `023.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `024.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `025.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `026.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `027.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `028.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `029.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `030.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `031.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `032.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `033.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `034.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `035.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `036.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `037.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `038.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `039.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `040.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `041.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `042.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `043.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `044.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `045.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `046.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `047.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `048.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `049.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `050.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `051.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `052.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `053.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `054.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `055.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `056.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `057.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `058.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `059.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `060.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `061.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `062.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `063.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `064.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `065.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `066.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `067.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `068.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `069.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `070.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `071.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `072.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `073.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `074.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `075.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `076.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `077.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `078.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `079.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `080.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `081.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `082.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `083.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `084.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `085.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `086.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `087.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `088.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `089.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `090.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `091.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `092.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `093.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `094.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `095.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `096.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `097.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `098.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, `099.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,
+#&gt; #   `100.00` </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

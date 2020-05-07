@@ -36,7 +36,6 @@ data_loader_UI <-
 
     shiny::tagList(
       use_reveal_element(),
-      use_pretty_popup(),
       shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
       shiny::htmlTemplate(
         system.file("html_templates/data_loading_template.html",
@@ -79,6 +78,13 @@ data_loader <- function(input, output, session,
     # dataframe of results of univariate statistical tests
     snp_name = NULL              # Name of the current snp being looked at.
   )
+
+  pretty_popup <- function(title, msg){
+    session$sendCustomMessage(
+      "load_popup",
+      list(title = title, text = msg)
+    )
+  }
 
   data_to_return <- reactiveVal()
 
@@ -128,15 +134,12 @@ data_loader <- function(input, output, session,
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
-        "There's something wrong with the format of your genome data",
-        glue::glue(
-          "Make sure the file has two columns. One with the title",
-          "IID with unique id and one with the title of your snp ",
-          "containing copies of the minor allele."
-        )
-      )
+      pretty_popup(title = "There's something wrong with the format of your genome data",
+                   msg = glue::glue(
+                     "Make sure the file has two columns. One with the title",
+                     "IID with unique id and one with the title of your snp ",
+                     "containing copies of the minor allele."
+                   ))
     })
   })
 
@@ -146,8 +149,7 @@ data_loader <- function(input, output, session,
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
+      pretty_popup(
         "There's something wrong with the format of your results data.",
         "Make sure the file has the right columns as listed."
       )
@@ -160,8 +162,7 @@ data_loader <- function(input, output, session,
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
+      pretty_popup(
         "There's something wrong with the format of your phenome data.",
         "Make sure the file has the right columns as listed."
       )

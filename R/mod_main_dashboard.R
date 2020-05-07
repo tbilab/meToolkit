@@ -13,7 +13,6 @@
 main_dashboard_UI <- function(id, snp_colors) {
   ns <- NS(id)
   shiny::tagList(
-    use_pretty_popup(),
     shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
     shiny::htmlTemplate(
       system.file("html_templates/main_dashboard.html", package = "meToolkit"),
@@ -112,6 +111,13 @@ main_dashboard <- function(input,
     )
   } else {
     app_instructions <- usage_instructions
+  }
+
+  pretty_popup <- function(title, msg){
+    session$sendCustomMessage(
+      "load_popup",
+      list(title = title, text = msg)
+    )
   }
 
   # Add colors to codes in results data.
@@ -218,12 +224,10 @@ main_dashboard <- function(input,
 
     bad_request_msg <- function(num_requested = 1) {
       if (num_requested < 2) {
-        meToolkit::pretty_popup(session,
-                                "Too few codes requested",
+        pretty_popup("Too few codes requested",
                                 "Try selecting at least two codes.")
       } else {
-        meToolkit::pretty_popup(
-          session,
+        pretty_popup(
           "Too many codes requested",
           glue::glue(
             "The maximum allowed is {max_allowed_codes} and {num_requested} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!"
