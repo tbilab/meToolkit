@@ -35,7 +35,6 @@ data_loader_UI <-
     )
 
     shiny::tagList(
-      use_reveal_element(),
       shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
       shiny::htmlTemplate(
         system.file("html_templates/data_loading_template.html",
