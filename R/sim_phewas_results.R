@@ -38,7 +38,7 @@ sim_phewas_results <- function(n_codes, n_categories, avg_OR = 1.3) {
   }
   codes_per_cat <- ceiling(n_codes / n_categories)
 
-  tibble::tibble(
+  dplyr::tibble(
     code = sprintf('%2.2f', 1:n_codes),
     p_val = rbeta(n_codes, alpha, beta),
     category = rep(head(letters, n_categories),

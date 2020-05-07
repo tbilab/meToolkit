@@ -125,7 +125,7 @@ subset_to_codes <- function(data, desired_codes, codes_to_invert = c()) {
     tidyr::gather(code, value,-IID,-snp) %>% {
       if (inverting_codes) {
         dplyr::left_join(.,
-                         tibble::tibble(code = codes_to_invert, invert = TRUE),
+                         dplyr::tibble(code = codes_to_invert, invert = TRUE),
                          by = 'code'
         )
       } else {

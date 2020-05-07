@@ -120,7 +120,7 @@ upset <- function(input,
           RR_results <-
             meToolkit::calc_pattern_risk_ratio(.$Total[2], .$MaCarriers[2], .$Total[1], .$MaCarriers[1])
 
-          tibble::tibble(
+          dplyr::tibble(
             pointEst = RR_results$PE,
             lower = RR_results$lower,
             upper = RR_results$upper
