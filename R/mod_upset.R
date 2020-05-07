@@ -1,4 +1,4 @@
-#' UI function of upset module
+#' Upset plot of multimorbidity patterns: UI
 #'
 #'
 #' @seealso \code{\link{upset}}
@@ -18,7 +18,7 @@ upset_UI <- function(id) {
       help_modal_UI(
         id = ns("upset"),
         title = "Help for the upset plot",
-        help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/upset_help_page.png",
+        help_img_url = "https://github.com/tbilab/meToolkit/raw/doc_updating/vignettes/upset_help_page.png",
         more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#comorbidity-upset-plot"
       )
     ),
@@ -27,7 +27,7 @@ upset_UI <- function(id) {
   )
 }
 
-#' Server function of upset module
+#' Upset plot of multimorbidity patterns: Server
 #'
 #' Generates an Upset plot to view patterns within comorbidity patterns.
 #' Contains marginal charts on individual code counts, comorbidity counts, along
@@ -118,7 +118,7 @@ upset <- function(input,
           PropMa = MaCarriers / Total
         ) %>% {
           RR_results <-
-            meToolkit::calcRrCi(.$Total[2], .$MaCarriers[2], .$Total[1], .$MaCarriers[1])
+            meToolkit::calc_pattern_risk_ratio(.$Total[2], .$MaCarriers[2], .$Total[1], .$MaCarriers[1])
 
           tibble::tibble(
             pointEst = RR_results$PE,

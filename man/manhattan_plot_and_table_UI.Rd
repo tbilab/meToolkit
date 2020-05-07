@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_manhattan_and_table.R
 \name{manhattan_plot_and_table_UI}
 \alias{manhattan_plot_and_table_UI}
-\title{Interactive manhattan plot and table}
+\title{Interactive manhattan plot and table: UI}
 \usage{
 manhattan_plot_and_table_UI(id)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_data_loader.R
 \name{data_loader}
 \alias{data_loader}
-\title{Server function of upset module}
+\title{Data loading screen: Server}
 \usage{
 data_loader(input, output, session, preloaded_path = NULL)
 }
@@ -17,7 +17,7 @@ Reactive object containing the data needed to run the main
 Multimorbidity Explorer dashboard.
 }
 \description{
-Server function of upset module
+Data loading screen: Server
 }
 \examples{
 callModule(data_loader, "data_loader", "data/preloaded")

@@ -7,7 +7,7 @@ The user can mouseover a phecode to see information about it along with selectin
 
 
 ## Inputs
-Takes a list of `edges` and `vertices` as generated from `meToolkit::makeNetworkData()`. Additionally, node sizes and various force-layout parameters can be tweaked. 
+Takes a list of `edges` and `vertices` as generated from `meToolkit::setup_network_data()`. Additionally, node sizes and various force-layout parameters can be tweaked. 
 
 
 ## Outputs

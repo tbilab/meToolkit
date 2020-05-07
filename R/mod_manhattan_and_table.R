@@ -1,4 +1,4 @@
-#' Interactive manhattan plot and table
+#' Interactive manhattan plot and table: UI
 #'
 #' For selecting codes for further visualization in app.
 #'
@@ -47,7 +47,7 @@ manhattan_plot_and_table_UI <- function(id) {
       help_modal_UI(
         id = ns("phewas"),
         title = "Help for ineractive phewas manhattan plot",
-        help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/phewas_help_page.png",
+        help_img_url = "https://github.com/tbilab/meToolkit/raw/doc_updating/vignettes/phewas_help_page.png",
         more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#interactive-phewas-manhattan-plot"
       ),
     ),
@@ -55,7 +55,7 @@ manhattan_plot_and_table_UI <- function(id) {
   )
 }
 
-#' Server function of manhattan plot module.
+#' Interactive manhattan plot and table: Server
 #'
 #' Draw an interactive manhattan plot and table that can be used to send
 #' selections for codes to the rest of the app.

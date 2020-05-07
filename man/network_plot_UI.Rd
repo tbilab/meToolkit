@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_network_plot.R
 \name{network_plot_UI}
 \alias{network_plot_UI}
-\title{Interactive individual-level data network diagram of patients to codes}
+\title{Subject-level network diagram: UI}
 \usage{
 network_plot_UI(id, snp_colors)
 }
@@ -17,7 +17,7 @@ allele.}
 HTML tag containing interactive network
 }
 \description{
-Interactive individual-level data network diagram of patients to codes
+Subject-level network diagram: UI
 }
 \examples{
 

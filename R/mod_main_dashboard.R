@@ -1,4 +1,4 @@
-#' Main Multimorbidity Explorer Dashboard: UI function
+#' Main Multimorbidity Explorer Dashboard: UI
 #'
 #'
 #' @seealso \code{\link{main_dashboard}}
@@ -13,7 +13,6 @@
 main_dashboard_UI <- function(id, snp_colors) {
   ns <- NS(id)
   shiny::tagList(
-    use_pretty_popup(),
     shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
     shiny::htmlTemplate(
       system.file("html_templates/main_dashboard.html", package = "meToolkit"),
@@ -23,12 +22,13 @@ main_dashboard_UI <- function(id, snp_colors) {
       upset = meToolkit::upset_UI(ns('upset_plot_main_dashboard')),
       network = meToolkit::network_plot_UI(ns('network_plot_main_dashboard'),
                                            snp_colors = snp_colors),
-      info_panel = meToolkit::info_panel_UI(ns('info_panel_main_dashboard'))
+      info_panel = meToolkit::info_panel_UI(ns('info_panel_main_dashboard')),
+      subject_download_btn = shiny::downloadButton(ns("subject_download_btn"), "Selected subjects")
     )
   )
 }
 
-#' Main Multimorbidity Explorer Dashboard: Server function
+#' Main Multimorbidity Explorer Dashboard: Server
 #'
 #' Generates a full dashboard page containing various visualizations for
 #' investigating comobidity patterns in individual level data and how they
@@ -113,9 +113,31 @@ main_dashboard <- function(input,
     app_instructions <- usage_instructions
   }
 
+  pretty_popup <- function(title, msg){
+    session$sendCustomMessage(
+      "load_popup",
+      list(title = title, text = msg)
+    )
+  }
+
   # Add colors to codes in results data.
-  phewas_results <-
-    meToolkit::buildColorPalette(phewas_results, category)
+  # Exported from http://tools.medialab.sciences-po.fr/iwanthue/
+  available_colors <- c(
+    "#d54c3b","#73d54a","#7245ce","#cad149","#ce4ec8","#76d58b",
+    "#562d7b","#d4983d","#857ccb","#59803d","#cb4c86","#77cdc0",
+    "#792f39","#ccc795","#3c2a46","#97b7dc","#98653a","#5a7684",
+    "#d395a5","#3a412b")
+
+  # By sorting here we ensure the same colors will always map to the same
+  # index/categories even if the dataframe is in a different order/has different
+  # numbers of rows. As long as the same unique categories exist.
+  cat_to_color <- phewas_results %>%
+    dplyr::distinct(category) %>%
+    dplyr::arrange(category) %>%
+    dplyr::mutate(color = head(available_colors, dplyr::n()))
+
+  phewas_results <- phewas_results %>%
+    dplyr::right_join(cat_to_color, by = "category")
 
   # Get available codes sorted by p-value
   available_codes <- phewas_results %>%
@@ -123,7 +145,7 @@ main_dashboard <- function(input,
     dplyr::pull(code)
 
   # Look to see if the URL used had desired codes in it.
-  url_state <- meToolkit::extract_snp_codes_from_url(session)
+  url_state <- extract_snp_codes_from_url(session)
 
   desired_snp <- url_state$snp
   requested_codes <- url_state$codes
@@ -171,7 +193,7 @@ main_dashboard <- function(input,
 
     individual_data %>%
       dplyr::filter((snp > 0) | keep_everyone) %>%
-      meToolkit::subsetToCodes(
+      subset_to_codes(
         desired_codes = state$selected_codes(),
         codes_to_invert = state$inverted_codes()
       )
@@ -179,7 +201,7 @@ main_dashboard <- function(input,
 
   # Network representation of the current data for use in the network plot(s)
   curr_network_data <- shiny::reactive({
-    meToolkit::makeNetworkData(
+    setup_network_data(
       data = curr_ind_data(),
       phecode_info = phewas_results,
       inverted_codes = state$inverted_codes(),
@@ -217,12 +239,10 @@ main_dashboard <- function(input,
 
     bad_request_msg <- function(num_requested = 1) {
       if (num_requested < 2) {
-        meToolkit::pretty_popup(session,
-                                "Too few codes requested",
+        pretty_popup("Too few codes requested",
                                 "Try selecting at least two codes.")
       } else {
-        meToolkit::pretty_popup(
-          session,
+        pretty_popup(
           "Too many codes requested",
           glue::glue(
             "The maximum allowed is {max_allowed_codes} and {num_requested} were selected. \n\n This is so your computer doesn't explode. Try a smaller selection. Sorry!"
@@ -272,8 +292,19 @@ main_dashboard <- function(input,
         invert = {
           currently_inverted <- state$inverted_codes()
           requested_inversion <- extract_codes(action_payload)
-          new_inverted_list <-
-            meToolkit::invertCodes(requested_inversion, currently_inverted)
+
+          # codes that have been inverted and are now being reverted to normal
+          already_inverted_codes <- intersect(currently_inverted, requested_inversion)
+
+          # codes that are being freshly inverted
+          newly_inverted_codes <- requested_inversion[!(requested_inversion %in% already_inverted_codes)]
+
+          # codes that are unchanged/ stay inverted
+          unchanged_codes <- currently_inverted[!(currently_inverted %in% already_inverted_codes)]
+
+          # return the list of codes that should be inverted
+          new_inverted_list <- c(newly_inverted_codes, unchanged_codes)
+
           state$inverted_codes(new_inverted_list)
         },
         stop("Unknown input")
@@ -285,7 +316,7 @@ main_dashboard <- function(input,
     }
 
     # Update the URL of the app so user's can return to point easily
-    meToolkit::embed_snp_codes_in_url(snp_name, state$selected_codes())
+    embed_snp_codes_in_url(snp_name, state$selected_codes())
   })
 
   #----------------------------------------------------------------
@@ -335,7 +366,7 @@ main_dashboard <- function(input,
     current_individual_data = curr_ind_data
   )
 
-  # Multicode selecter input
+  # Multicode selector input
   shiny::observeEvent(input$filter_to_desired, {
     codes_desired <- input$desired_codes
     action_object_message <-  list(type = 'selection',
@@ -352,9 +383,26 @@ main_dashboard <- function(input,
     # Enable back button
     show_back_button_messenger(
       "show_back_button",
-      "<span class='back-arrow'>&#10554;</span> Return to data loader"
+      "<i class=\"fa fa-undo\" aria-hidden=\"true\"></i> Return to data loader"
     )
   }
 
+  output$subject_download_btn <- downloadHandler(
+    filename = function() {
 
+      codes_present <- colnames(curr_ind_data()) %>%
+        tail(-2) %>%
+        stringr::str_remove("\\.") %>%
+        paste(collapse = "_")
+
+      paste("subject_data-", codes_present, ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(curr_ind_data(), file)
+    }
+  )
 }
+
+
+
+

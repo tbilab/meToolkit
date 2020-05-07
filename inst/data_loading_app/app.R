@@ -4,7 +4,7 @@ library(meToolkit)
 # Need to load fresh copy of package because shinytests runs in new thread.
 # devtools::load_all('../')
 
-data_loading_app <- run_me(
+data_loading_app <- build_me_w_loader(
   preloaded_path = 'preloaded_data',
   auto_run = FALSE
 )

@@ -1,4 +1,4 @@
-#' UI function of upset module
+#' Data loading screen: UI
 #'
 #' @param id String with unique id of module in app
 #' @param app_title Name of your app. Defaults to "Multimorbidity Explorer"
@@ -35,8 +35,6 @@ data_loader_UI <-
     )
 
     shiny::tagList(
-      use_reveal_element(),
-      use_pretty_popup(),
       shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
       shiny::htmlTemplate(
         system.file("html_templates/data_loading_template.html",
@@ -49,7 +47,7 @@ data_loader_UI <-
     )
   }
 
-#' Server function of upset module
+#' Data loading screen: Server
 #'
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param preloaded_path File path relative to app that preloaded data is
@@ -80,12 +78,19 @@ data_loader <- function(input, output, session,
     snp_name = NULL              # Name of the current snp being looked at.
   )
 
+  pretty_popup <- function(title, msg){
+    session$sendCustomMessage(
+      "load_popup",
+      list(title = title, text = msg)
+    )
+  }
+
   data_to_return <- reactiveVal()
 
   bookmarked_snp <- reactiveVal()
 
   # Look to see if the URL used had desired codes in it.
-  url_state <- meToolkit::extract_snp_codes_from_url(session)
+  url_state <- extract_snp_codes_from_url(session)
 
   have_requested_snp <- !is.null(url_state$snp)
 
@@ -124,30 +129,26 @@ data_loader <- function(input, output, session,
   shiny::observeEvent(input$genome, {
     tryCatch({
       app_data$genome_raw <- readr::read_csv(input$genome$datapath) %>%
-        meToolkit::checkGenomeFile(separate = FALSE)
+        check_genome_file(separate = FALSE)
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
-        "There's something wrong with the format of your genome data",
-        glue::glue(
-          "Make sure the file has two columns. One with the title",
-          "IID with unique id and one with the title of your snp ",
-          "containing copies of the minor allele."
-        )
-      )
+      pretty_popup(title = "There's something wrong with the format of your genome data",
+                   msg = glue::glue(
+                     "Make sure the file has two columns. One with the title",
+                     "IID with unique id and one with the title of your snp ",
+                     "containing copies of the minor allele."
+                   ))
     })
   })
 
   shiny::observeEvent(input$phewas, {
     tryCatch({
-      app_data$phewas_raw <- meToolkit::checkPhewasFile(readr::read_csv(input$phewas$datapath))
+      app_data$phewas_raw <- check_phewas_file(readr::read_csv(input$phewas$datapath))
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
+      pretty_popup(
         "There's something wrong with the format of your results data.",
         "Make sure the file has the right columns as listed."
       )
@@ -156,12 +157,11 @@ data_loader <- function(input, output, session,
 
   shiny::observeEvent(input$phenome, {
     tryCatch({
-      app_data$phenome_raw <- meToolkit::checkPhenomeFile(readr::read_csv(input$phenome$datapath))
+      app_data$phenome_raw <- check_phenome_file(readr::read_csv(input$phenome$datapath))
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
+      pretty_popup(
         "There's something wrong with the format of your phenome data.",
         "Make sure the file has the right columns as listed."
       )
@@ -181,7 +181,7 @@ data_loader <- function(input, output, session,
       # read files into R's memory
       shiny::incProgress(1 / 3, detail = "Reading in uploaded files")
 
-      app_data$reconciled_data <- meToolkit::reconcile_data(
+      app_data$reconciled_data <- reconcile_data(
         phewas_results = app_data$phewas_raw,
         id_to_snp = app_data$genome_raw,
         id_to_code = app_data$phenome_raw,
@@ -212,7 +212,7 @@ data_loader <- function(input, output, session,
     genome <- glue::glue("{base_dir}/id_to_snp.csv") %>%
       readr::read_csv()
 
-    app_data$reconciled_data <- meToolkit::reconcile_data(
+    app_data$reconciled_data <- reconcile_data(
       phewas_results =  phewas_results,
       id_to_snp = genome,
       id_to_code = phenome,

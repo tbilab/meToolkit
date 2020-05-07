@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_info_panel.R
 \name{info_panel_UI}
 \alias{info_panel_UI}
-\title{SNP info panel: UI function}
+\title{SNP info panel: UI}
 \usage{
 info_panel_UI(id)
 }
@@ -13,7 +13,7 @@ info_panel_UI(id)
 UI portion of info panel module
 }
 \description{
-SNP info panel: UI function
+SNP info panel: UI
 }
 \examples{
 

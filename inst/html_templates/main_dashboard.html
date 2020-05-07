@@ -17,16 +17,7 @@
     justify-content: space-between;
   }
 
-  #return-to-loader-button {
-    height: 70%;
-    align-self: center;
-    margin-right: 0.2rem;
-    padding: 0px 0.6rem;
-  }
 
-  #return-to-loader-button.hidden {
-    display: none;
-  }
 
   span.back-arrow {
     font-size: 1.1rem;
@@ -86,6 +77,23 @@
     margin-bottom: 2px;
     height: var(--section-title-height);
   }
+
+  .interaction-buttons a {
+    align-self: center;
+    margin-top: 0.4rem;
+    margin-right: 0.2rem;
+    font-size: 0.75rem;
+    color: var(--main-text-color);
+    font-weight: 400;
+    padding: 5px 10px;
+  }
+
+  #return-to-loader-button.hidden {
+    display: none;
+  }
+
+
+
 }
 
 </style>
@@ -93,7 +101,13 @@
 
 <div class = 'app-header'>
   <h2 class = 'app-title'> {{ app_title }} </h2>
-  <button id = 'return-to-loader-button' class = 'hidden'>Return to data loading</button>
+  <div class = 'interaction-buttons'>
+    {{subject_download_btn}}
+    <a id="return-to-loader-button" class="btn btn-default hidden" target="_blank">
+      <i class="fa fa-undo" aria-hidden="true"></i>
+      Return to data loading
+    </a>
+  </div>
 </div>
 <div class = 'template-parent'>
   <div class = 'template-info-panel template-section'>

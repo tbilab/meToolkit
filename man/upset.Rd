@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_upset.R
 \name{upset}
 \alias{upset}
-\title{Server function of upset module}
+\title{Upset plot of multimorbidity patterns: Server}
 \usage{
 upset(
   input,

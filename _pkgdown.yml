@@ -1,1 +1,32 @@
 destination: docs
+reference:
+- title: Full Apps
+  desc: These built an entire me app from either preloaded data or data uploaded in csv form.
+  contents:
+  - build_me_w_loader
+  - build_me_dashboard
+- title: Shiny Modules
+  desc: The shiny modules that make up a ME app. If building a customized app these are the building blocks.
+  contents:
+  - main_dashboard_UI
+  - main_dashboard
+  - data_loader_UI
+  - data_loader
+  - upset_UI
+  - upset
+  - network_plot_UI
+  - network_plot
+  - manhattan_plot_and_table_UI
+  - manhattan_plot_and_table
+  - info_panel_UI
+  - info_panel
+- title: Helpers
+  desc: Functions that help with data cleaning or statistical testing
+  contents:
+  - calc_pattern_risk_ratio
+  - normalize_phecodes
+- title: Simulation
+  desc: Functions to simulate the data used in the ME apps
+  contents:
+  - sim_individual_data
+  - sim_phewas_results

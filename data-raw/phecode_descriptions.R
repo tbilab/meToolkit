@@ -6,7 +6,7 @@ library(dplyr)
 phecode_descriptions <-
   readr::read_csv('data-raw/phecode_definitions1.2.csv') %>%
   transmute(
-    phecode = normalizePhecode(phecode),
+    phecode = normalize_phecodes(phecode),
     description = phenotype,
     category = ifelse(category == "NULL", 'other', category)
   ) %>%

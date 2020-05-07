@@ -6,7 +6,6 @@
 #' @param more_link Link to further information about context
 #'
 #' @return NULL
-#' @export
 help_modal_UI <- function(id, title, help_img_url, more_link) {
   ns <- NS(id)
 
@@ -113,7 +112,6 @@ help_modal_UI <- function(id, title, help_img_url, more_link) {
 #' @param input,output,session Auto-filled by `callModule` | ignore
 #'
 #' @return NULL
-#' @export
 help_modal <- function(input, output, session) {
   observeEvent(input$open_help, {
     session$sendCustomMessage(session$ns("show_modal"), "")

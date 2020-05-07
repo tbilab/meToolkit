@@ -80,11 +80,13 @@
 <p><strong>PheWas results</strong> The last set of data needed is the results of the PheWas study you wish to analyze. This takes the form of a table with the following columns. - <code>code</code>: PheCode, ICD9, or ICD10 code - <code>OR</code>: Odds ratio for test with SNP - <code>p_val</code>: P-Value for significance of code’s association - <code>description</code>: The plain text description of the code - <code>category</code>: Plain text description of code’s broad-level category.</p>
 <p>Any other columns included will be displayed in the app as additional information when investigating a single SNP via tooltips, but is not necessary.</p>
 <p><strong>App API</strong></p>
-<p>If you are starting an ME application with preloaded data from the R package API, the format of these files remains almost the same, with the exception being R dataframes are passed directly to the function <code><a href="../reference/build_me_app.html">build_me_app()</a></code>. For more detailed information see the application documentation either in the ‘reference’ tab of this website or by accessing the package documentation in your R console with <code><a href="../reference/build_me_app.html">?meToolkit:: build_me_app</a></code>.</p>
+<p>If you are starting an ME application with preloaded data from the R package API, the format of these files remains almost the same, with the exception being R dataframes are passed directly to the function <code><a href="../reference/build_me_dashboard.html">build_me_dashboard()</a></code>. For more detailed information see the application documentation either in the ‘reference’ tab of this website or by accessing the package documentation in your R console with <code>?meToolkibuild_me_dashboard_app</code>.</p>
 <div id="data-loading-screen" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-loading-screen" class="anchor"></a>Data Loading Screen</h2>
-<p><img src="loading_page.png" width="100%"></p>
+<div style="text-align: center;">
+<img src="data_loading_screen.png" width="100%">
+</div>
 <p>When the app is first loaded the user is greeted by the data-loading screen. This screen prompts the user to provide the three previously described datasets as CSV’s or choose from available preloaded data (see next section for how to prepare this data.)</p>
 <p>As each file is uploaded the app will check to make sure the files match the required format and inform the user of malformed data if it is uploaded.</p>
 <p>Once all data is loaded, the user is automatically sent to the main dashboard.</p>
@@ -102,26 +104,32 @@
 <p>There are two main ways to access Multimorbidity Explorer.</p>
 <p><strong>Hosted</strong> The first is to go to the hosted example at prod.tbilab.org/multimorbidity_explorer. Here you can run the app on preloaded simulated data or upload your own data. No uploaded data is saved on the hosting server.</p>
 <p><strong>Self-Hosting</strong> If data privacy is a concern, the app can be run entirely locally on any computer with R installed and the ability to install packages. To run locally install the <code>meToolkit</code> package from github using the <code>devtools</code> package…</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">'tbilab/meToolkit'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">'tbilab/meToolkit'</span>)</span></code></pre></div>
 <p>Once the package is installed the app can be launched with the data loading interface using the command</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">meToolkit<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/meToolkit/man/run_me.html">run_me</a></span>()</a></code></pre></div>
-<p><strong>Customizing with R API</strong> The <code>meToolkit</code> package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function <code><a href="../reference/build_me_app.html">meToolkit::build_me_app()</a></code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">my_ME_app &lt;-<span class="st"> </span><span class="kw"><a href="../reference/build_me_app.html">build_me_app</a></span>(</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">  phewas_table,</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">  id_to_snp,</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">  phenotype_id_pairs</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>meToolkit<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/meToolkit/man/build_me_w_loader.html">build_me_w_loader</a></span>()</span></code></pre></div>
+<p><strong>Customizing with R API</strong> The <code>meToolkit</code> package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function <code><a href="../reference/build_me_dashboard.html">meToolkit::build_me_dashboard()</a></code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>my_ME_app &lt;-<span class="st"> </span><span class="kw"><a href="../reference/build_me_dashboard.html">build_me_dashboard</a></span>(</span>
+<span id="cb3-2"><a href="#cb3-2"></a>  phewas_table,</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  id_to_snp,</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  phenotype_id_pairs</span>
+<span id="cb3-5"><a href="#cb3-5"></a>)</span></code></pre></div>
 <p>The data format for <code>phewas_table</code>, <code>id_to_snp</code>, and <code>phenotype_id_pairs</code> follows exactly from the required input files as outlined in <a href="#Data">the Data section</a></p>
 <p>For further information on customizing applications read the packages documentation at prod.tbilab.org/meToolkit.</p>
 </div>
 <div id="main-app" class="section level1">
 <h1 class="hasAnchor">
 <a href="#main-app" class="anchor"></a>Main App</h1>
-<p><img src="main_dashboard.png" width="100%"></p>
+<div style="text-align: center;">
+<img src="main_dashboard.png" width="100%">
+</div>
 <div id="application-state-and-reading-this-manual" class="section level2">
 <h2 class="hasAnchor">
 <a href="#application-state-and-reading-this-manual" class="anchor"></a>Application state and reading this manual</h2>
 <p>The state of the app is primarily driven by the list of currently selected phenotypes. At load this is small number of the most significant results from the Phewas analysis, but by interacting with the application the user changes this state.</p>
+<p>At anytime a csv of all the subjects that have one or more of the currently selected phenotypes can be downloaded using the “Selected subjects” button at the top right of the app.</p>
+<div style="text-align: center;">
+<img src="subject_download_btn.png" width="40%">
+</div>
 <p>Other state information includes, subjects that are to be highlighted or phenotypes that are to be ‘inverted’ (see ‘Subject-Phecode Bipartite Network’ section for details.)</p>
 <p>Throughout the following sections the functionality of each panel of the dashboard is broken into two parts: what the panel shows and how interactivity works within the context of the panel, along with how that panel can interact with the main application state (the <strong>App Interaction</strong>) subsection for each panel.</p>
 <p>The application state is saved in the URL of the page. To return to a pre-determined view, simply bookmark or copy the current URL. For apps with data loading screen, the state will automatically select the correct snp from preloaded data if it is available.</p>
@@ -129,7 +137,9 @@
 <div id="interactive-phewas-manhattan-plot" class="section level2">
 <h2 class="hasAnchor">
 <a href="#interactive-phewas-manhattan-plot" class="anchor"></a>Interactive Phewas Manhattan Plot</h2>
-<p><img src="manhattan_plot.png" width="100%"></p>
+<div style="text-align: center;">
+<img src="phewas_help_page.png" width="100%">
+</div>
 <div id="purpose" class="section level3">
 <h3 class="hasAnchor">
 <a href="#purpose" class="anchor"></a>Purpose</h3>
@@ -145,6 +155,7 @@
 <p><strong>Odds Ratio Histogram</strong> In addition to showing positive and negative association in point shape, a histogram of the log-odds ratio of all tests is provided below the manhattan plot. This plot allows the viewer to see the broad distribution of associations with the SNP of interest.</p>
 <p>A range selector is overlaid. This can be dragged to control which points are shown in the manhattan plot based upon their odds ratio. E.g. if the histogram upper range is reduced to a log odds ratio of 0, only phecodes that had a negative association would be plotted on the manhattan plot. This allows the viewer to target phenotypes based on effect size.</p>
 <p><strong>Phewas Table</strong> Below the manhattan plot and odds ratio histogram is a table corresponding to all the provided results. This table contains columns for the code name, odds ratio, p-value, code description, and code category. The table can be sorted by all column values in addition to being searched for both code name and description.</p>
+<p><strong>Significance Threshold Line</strong> An optional line denoting statistical significance at the 95% or 99% levels is available by using the dropdown menu at the top of the panel labeled “Significance Threshold.” When a value is chosen it will appear on the y-axis of the plot. The line defaults to extending across the plot but can be reduced to just a dash on the y-axis by clicking on the left arrow underneath the "P = 0.__" text on the y-axis.</p>
 </div>
 <div id="filtering-codes" class="section level3">
 <h3 class="hasAnchor">
@@ -165,7 +176,9 @@
 <div id="comorbidity-upset-plot" class="section level2">
 <h2 class="hasAnchor">
 <a href="#comorbidity-upset-plot" class="anchor"></a>Comorbidity Upset Plot</h2>
-<p><img src="upset_plot.png" width="100%"></p>
+<div style="text-align: center;">
+<img src="upset_help_page.png" width="100%">
+</div>
 <div id="purpose-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#purpose-1" class="anchor"></a>Purpose</h3>
@@ -189,12 +202,15 @@
 <p><strong>Code Highlighting</strong> By clicking on a column corresponding to a given code, all subjects that have that code present in their phenomes will be highlighted on the network plot. This means if subject A had a phenome with codes <em>i</em> and <em>j</em>, and subject B had a phenome with codes <em>i</em>, <em>j</em>, and <em>k</em>, both would be highlighted when code i or j’s columns were selected.</p>
 <p><strong>Pattern Highlighting</strong> By clicking on a row corresponding to a given comorbidity pattern of codes, all subjects who possess that <em>exact</em> pattern in their phenomes will be selected. Returning to the example in the ‘Code Highlighting’ section, this means if the pattern of phecodes (<em>i</em>, <em>j</em>) was selected <em>only</em> subject A would be highlighted.</p>
 <p>Highlights for both codes and patterns are reset when either another pattern is selected of the column/row is selected again.</p>
+<p><strong>Multi-Select Mode</strong> By holding down the shift key while selecting codes or patterns, multiple entities can be selected at once. The resulting subject-level data shown will be those with all of the selected codes or patterns present.</p>
 </div>
 </div>
 <div id="info-panel" class="section level2">
 <h2 class="hasAnchor">
 <a href="#info-panel" class="anchor"></a>Info Panel</h2>
-<p><img src="info_panel.png" width="100%"></p>
+<div style="text-align: center;">
+<img src="info_panel.png" width="100%">
+</div>
 <div id="purpose-2" class="section level3">
 <h3 class="hasAnchor">
 <a href="#purpose-2" class="anchor"></a>Purpose</h3>
@@ -218,7 +234,9 @@
 <div id="subject-phecode-bipartite-network" class="section level2">
 <h2 class="hasAnchor">
 <a href="#subject-phecode-bipartite-network" class="anchor"></a>Subject-Phecode Bipartite Network</h2>
-<p><img src="network_plot.png" width="100%"></p>
+<div style="text-align: center;">
+<img src="network_help_page.png" width="100%">
+</div>
 <div id="purpose-3" class="section level3">
 <h3 class="hasAnchor">
 <a href="#purpose-3" class="anchor"></a>Purpose</h3>
@@ -277,7 +295,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>
