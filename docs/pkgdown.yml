@@ -2,5 +2,6 @@ pandoc: 2.7.3
 pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
+  _manuscript_appendix: _manuscript_appendix.html
   meToolkit: meToolkit.html
 
