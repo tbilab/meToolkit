@@ -1,7 +1,7 @@
 Package: meToolkit
 Type: Package
 Title: Build and Customize Phewas Multimorbidity Explorer Apps. 
-Version: 0.1.0
+Version: 0.2.0
 Author: Nick Strayer
 Maintainer: Nick Strayer <nick.strayer@gmail.com>
 Description: The main function in this package spins up a fully contained and self-hosted copy of an ME app for data privacy. 
@@ -18,17 +18,15 @@ Imports:
     tidyr,
     dplyr,
     epitools,
-    rlang,
-    tibble,
     shiny,
     r2d3,
     jsonlite,
     purrr,
     glue,
-    shinytest (>= 1.3.1.9999),
     markdown,
     readr
 Suggests: 
+    shinytest (>= 1.3.1),
     testthat (>= 2.1.0),
     knitr,
     rmarkdown
