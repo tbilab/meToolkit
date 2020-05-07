@@ -7,11 +7,10 @@
 #'
 #' @return A list of the genome data with the snp column renamed \code{snp} and
 #'   the snp name saved as \code{snp_name}.
-#' @export
 #'
 #' @examples
-#' checkGenomeFile(uploadedGenomeData)
-checkGenomeFile <- function(genome, separate = TRUE){
+#' check_genome_file(uploadedGenomeData)
+check_genome_file <- function(genome, separate = TRUE){
 
   # Make all columns lowercase.
   colnames(genome) <- tolower(colnames(genome))
@@ -54,11 +53,10 @@ checkGenomeFile <- function(genome, separate = TRUE){
 #' @param phenome Uploaded dataframe containing phenotype info
 #'
 #' @return Dataframe if no errors are thrown.
-#' @export
 #'
 #' @examples
-#' checkPhenomeFile(uploadedPhenomeFile)
-checkPhenomeFile <- function(phenome){
+#' check_phenome_file(uploadedPhenomeFile)
+check_phenome_file <- function(phenome){
 
   # should have two columns: one with title IID and one with title code.
   colnames(phenome) <-  tolower(colnames(phenome))
@@ -79,11 +77,10 @@ checkPhenomeFile <- function(phenome){
 #'
 #' @return Supplied dataframe with a tooltip column added if it wasn't
 #'   originally present.
-#' @export
 #'
 #' @examples
-#' checkPhewasFile('uploadedPhewasFile')
-checkPhewasFile <- function(phewas){
+#' check_phewas_file('uploadedPhewasFile')
+check_phewas_file <- function(phewas){
 
   required_columns <- c('code', 'p_val', 'OR', 'description', 'category')
 

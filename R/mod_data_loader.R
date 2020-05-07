@@ -129,7 +129,7 @@ data_loader <- function(input, output, session,
   shiny::observeEvent(input$genome, {
     tryCatch({
       app_data$genome_raw <- readr::read_csv(input$genome$datapath) %>%
-        meToolkit::checkGenomeFile(separate = FALSE)
+        check_genome_file(separate = FALSE)
     },
     error = function(message) {
       print(message)
@@ -144,7 +144,7 @@ data_loader <- function(input, output, session,
 
   shiny::observeEvent(input$phewas, {
     tryCatch({
-      app_data$phewas_raw <- meToolkit::checkPhewasFile(readr::read_csv(input$phewas$datapath))
+      app_data$phewas_raw <- check_phewas_file(readr::read_csv(input$phewas$datapath))
     },
     error = function(message) {
       print(message)
@@ -157,7 +157,7 @@ data_loader <- function(input, output, session,
 
   shiny::observeEvent(input$phenome, {
     tryCatch({
-      app_data$phenome_raw <- meToolkit::checkPhenomeFile(readr::read_csv(input$phenome$datapath))
+      app_data$phenome_raw <- check_phenome_file(readr::read_csv(input$phenome$datapath))
     },
     error = function(message) {
       print(message)
