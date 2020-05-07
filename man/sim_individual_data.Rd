@@ -2,15 +2,15 @@
 % Please edit documentation in R/sim_individual_data.R
 \name{sim_individual_data}
 \alias{sim_individual_data}
-\title{Generate sample individual level data based upon some phewas results}
+\title{Generate sample individual level data based upon a PheWAS results set}
 \usage{
 sim_individual_data(phewas_results, num_patients, snp_prev)
 }
 \arguments{
 \item{phewas_results}{Phewas results. Needs a column \code{code} with the id
-of a given phecode, \code{code_proportion}: with the proportion of
-individuals that have the code in the entire population, and \code{OR}: the
-odds ratio of having a code given having the snp of interest.}
+of a given phecode, and \code{OR}: the odds ratio of having a code given
+having the snp of interest. Optionally, individuals that have the code in
+the entire population can be provided with column \code{code_proportion}.}
 
 \item{num_patients}{How many patients should be simulated.}
 
@@ -25,10 +25,12 @@ tibble with an \code{ID} column and a column for each code provided in the
 code.} }
 }
 \description{
-This function will take the results of a phewas study (most importantly a
+This function will take the results of a PheWAS study (most importantly a
 code, case and control numbers, and an OR) and simulate as many individual
-datapoints as you desire.
+datapoints as you desire. Should only be used for testing of apps and not any
+real simulation studies.
 }
 \examples{
-sim_individual_data(fake_phewas_results, 10, 0.15)
+simulated_phewas <- sim_phewas_results(n_codes = 100, n_categories = 11)
+sim_individual_data(simulated_phewas, 10, 0.15)
 }

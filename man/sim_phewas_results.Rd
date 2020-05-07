@@ -4,27 +4,31 @@
 \alias{sim_phewas_results}
 \title{Simulate PheWAS results}
 \usage{
-sim_phewas_results(n_codes, n_categories)
+sim_phewas_results(n_codes, n_categories, avg_OR = 1.3)
 }
 \arguments{
 \item{n_codes}{How many phecodes should be simulated for the results?}
 
 \item{n_categories}{How many categories should the phecodes be grouped into?
 Can't be more than 26.}
+
+\item{avg_OR}{The rough average of the odds ratio for the each code.}
 }
 \value{
 A dataframe with columns: \code{code}: a unique phecode id (numbers
 of the form x.00), \code{p_val}: P-value drawn from a beta distribution
-peaked near zero, \code{category}: A simulated category (just a letter
-currently) that fills in order with last group category having less codes
-in it if there is not an even division of codes to categories.
-\code{tooltip}: Simple two line html tooltip of the code name and simulated
-p-value.
+peaked near zero, \code{OR}: An odds ratio for the code's test results,
+\code{category}: A simulated category (just a letter currently) that fills
+in order with last group category having less codes in it if there is not
+an even division of codes to categories. \code{tooltip}: Simple two line
+html tooltip of the code name and simulated p-value.
 }
 \description{
 Produces a dataframe that can be used for testing out
 functions in package on simulated data. Usually paired with
-\code{meToolkit::sim_individual_data()}.
+\code{meToolkit::sim_individual_data()}. Note that the results from this are
+a very rough simulation and should not be used for any legitimate simulation
+studies.
 }
 \examples{
 sim_phewas_results(n_codes = 100, n_categories = 11)

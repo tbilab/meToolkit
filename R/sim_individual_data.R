@@ -1,13 +1,14 @@
-#' Generate sample individual level data based upon some phewas results
+#' Generate sample individual level data based upon a PheWAS results set
 #'
-#' This function will take the results of a phewas study (most importantly a
+#' This function will take the results of a PheWAS study (most importantly a
 #' code, case and control numbers, and an OR) and simulate as many individual
-#' datapoints as you desire.
+#' datapoints as you desire. Should only be used for testing of apps and not any
+#' real simulation studies.
 #'
 #' @param phewas_results Phewas results. Needs a column \code{code} with the id
-#'   of a given phecode, \code{code_proportion}: with the proportion of
-#'   individuals that have the code in the entire population, and \code{OR}: the
-#'   odds ratio of having a code given having the snp of interest.
+#'   of a given phecode, and \code{OR}: the odds ratio of having a code given
+#'   having the snp of interest. Optionally, individuals that have the code in
+#'   the entire population can be provided with column \code{code_proportion}.
 #' @param num_patients How many patients should be simulated.
 #' @param snp_prev The overall population prevalence of the snp you want to
 #'   simulate.
@@ -20,8 +21,18 @@
 #' @export
 #'
 #' @examples
-#' sim_individual_data(fake_phewas_results, 10, 0.15)
+#' simulated_phewas <- sim_phewas_results(n_codes = 100, n_categories = 11)
+#' sim_individual_data(simulated_phewas, 10, 0.15)
 sim_individual_data <- function(phewas_results, num_patients, snp_prev){
+
+  # Check for code proportion column in phewas results
+  has_prop_column <- "code_proportion" %in% colnames(phewas_results)
+
+  if(!has_prop_column){
+    # Make every code occur in 10% of the population
+    phewas_results$code_proportion <- 0.3
+  }
+
     # Get needed statistics out of the phewas results
     code_stats <- phewas_results %>%
       dplyr::mutate(
@@ -49,7 +60,7 @@ sim_individual_data <- function(phewas_results, num_patients, snp_prev){
         # Decide code probabilities based upon snp status
         prob_of_codes = ifelse(has_snp, prob_w_snp, prob_wo_snp),
         # Draw bernouli for each code based upon patients prob
-        value = rbinom(n=n(), size=1, p=prob_of_codes)
+        value = rbinom(n=dplyr::n(), size=1, p=prob_of_codes)
       ) %>%
       dplyr::select(id, has_snp, code, value)
 
