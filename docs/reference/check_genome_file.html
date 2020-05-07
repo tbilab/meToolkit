@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Convert phenotype dataframe to a data list that works with network plotting
-functions — setup_network_data • meToolkit</title>
+<title>Checks genome input dataframe for correct form — check_genome_file • meToolkit</title>
 
 
 <!-- jquery -->
@@ -36,11 +35,8 @@ functions — setup_network_data • meToolkit</title>
 
 
 
-<meta property="og:title" content="Convert phenotype dataframe to a data list that works with network plotting
-functions — setup_network_data" />
-<meta property="og:description" content="Helper functions related to the networks module Takes a subset of the
-individual data along with phewas results and returns a set of network data
-in the form of edges and vertices as required by network_plot." />
+<meta property="og:title" content="Checks genome input dataframe for correct form — check_genome_file" />
+<meta property="og:description" content="This function will lowercase all columns." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -107,87 +103,37 @@ in the form of edges and vertices as required by network_plot." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Convert phenotype dataframe to a data list that works with network plotting
-functions</h1>
+    <h1>Checks genome input dataframe for correct form</h1>
     
-    <div class="hidden name"><code>setup_network_data.Rd</code></div>
+    <div class="hidden name"><code>check_genome_file.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Helper functions related to the networks module Takes a subset of the
-individual data along with phewas results and returns a set of network data
-in the form of edges and vertices as required by <code><a href='network_plot.html'>network_plot</a></code>.</p>
+    <p>This function will lowercase all columns.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>setup_network_data</span>(
-  <span class='no'>data</span>,
-  <span class='no'>phecode_info</span>,
-  <span class='kw'>inverted_codes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
-  <span class='kw'>case_size</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='kw'>code_size</span> <span class='kw'>=</span> <span class='fl'>0.3</span>,
-  <span class='kw'>no_copies</span> <span class='kw'>=</span> <span class='st'>"#bdbdbd"</span>,
-  <span class='kw'>one_copy</span> <span class='kw'>=</span> <span class='st'>"orangered"</span>,
-  <span class='kw'>two_copies</span> <span class='kw'>=</span> <span class='st'>"red"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>check_genome_file</span>(<span class='no'>genome</span>, <span class='kw'>separate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>A phenome dataframe with phecodes as columns and also with an
-<code>IID</code> column and a <code>snp</code> status column</p></td>
+      <th>genome</th>
+      <td><p>Tibble loaded from supplied file.</p></td>
     </tr>
     <tr>
-      <th>phecode_info</th>
-      <td><p>Information about each codes results in phewas study in
-form of columns: <code>code</code>, <code>category</code>, <code>color</code>,
-<code>tooltip</code>.</p></td>
-    </tr>
-    <tr>
-      <th>inverted_codes</th>
-      <td><p>An array of codes that are inverted. Note that if a
-code is inverted that should also be reflected in <code>data</code>. This is only
-for visual modifications.</p></td>
-    </tr>
-    <tr>
-      <th>case_size</th>
-      <td><p>Size of nodes drawn for cases (default of 0.1)</p></td>
-    </tr>
-    <tr>
-      <th>code_size</th>
-      <td><p>Size of nodes drawn for phecodes (default of 0.3)</p></td>
-    </tr>
-    <tr>
-      <th>no_copies</th>
-      <td><p>Color of cases nodes with no minor allele copy (default
-grey)</p></td>
-    </tr>
-    <tr>
-      <th>one_copy</th>
-      <td><p>Color of cases nodes with one minor allele copy (default
-orangered)</p></td>
-    </tr>
-    <tr>
-      <th>two_copies</th>
-      <td><p>Color of cases nodes with two minor allele copies (default
-redish)</p></td>
+      <th>separate</th>
+      <td><p>Return a list with snp name and data? Defaults to <code>TRUE</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list containing two dataframes: <code>vertices</code> a dataframe
-containing each unique node in network (all unique IIDs and Phecodes) along
-with columns <code>snp_status</code>, <code>name</code>, <code>color</code>, <code>size</code>,
-<code>selectable</code>, <code>id</code>, <code>tooltip</code> which are all attributes used
-by the various network plotting functions included in library <code>edges</code>:
-a dataframe with columns <code>source</code> and <code>target</code> corresponding to
-the edges between each vertices according to the assigned interger
-<code>id</code>.</p>
+    <p>A list of the genome data with the snp column renamed <code>snp</code> and
+the snp name saved as <code>snp_name</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>setup_network_data</span>(<span class='no'>data</span>, <span class='no'>phewas_results</span>)</div><div class='output co'>#&gt; <span class='error'>Error in setup_network_data(data, phewas_results): could not find function "setup_network_data"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>check_genome_file</span>(<span class='no'>uploadedGenomeData</span>)</div><div class='output co'>#&gt; <span class='error'>Error in check_genome_file(uploadedGenomeData): could not find function "check_genome_file"</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
