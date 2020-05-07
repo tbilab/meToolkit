@@ -32,6 +32,7 @@ network_plot_UI <- function(id, snp_colors) {
 
     #network_plot_holder {
       height: calc(100% - var(--section-title-height) - [[height_of_controls]]px);
+      position: relative;
     }
     ",
     .open = "[[",
