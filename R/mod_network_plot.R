@@ -71,7 +71,8 @@ network_plot_UI <- function(id, snp_colors) {
         class = 'network_module-network-controls minor-allele-checkbox',
         checkboxInput(ns("snp_filter"),
                       label = "Just minor-allele carriers",
-                      value = FALSE)
+                      value = FALSE,
+                      width = "auto")
       ),
       div(
         class = 'network_module-network-controls minor-allele-legend',
