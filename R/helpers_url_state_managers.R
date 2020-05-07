@@ -7,7 +7,6 @@
 #' @param session session variable from current shiny server. Used to grab current URL string
 #'
 #' @return A list containing the requested SNP id and codes
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -26,7 +25,6 @@ extract_snp_codes_from_url <- function(session){
 #' @param session session variable from current shiny server. Used to grab current URL string
 #'
 #' @return A list containing the requested SNP id and codes
-#' @export
 #'
 #' @examples
 #' extract_snp_codes_from_url_string("?rs123456__00800_90800_08300")
@@ -63,7 +61,6 @@ extract_snp_codes_from_url_string <- function(query_string_raw){
 #' @param codes List of currently selected codes
 #'
 #' @return Nothing (updates app URL)
-#' @export
 #'
 #' @examples
 #' embed_snp_codes_in_url('rs123456', c('009.00', '008.10', '008.20'))

@@ -145,7 +145,7 @@ main_dashboard <- function(input,
     dplyr::pull(code)
 
   # Look to see if the URL used had desired codes in it.
-  url_state <- meToolkit::extract_snp_codes_from_url(session)
+  url_state <- extract_snp_codes_from_url(session)
 
   desired_snp <- url_state$snp
   requested_codes <- url_state$codes
@@ -316,7 +316,7 @@ main_dashboard <- function(input,
     }
 
     # Update the URL of the app so user's can return to point easily
-    meToolkit::embed_snp_codes_in_url(snp_name, state$selected_codes())
+    embed_snp_codes_in_url(snp_name, state$selected_codes())
   })
 
   #----------------------------------------------------------------

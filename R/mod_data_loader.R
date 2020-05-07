@@ -90,7 +90,7 @@ data_loader <- function(input, output, session,
   bookmarked_snp <- reactiveVal()
 
   # Look to see if the URL used had desired codes in it.
-  url_state <- meToolkit::extract_snp_codes_from_url(session)
+  url_state <- extract_snp_codes_from_url(session)
 
   have_requested_snp <- !is.null(url_state$snp)
 
