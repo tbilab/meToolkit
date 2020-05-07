@@ -60,7 +60,7 @@ network_plot_UI <- function(id, snp_colors) {
       help_modal_UI(
         id = ns("network"),
         title = "Help for the subject-phecode bipartite netework",
-        help_img_url = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/network_help_page.png",
+        help_img_url = "https://github.com/tbilab/meToolkit/raw/doc_updating/vignettes/network_help_page.png",
         more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#subject-phecode-bipartite-network"
       )
     ),
@@ -81,15 +81,7 @@ network_plot_UI <- function(id, snp_colors) {
       )
     ),
     shiny::div(id = "network_plot_holder",
-               r2d3::d3Output(ns("plot"), height = '100%')),
-    shiny::div(
-      class = "network-help-page help_page hidden",
-      shiny::h1("Help for the network plot"),
-      shiny::div(
-        shiny::img(src = "https://github.com/tbilab/meToolkit/raw/help_modals/inst/figures/network_help_page.png")
-      ),
-      shiny::actionButton(ns("close_help"), label = "Close")
-    )
+               r2d3::d3Output(ns("plot"), height = '100%'))
   )
 }
 
