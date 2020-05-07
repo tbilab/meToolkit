@@ -26,7 +26,6 @@
 #'
 #' @examples
 #' reconcile_data(phewas_table, id_to_snp, phenotype_id_pairs)
-#' @export
 reconcile_data <- function(phewas_results, id_to_snp, id_to_code, multiple_comparisons_adjustment) {
 
   phewas_checked <- meToolkit::checkPhewasFile(phewas_results)

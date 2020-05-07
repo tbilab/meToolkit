@@ -46,14 +46,14 @@ desired_results <- list(
 
 test_that("Data is merged properly and snp returned", {
   expect_equal(
-    meToolkit::reconcile_data(phewas_results, genome_data, phenome_data),
+    reconcile_data(phewas_results, genome_data, phenome_data),
     desired_results
   )
 })
 
 test_that("SNP is properly picked up", {
   expect_equal(
-    meToolkit::reconcile_data(
+    reconcile_data(
       phewas_results,
       genome_data %>% dplyr::rename(rs4547 = rs1234),
       phenome_data)$snp_name,
@@ -63,7 +63,7 @@ test_that("SNP is properly picked up", {
 
 test_that("Is robust to id column changes", {
   expect_equal(
-    meToolkit::reconcile_data(
+    reconcile_data(
       phewas_results,
       genome_data %>% dplyr::rename(grid = id),
       phenome_data %>% dplyr::rename(grid = id)
@@ -75,7 +75,7 @@ test_that("Is robust to id column changes", {
 test_that("Warns and removes when there are mismatched codes in individual and phewas data", {
 
   expect_warning(
-    meToolkit::reconcile_data(
+    reconcile_data(
       phewas_results,
       genome_data,
       phenome_data %>% dplyr::filter(code != '0.03')
@@ -85,7 +85,7 @@ test_that("Warns and removes when there are mismatched codes in individual and p
 
   expect_equal(
     suppressWarnings({
-      meToolkit::reconcile_data(
+      reconcile_data(
         phewas_results,
         genome_data,
         phenome_data %>% dplyr::filter(code != '0.03')

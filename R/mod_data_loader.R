@@ -181,7 +181,7 @@ data_loader <- function(input, output, session,
       # read files into R's memory
       shiny::incProgress(1 / 3, detail = "Reading in uploaded files")
 
-      app_data$reconciled_data <- meToolkit::reconcile_data(
+      app_data$reconciled_data <- reconcile_data(
         phewas_results = app_data$phewas_raw,
         id_to_snp = app_data$genome_raw,
         id_to_code = app_data$phenome_raw,
@@ -212,7 +212,7 @@ data_loader <- function(input, output, session,
     genome <- glue::glue("{base_dir}/id_to_snp.csv") %>%
       readr::read_csv()
 
-    app_data$reconciled_data <- meToolkit::reconcile_data(
+    app_data$reconciled_data <- reconcile_data(
       phewas_results =  phewas_results,
       id_to_snp = genome,
       id_to_code = phenome,
