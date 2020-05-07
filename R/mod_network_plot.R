@@ -61,7 +61,7 @@ network_plot_UI <- function(id, snp_colors) {
       help_modal_UI(
         id = ns("network"),
         title = "Help for the subject-phecode bipartite netework",
-        help_img_url = "https://github.com/tbilab/meToolkit/raw/doc_updating/vignettes/network_help_page.png",
+        help_img_url = "https://raw.githubusercontent.com/tbilab/meToolkit/reviewer_updates/vignettes/network_help_page.png",
         more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#subject-phecode-bipartite-network"
       )
     ),
