@@ -345,6 +345,10 @@ r2d3.onRender(function(data, svg, width, height, options) {
   if(new_data){
     // Get data in proper format
     viz_data = process_new_data(data);
+
+    // Update table with new data
+    my_table.add_data(viz_data);
+
     // Update our timestamp so we can detect new data again
     loading_timestamp = options.timestamp;
   }
