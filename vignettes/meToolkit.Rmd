@@ -118,7 +118,7 @@ embed_png("main_dashboard.png")
 
 The state of the app is primarily driven by the list of currently selected phenotypes. At load this is small number of the most significant results from the Phewas analysis, but by interacting with the application the user changes this state.  
 
-At anytime a csv of all the subjects that have one or more of the currently selected phenotypes can be downloaded using the "Selected subjects" button at the top right of the app. 
+At anytime a csv of all the subject ids that have one or more of the currently selected phenotypes can be downloaded using the "Selected subjects" button at the top right of the app. If a code or patterns of codes are selected in the [upset plot](#comorbidity-upset-plot), nodes that have the selected pattern will be noted as `highlighted` in the exported id list. 
 
 ```{r, echo = FALSE}
 embed_png("subject_download_btn.png", width = "40%")
