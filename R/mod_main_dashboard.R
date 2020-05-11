@@ -407,7 +407,6 @@ main_dashboard <- function(input,
       if(length(highlights) == 0){
         curr_ind_data() %>%
           dplyr::select(IID) %>%
-          dplyr::mutate(highlighted = FALSE) %>%
           write.csv(file)
       } else {
         curr_ind_data() %>%
