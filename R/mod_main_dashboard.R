@@ -390,15 +390,34 @@ main_dashboard <- function(input,
   output$subject_download_btn <- downloadHandler(
     filename = function() {
 
-      codes_present <- colnames(curr_ind_data()) %>%
-        tail(-2) %>%
-        stringr::str_remove("\\.") %>%
-        paste(collapse = "_")
+      highlights <- state$highlighted_pattern()$codes
 
-      paste("subject_data-", codes_present, ".csv", sep="")
+      if(length(highlights) == 0){
+        "subject_data.csv"
+      } else {
+        codes_present <- stringr::str_remove(state$highlighted_pattern()$codes, "\\.") %>%
+          paste(collapse = "_")
+
+        paste("subject_data-", codes_present, ".csv", sep="")
+      }
     },
     content = function(file) {
-      write.csv(curr_ind_data(), file)
+      highlights <- state$highlighted_pattern()$codes
+
+      if(length(highlights) == 0){
+        curr_ind_data() %>%
+          dplyr::select(IID) %>%
+          dplyr::mutate(highlighted = FALSE) %>%
+          write.csv(file)
+      } else {
+        curr_ind_data() %>%
+          dplyr::select(-snp) %>%
+          tidyr::pivot_longer(-IID, names_to = "code") %>%
+          dplyr::filter(value == 1) %>%
+          dplyr::group_by(IID) %>%
+          dplyr::summarize(highlighted = all(highlights %in% code)) %>%
+          write.csv(file)
+      }
     }
   )
 }
