@@ -175,10 +175,20 @@ function setup_network_viz(dom_elements, on_node_click){
     // Highlight SVG nodes if in export mode
     if(C.export_mode){
 
-      dom_elements.svg.selectAll('circle')
+      // Select all subject nodes
+      dom_elements.svg.selectAll('circle.subject')
+        .each(function(d){
+          const highlighted = nodes_to_highlight.includes(d.name);
+
+          d3.select(this)
+            .at(highlighted
+                ? {stroke: "black", strokeWidth: 1}
+                : {stroke: "white", strokeWidth: 0.5}
+               );
+        })
         .at({
           stroke: 'black',
-          strokeWidth: d => nodes_to_highlight.includes(d.name) ? 1: 0,
+          strokeWidth: d => nodes_to_highlight.includes(d.name) ? 1: choose_stroke_width(d),
         });
 
     } else {
@@ -189,7 +199,6 @@ function setup_network_viz(dom_elements, on_node_click){
   const draw = function(highlight_pattern = viz.options.highlighted_pattern){
     // Update scales with the zoom if we have any
     update_scales();
-
 
     const node_callbacks = {
       mouseover: d => highlight_nodes({type: 'code', codes: d.name}),
@@ -346,24 +355,6 @@ function draw_svg_nodes({
   const x_max = scales.X.range()[1];
   const y_max = scales.Y.range()[1];
 
-  // Special attributes for selected codes
-  const choose_stroke_color = d => d.inverted ?  d.color: 'black';
-
-  const choose_stroke_width = d => {
-    if(d.inverted) return 3;
-
-    const selected = selected_codes.includes(d.name);
-
-    return selected ? 2 : 0;
-  };
-
-  const choose_fill = d => {
-    if(d.inverted){
-      return selected_codes.includes(d.name) ? 'grey' : 'white';
-    } else {
-      return d.color;
-    }
-  }
 
   const node_attrs = {
     r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
@@ -395,6 +386,7 @@ function draw_svg_nodes({
       cx: d => Math.random()*x_max,
       cy: d => Math.random()*y_max,
     })
+    .classed("subject", d => !d.selectable)
     .merge(node_circles)
     .at(node_attrs);
 
@@ -557,6 +549,35 @@ function draw_svg_nodes({
     }
 }
 
+function choose_fill({name, inverted, color}){
+
+  if(selected_codes.includes(name)){
+    return "grey"
+  } else if(inverted) {
+    return "white"
+  } else {
+    return color;
+  }
+}
+
+function choose_stroke_width(d){
+  const subject_node = !d.selectable;
+
+  // Phenotype nodes
+  if(subject_node){
+    return 0.5;
+  } else if(d.inverted){
+    return 3;
+  } else if(selected_codes.includes(d.name)){
+    return 2;
+  } else {
+    return 1;
+  }
+};
+
+function choose_stroke_color(d){
+  return d.inverted ?  'white': 'black';
+}
 
 
 const settings_menu = div.selectAppend('div.settings_menu');
