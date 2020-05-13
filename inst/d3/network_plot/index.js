@@ -546,11 +546,12 @@ function draw_svg_nodes({
 }
 
 function choose_fill({name, inverted, color}){
+  const selected = selected_codes.includes(name);
 
-  if(selected_codes.includes(name)){
-    return "grey"
-  } else if(inverted) {
-    return "white"
+  if(selected && inverted) {
+    return "grey";
+  } else if (inverted) {
+    return "white";
   } else {
     return color;
   }
@@ -571,8 +572,15 @@ function choose_stroke_width(d){
   }
 };
 
-function choose_stroke_color(d){
-  return d.inverted ? d.color : 'white';
+function choose_stroke_color({name, inverted, color}){
+  const selected = selected_codes.includes(name);
+  if(inverted){
+    return color;
+  } else if (selected) {
+    return "grey";
+  } else {
+    return "white";
+  }
 }
 
 
@@ -632,3 +640,32 @@ const export_mode_button = settings_menu.selectAppend('button.export_mode_button
 
     size_viz(viz.width, viz.height);
 });
+
+
+// Logic for when a svg node is clicked.
+function on_node_click(d){
+
+  if(selected_codes.includes(d.name)){
+    // pull code out of selected list
+    selected_codes = selected_codes.filter(code => code !== d.name);
+  } else {
+    // add code to selected codes list
+    selected_codes = [d.name, ...selected_codes];
+  }
+
+  // Update node style
+  d3.select(this).at({
+    stroke: choose_stroke_color(d),
+    strokeWidth: choose_stroke_width(d),
+  });
+
+  // do we have selected codes currently? If so display the action popup.
+  if(selected_codes.length > 0){
+    dom_elements.message_buttons.show(
+      selected_codes.length === 1 ? ['Delete', 'Invert']: 'all'
+    );
+  } else {
+    dom_elements.message_buttons.hide();
+  }
+}
+

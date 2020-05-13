@@ -29,7 +29,7 @@ function sanitize_data(data){
     nodes: data_props.includes('vertices') ? data.vertices : data.nodes,
     links: data_props.includes('edges') ? data.edges : data.links,
   };
-};
+}
 
 
 // Function to add a dx or dy point to nodes for fixing them on a line in force simulation
@@ -348,46 +348,6 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
   });
 
 }
-
-
-// Logic for when a svg node is clicked.
-function on_node_click(d){
-  const node = d3.select(this);
-
-  // Is code already selected?
-  if(selected_codes.includes(d.name)){
-    // pull code out of selected list
-    selected_codes = selected_codes.filter(code => code !== d.name);
-
-    // reset the style of node
-    if(d.inverted){
-      node.attr("fill", 'white');
-    } else {
-      node.attr("stroke-width", 0);
-    }
-
-
-  } else {
-    // add code to selected codes list
-    selected_codes = [d.name, ...selected_codes];
-
-    // Emphasize highlight
-    if(d.inverted){
-      node.attr("fill", 'grey');
-    } else {
-      node.attr("stroke-width", 2);
-    }
-  }
-
-  // do we have selected codes currently? If so display the action popup.
-  if(selected_codes.length > 0){
-    dom_elements.message_buttons.show(
-      selected_codes.length === 1 ? ['Delete', 'Invert']: 'all'
-    );
-  } else {
-    dom_elements.message_buttons.hide();
-  }
-};
 
 
 // Finds which patient nodes contain a given pattern of codes.
