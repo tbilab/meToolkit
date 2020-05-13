@@ -108,7 +108,18 @@ function setup_dom_elements(div, C, on_message){
     svg.at(viz_sizing)
        .st(viz_sizing);
 
-    canvas.at(viz_sizing);
+    // Get the device pixel ratio, falling back to 1.
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas
+      .at({
+        width:   width*dpr,
+        height: height*dpr,
+      })
+      .st(viz_sizing);
+
+    // Scale canvas image so it looks good on retina displays
+    canvas.node().getContext('2d').scale(dpr,dpr);
   };
 
   return {svg, canvas, context, tooltip, message_buttons, resize};
@@ -309,7 +320,7 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
   // Clear canvas
   context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
 
-  // If we're in export mode don't do anything.
+  // If we're in export mode we dont need to draw anything to the canvas.
   if(C.export_mode) return;
 
   context.save();
@@ -330,7 +341,6 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
 
   // Draw patient nodes
   context.globalAlpha = C.case_opacity;
-
 
   nodes.forEach( d => {
     if(!d.selectable){
