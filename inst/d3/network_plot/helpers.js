@@ -331,18 +331,12 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
   // Draw patient nodes
   context.globalAlpha = C.case_opacity;
 
-  // Function to assign node highlights
-  // Only check for highlight modification if we need to to avoid expensive calculations
-  const node_border = d => highlighted_nodes.length != 0 ?
-    `rgba(0, 0, 0, ${highlighted_nodes.includes(d.name) ? 1 : 0})` :
-    `rgba(0, 0, 0, 0)`;
-
 
   nodes.forEach( d => {
     if(!d.selectable){
 
       // Border around the nodes.
-      context.strokeStyle = node_border(d);
+      context.strokeStyle = highlighted_nodes.includes(d.name) ? "black" : "white";
 
       context.fillStyle = d.color;
 

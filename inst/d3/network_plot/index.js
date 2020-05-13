@@ -185,10 +185,6 @@ function setup_network_viz(dom_elements, on_node_click){
                 ? {stroke: "black", strokeWidth: 1}
                 : {stroke: "white", strokeWidth: 0.5}
                );
-        })
-        .at({
-          stroke: 'black',
-          strokeWidth: d => nodes_to_highlight.includes(d.name) ? 1: choose_stroke_width(d),
         });
 
     } else {
@@ -576,7 +572,7 @@ function choose_stroke_width(d){
 };
 
 function choose_stroke_color(d){
-  return d.inverted ?  'white': 'black';
+  return d.inverted ? 'black' : 'white';
 }
 
 
