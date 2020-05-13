@@ -572,7 +572,7 @@ function choose_stroke_width(d){
 };
 
 function choose_stroke_color(d){
-  return d.inverted ? 'black' : 'white';
+  return d.inverted ? d.color : 'white';
 }
 
 
