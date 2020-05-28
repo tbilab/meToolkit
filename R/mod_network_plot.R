@@ -69,10 +69,7 @@ network_plot_UI <- function(id, snp_colors) {
       id = "network_module-control-panel",
       div(
         class = 'network_module-network-controls minor-allele-checkbox',
-        checkboxInput(ns("snp_filter"),
-                      label = "Just minor-allele carriers",
-                      value = FALSE,
-                      width = "auto")
+        uiOutput(ns("snp_filter_holder")),
       ),
       div(
         class = 'network_module-network-controls minor-allele-legend',
@@ -128,11 +125,9 @@ network_plot <- function(input,
   # send data and options to the 2d plot
   output$plot <- r2d3::renderD3({
     validate(need(network_data(), message = FALSE))
-    json_for_network <- jsonlite::toJSON(network_data())
-
 
     r2d3::r2d3(
-      data = json_for_network,
+      data = jsonlite::toJSON(network_data()),
       script = system.file("d3/network_plot/index.js", package = "meToolkit"),
       container = 'div',
       dependencies = c(
@@ -155,11 +150,14 @@ network_plot <- function(input,
     )
   })
 
-  # Make sure checkbox is displaying right value
-  observeEvent(snp_filter(), {
-    updateCheckboxInput(session, "snp_filter", value = snp_filter())
-  })
+  starting_filter_value <- isolate(snp_filter())
 
+  output$snp_filter_holder <- renderUI({
+    checkboxInput(session$ns("snp_filter"),
+                  label = "Just minor-allele carriers",
+                  value = starting_filter_value,
+                  width = "auto")
+  })
 
   # If we've received a message from the network viz package
   # it into the returned reactive value
@@ -174,9 +172,9 @@ network_plot <- function(input,
     # Check to see if the snp filter is different than current state
     validate(need(input$snp_filter != snp_filter(), message = FALSE))
 
-    to_return <- list(type = 'snp_filter_change',
-                      payload = input$snp_filter)
-    action_object(to_return)
+    action_object(list(type = 'snp_filter_change',
+                       payload = input$snp_filter,
+                       source = "network_plot"))
   })
 
   # Enable opening and closing of help modal

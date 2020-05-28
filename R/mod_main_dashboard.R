@@ -178,10 +178,11 @@ main_dashboard <- function(input,
     # Start with all codes not inverted
     inverted_codes = shiny::reactiveVal(c()),
     # Start with all individuals regardless of snp status
-    snp_filter = shiny::reactiveVal(FALSE),
+    snp_filter = shiny::reactiveVal(url_state$ma_filtered),
     # Pattern to highlight in network plot,
     highlighted_pattern = shiny::reactiveVal(list(type = 'pattern', codes = c()))
   )
+
 
   #----------------------------------------------------------------
   # App values that change based upon the current state
@@ -230,9 +231,11 @@ main_dashboard <- function(input,
     if (debug_mode) {
       print(
         glue::glue(
-          "========================
-                       Action:{action_type}
-                       Payload:{jsonlite::toJSON(action_payload)}"
+          "========================\n",
+          "Action:{action_type}\n",
+          "Payload:{jsonlite::toJSON(action_payload)}\n",
+          "Source:{app_interaction()[['source']]}\n",
+          "========================"
         )
       )
     }
@@ -316,8 +319,9 @@ main_dashboard <- function(input,
     }
 
     # Update the URL of the app so user's can return to point easily
-    embed_snp_codes_in_url(snp_name, state$selected_codes())
+    embed_snp_codes_in_url(snp_name, state$selected_codes(), state$snp_filter())
   })
+
 
   #----------------------------------------------------------------
   # Setup all the components of the app
