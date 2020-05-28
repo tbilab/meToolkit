@@ -28,30 +28,18 @@ extract_snp_codes_from_url <- function(session){
 #'
 #' @examples
 #' extract_snp_codes_from_url_string("?rs123456__00800_90800_08300")
-extract_snp_codes_from_url_string <- function(query_string_raw){
-  query_string <- query_string_raw %>%
-    stringr::str_remove("\\?")
-
-  snp_and_delim_pattern <- "rs.+__"
-
-  snp_id <- query_string %>%
-    stringr::str_extract(snp_and_delim_pattern) %>%
-    stringr::str_remove("__")
-
-  no_snp_found <- is.na(snp_id)
+extract_snp_codes_from_url_string <- function(query_string){
+  snp_id <- stringr::str_extract(query_string, "(?<=\\?).+?(?=__)")
 
   codes <- query_string %>%
-    stringr::str_remove(snp_and_delim_pattern) %>%
-    stringr::str_split("_") %>%
+    stringr::str_extract_all("(?<=_)[0-9]{5}") %>%
     purrr::pluck(1) %>%
     stringr::str_replace("(.{3})(.*)", "\\1.\\2")
 
-  # Need to have at least one code.
-  no_codes_found <- length(codes) == 1 || codes[1] == ""
-
   list(
-    snp =   if (no_snp_found)   NULL else snp_id,
-    codes = if (no_codes_found) NULL else codes
+    snp =   if (is.na(snp_id))      NULL else snp_id,
+    codes = if (length(codes) == 0) NULL else codes,
+    ma_filtered = stringr::str_detect(query_string, "ma_filtered")
   )
 }
 
@@ -59,19 +47,22 @@ extract_snp_codes_from_url_string <- function(query_string_raw){
 #'
 #' @param snp Name of current snp
 #' @param codes List of currently selected codes
+#' @param ma_filtered Is the subject data currently filtered to minor allele carriers?
 #'
 #' @return Nothing (updates app URL)
 #'
 #' @examples
 #' embed_snp_codes_in_url('rs123456', c('009.00', '008.10', '008.20'))
-embed_snp_codes_in_url <- function(snp, codes){
+embed_snp_codes_in_url <- function(snp, codes, ma_filtered = FALSE){
 
   # Collapse codes to decimal-less string
   codes_string <- codes %>%
     stringr::str_remove('\\.') %>%
     paste(collapse = '_')
 
-  new_url_string <- glue::glue("?{snp}__{codes_string}")
+  filter_text <- if (ma_filtered) "__ma_filtered" else ""
+
+  new_url_string <- glue::glue("?{snp}__{codes_string}{filter_text}")
 
   shiny::updateQueryString(new_url_string)
 }
