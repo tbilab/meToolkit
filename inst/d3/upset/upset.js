@@ -6,8 +6,60 @@ let viz_options = options;
 let viz_width = width;
 let viz_height = height;
 
-let highlighted_pattern;
 let current_min_size;
+
+const highlights = {
+  type: "code",
+  values: new Set(),
+  reset_to: function(new_val) {
+    this.values.clear();
+    this.values.add(new_val);
+  },
+  add: function(val, multiselect_mode){
+    if (multiselect_mode) {
+      // User has requested more patterns or codes to be added to current selection
+      this.values.add(val);
+    } else {
+      // User has selected a new pattern or code that should be viewed in isolation
+      this.reset_to(val);
+    }
+  },
+  update: function(d, multiselect_mode){
+    const highlight_type = Object.keys(d).includes('pattern') ? 'pattern' : 'code';
+    const value = d[highlight_type];
+    const already_highlighted = this.values.has(value);
+    const multiple_selected = this.values.size > 1;
+
+    // User has switched the type of highlight they are doing from code->pattern or vis-versa
+    if(highlight_type !== this.type) {
+      this.reset_to(value);         // Reset to just this current value
+      this.type = highlight_type;   // Update current highlight type
+    } else if(already_highlighted && multiselect_mode) {
+      this.values.delete(value);
+    } else if(already_highlighted && multiple_selected) {
+      this.reset_to(value);
+    } else if(already_highlighted){
+      this.values.clear();
+    } else {
+      this.add(value, multiselect_mode);
+    }
+  },
+  dump_unique_codes: function(){
+    const unique_codes = new Set();
+
+    this.values.forEach(pattern => pattern
+      .split("-")
+      .forEach(code => unique_codes.add(code))
+    );
+
+    return [...unique_codes];
+  },
+  as_element_ids: function(){
+    return [...this.values].map(id => `#${make_id_string(id, this.type)}`);
+  }
+};
+
+
 
 // Constants
 const margin = {right: 50, left: 50, top: 20, bottom: 70}; // margins on side of chart
@@ -209,16 +261,18 @@ function draw_with_set_size(g, sizes, set_size_x, only_snp_data, remove_singleto
       left_info_panel.hide();
       d3.select(this).attr('stroke-width', 0);
   },
-    click: function(d){
-      toggle_pattern_highlight(d, 'pattern');
-    }
+    click: toggle_pattern_highlight
   };
 
   const code_callbacks = {
     mouseover: function(d){
+
       const line_height = 22;
 
-      left_info_panel.update(`Code: ${d.code}`).show();
+      left_info_panel.update(`
+      <tspan>Code: ${d.code}:</tspan>
+      <tspan style="font-size: 0.6rem;" dy="${line_height}">${d.description}</tspan>
+      `).show();
 
       right_info_panel.update(`
         <tspan>Appears</tspan>
@@ -233,9 +287,7 @@ function draw_with_set_size(g, sizes, set_size_x, only_snp_data, remove_singleto
       right_info_panel.hide();
       d3.select(this).attr('stroke-width', 0);
     },
-    click: function(d){
-      toggle_pattern_highlight(d, 'code');
-    }
+    click: toggle_pattern_highlight
   };
 
   const code_interaction_layer = g.selectAppend('g.code_interaction_layer')
@@ -246,10 +298,8 @@ function draw_with_set_size(g, sizes, set_size_x, only_snp_data, remove_singleto
     .translate([0, sizes.margin_count_h])
     .call(create_pattern_interaction_layer, patterns, scales, sizes, pattern_callbacks);
 
-  // Redo old highlight if it's there
-  if(highlighted_pattern !== null){
-    highlight_or_reset_pattern(highlighted_pattern);
-  }
+  // Redo old highlight if it's there, don't update shiny though
+  highlight_or_reset_patterns(false);
 }
 
 function draw_upset(){
@@ -301,7 +351,7 @@ function draw_upset(){
         current_min_size,
         new_size => {
           current_min_size = new_size;
-          draw_with_set_size(g, sizes, set_size_x, filtered_on_snp, filtering_singletons)
+          draw_with_set_size(g, sizes, set_size_x, filtered_on_snp, filtering_singletons);
         });
 
     // Setup singleton filter button
@@ -343,45 +393,28 @@ r2d3.onResize((width,height) => {
   draw_upset(viz_data, viz_svg, viz_width, viz_height, viz_options);
 });
 
-function highlight_or_reset_pattern(id_of_pattern, undoing_highlight = false){
-
-  // Can we find pattern in current view?
-  const pattern_holder = svg.select(`#${id_of_pattern}`);
-
-  // Is the pattern out of view?
-  const missing_pattern = pattern_holder.empty();
+function highlight_or_reset_patterns(pass_message = true){
 
   // Reset all boxes
   svg.selectAll('rect.interaction_box').at(interaction_box_styles);
 
-  if(missing_pattern || undoing_highlight){
-    // Unhighlight and send to shiny
-    highlighted_pattern = null;
-    send_to_shiny('pattern_highlight', [], viz_options.msg_loc || 'no_shiny');
-  } else {
-    // Otherwise, parse the pattern and send to shiny
-    pattern_holder.select('.interaction_box').at(selected_interaction_box);
-    highlighted_pattern = id_of_pattern;
+  // Highlight all the patterns requested
+  highlights.as_element_ids()
+    .forEach(element_id => svg
+      .select(element_id)
+      .select('.interaction_box')
+      .at(selected_interaction_box));
+
+  if(pass_message){
+    send_to_shiny('pattern_highlight', highlights.dump_unique_codes(), viz_options.msg_loc || 'no_shiny');
   }
 }
 
-function toggle_pattern_highlight(d, code_or_pattern){
-
-  const id_of_pattern = make_id_string(d, code_or_pattern);
-
-  // Is this pattern already highlighted? (thus we're turning it off?)
-  const undoing_highlight = id_of_pattern === highlighted_pattern;
+function toggle_pattern_highlight(d){
+  highlights.update(d, d3.event.shiftKey);
 
   // Perform the actual visual changes (and send to shiny if we're resetting to no highlight)
-  highlight_or_reset_pattern(id_of_pattern, undoing_highlight)
-
-  // If we're not simply reseting then update the current highlight and send to shiny the new
-  // pattern.
-  if(!undoing_highlight){
-    highlighted_pattern = id_of_pattern;
-    const codes_in_pattern = d[code_or_pattern].split('-');
-    send_to_shiny('pattern_highlight', codes_in_pattern, viz_options.msg_loc || 'no_shiny');
-  }
+  highlight_or_reset_patterns()
 }
 
 

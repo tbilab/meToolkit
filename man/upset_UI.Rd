@@ -2,22 +2,18 @@
 % Please edit documentation in R/mod_upset.R
 \name{upset_UI}
 \alias{upset_UI}
-\title{UI function of upset module}
+\title{Upset plot of multimorbidity patterns: UI}
 \usage{
-upset_UI(id, div_class = "upset_plot")
+upset_UI(id)
 }
 \arguments{
 \item{id}{String with unique id of module in app}
-
-\item{div_class}{A character string containing a class name for the entire
-plot to be wrapped in. This can then be used to style with external css.
-Defaults to 'upset_plot'.}
 }
 \value{
 HTML component of shiny module
 }
 \description{
-UI function of upset module
+Upset plot of multimorbidity patterns: UI
 }
 \examples{
 upset_UI('my_mod')

@@ -100,49 +100,48 @@ function setup_table(dom_target, arrow_color, columns_to_show){
     .append('tbody.clusterize-content')
     .attr('id', 'content-area');
 
-  const table_body = content_area
-    .append('tr.clusterize-no-data');
+  const table_body = content_area.append('tr.clusterize-no-data');
 
-   // Build key for how wide each column needs to be.
-    get_col_style = build_column_style(columns_to_show, col_units);
+  // Build key for how wide each column needs to be.
+  get_col_style = build_column_style(columns_to_show, col_units);
 
-    function setup_sort_arrows(d){
-      if(d.sortable){
-        const column_header = d3.select(this);
-        ['decreasing', 'increasing'].forEach(direction => {
-           column_header
-            .append(`span.${direction}`)
-            .text(direction === 'decreasing' ? ' ↓' : '↑')
-            .attr(
-              'title',
-              `Click to sort ${d.name} column ` +
-              `in ${direction} order`
-            )
-            .on('click', function(d){
-              current_sort = {
-                col: d.id,
-                direction,
-              };
-              update_w_sort();
-            });
-        });
-      }
+  function setup_sort_arrows(d){
+    if(d.sortable){
+      const column_header = d3.select(this);
+      ['decreasing', 'increasing'].forEach(direction => {
+         column_header
+          .append(`span.${direction}`)
+          .text(direction === 'decreasing' ? ' ↓' : '↑')
+          .attr(
+            'title',
+            `Click to sort ${d.name} column ` +
+            `in ${direction} order`
+          )
+          .on('click', function(d){
+            current_sort = {
+              col: d.id,
+              direction,
+            };
+            update_w_sort();
+          });
+      });
     }
+  }
 
-    // Draw headers for table
-    const header_columns = header_table
-      .selectAll('td')
-      .data(columns_to_show).enter()
-      .append('td')
-      .html(d => `${d.name}`)
-      .style('width', col => get_col_style(col, false, true))
-      .attr('class', d => `tool ${d.size}-column ${d.id}`)
-      .each(setup_sort_arrows);
+  // Draw headers for table
+  const header_columns = header_table
+    .selectAll('td')
+    .data(columns_to_show).enter()
+    .append('td')
+    .html(d => `${d.name}`)
+    .style('width', col => get_col_style(col, false, true))
+    .attr('class', d => `tool ${d.size}-column ${d.id}`)
+    .each(setup_sort_arrows);
 
-    // Fill in first loading row
-    table_body.append('td')
-      .attr('colspan', 100)
-      .html(`Loading data...`);
+  // Fill in first loading row
+  table_body.append('td')
+    .attr('colspan', 100)
+    .html(`Loading data...`);
 
   const table_obj = new Clusterize({
     rows: [],
@@ -248,13 +247,11 @@ function setup_table(dom_target, arrow_color, columns_to_show){
         d.log_or > or_bounds[0] &&
         d.log_or < or_bounds[1]
       );
-      const found_in_search = d.found_in_search;
       const selected = selected_codes.includes(d.code);
 
-      let row_class = '';
-      if(inside_or_bounds){
-        row_class = `class="${found_in_search ? 'found_in_search ' : ''}${selected ? 'selected': ''}"`;
-      }
+      const row_class = inside_or_bounds || selected
+        ? `class="${d.found_in_search ? 'found_in_search ' : ''}${selected ? 'selected': ''}"`
+        :'class="disabled"';
 
       return `<tr data-code=${d.code} ${row_class}>${row_data}</tr>`;
     };

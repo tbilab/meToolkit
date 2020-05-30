@@ -75,7 +75,7 @@ snp name from the column of the genotype file." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">meToolkit</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -95,7 +95,12 @@ snp name from the column of the genotype file." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/tbilab/meToolkit">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -111,7 +116,7 @@ snp name from the column of the genotype file." />
     <div class="page-header">
     <h1>Combine and reconcile the three main data components needed for ME app and
 return in app-friendly format</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/tbilab/meToolkit/blob/master/R/helpers_reconcile_data.R'><code>R/helpers_reconcile_data.R</code></a></small>
     <div class="hidden name"><code>reconcile_data.Rd</code></div>
     </div>
 
@@ -123,7 +128,12 @@ combines individual data and checks phewas results along with extracting the
 snp name from the column of the genotype file.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>reconcile_data</span>(<span class='no'>phewas_results</span>, <span class='no'>id_to_snp</span>, <span class='no'>id_to_code</span>)</pre>
+    <pre class="usage"><span class='fu'>reconcile_data</span>(
+  <span class='no'>phewas_results</span>,
+  <span class='no'>id_to_snp</span>,
+  <span class='no'>id_to_code</span>,
+  <span class='no'>multiple_comparisons_adjustment</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,8 +151,17 @@ copies of allele).</p></td>
     </tr>
     <tr>
       <th>id_to_code</th>
-      <td><p>Dataframe containing column <code>id</code>, and columns for
-each code included.</p></td>
+      <td><p>Dataframe containing column <code>id</code>, and columns for each
+code included.</p></td>
+    </tr>
+    <tr>
+      <th>multiple_comparisons_adjustment</th>
+      <td><p>What type of multiple comparisons
+adjustment should be done to the phewas results? Options include "None",
+"Bonferroni", and "Benjamini-Hochberg". Note that the correction is
+performed <em>before</em> filtering of codes to those contained in individual
+data. Aka for as many tests as were passed in raw phewas results. If
+different behavior is desired, the user must provide results pre-adjusted.</p></td>
     </tr>
     </table>
 
@@ -152,7 +171,7 @@ each code included.</p></td>
 properties for use in ME app.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>reconcile_data</span>(<span class='no'>phewas_table</span>, <span class='no'>id_to_snp</span>, <span class='no'>phenotype_id_pairs</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is.data.frame(x): object 'phewas_table' not found</span></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>reconcile_data</span>(<span class='no'>phewas_table</span>, <span class='no'>id_to_snp</span>, <span class='no'>phenotype_id_pairs</span>)</div><div class='output co'>#&gt; <span class='error'>Error in reconcile_data(phewas_table, id_to_snp, phenotype_id_pairs): could not find function "reconcile_data"</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -172,7 +191,7 @@ properties for use in ME app.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

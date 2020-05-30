@@ -1,31 +1,61 @@
-#' Interactive manhattan plot and table
+#' Interactive manhattan plot and table: UI
 #'
 #' For selecting codes for further visualization in app.
 #'
 #'
 #' @seealso \code{\link{manhattan_plot_and_table}}
 #' @param id String with unique id of module in app
-#' @param height How tall we want this module to be in pixels (defaults to
-#'   `NULL`). If not provided the div must be styled to have a height using css.
-#'   (See `div_class` argument for targeting.)
 #' @return UI component of interactive manhattan plot
 #' @export
 #'
 #' @examples
 #' manhattan_plot_and_table_UI('my_mod')
-manhattan_plot_and_table_UI <- function(id, height = NULL) {
+manhattan_plot_and_table_UI <- function(id) {
   ns <- NS(id)
 
-  wrapper_height <- ''
-  if(!is.null(height)){
-    wrapper_height <- glue::glue('height: {height}px')
-  }
+  module_css <- "
+    #phewas_panel select {
+      width: 60px;
+    }
+
+    #phewas_panel .form-group{
+      width: auto;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      font-size: 0.8rem;
+    }
+
+    #phewas_panel label {
+      padding-right: 4px;
+    }
+  "
+
   tagList(
+    shiny::tags$style(module_css),
+    shiny::div(
+      id = "phewas_panel",
+      class = "title-bar",
+      shiny::h3("Interactive Phewas Manhattan Plot", class = "template-section-title"),
+      shiny::selectInput(
+        ns("significance_threshold"),
+        label = "Signficance Threshold",
+        choices = list("None", "0.05", "0.01"),
+        selected = "None",
+        selectize = FALSE
+      ),
+      help_modal_UI(
+        id = ns("phewas"),
+        title = "Help for ineractive phewas manhattan plot",
+        help_img_url = "https://raw.githubusercontent.com/tbilab/meToolkit/reviewer_updates/vignettes/phewas_help_page.png",
+        more_link = "https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html#interactive-phewas-manhattan-plot"
+      )
+    ),
     r2d3::d3Output(ns('manhattan_plot_and_table'), height = '100%')
   )
 }
 
-#' Server function of manhattan plot module.
+#' Interactive manhattan plot and table: Server
 #'
 #' Draw an interactive manhattan plot and table that can be used to send
 #' selections for codes to the rest of the app.
@@ -49,18 +79,19 @@ manhattan_plot_and_table_UI <- function(id, height = NULL) {
 #'
 #' @examples
 #' callModule(manhattan_plot_and_table,  'my_mod', selected_codes, app_state$currently_selected)
-manhattan_plot_and_table <- function(
-  input, output, session,
-  results_data,
-  selected_codes,
-  colors,
-  action_object ) {
-
+manhattan_plot_and_table <- function(input,
+                                     output,
+                                     session,
+                                     results_data,
+                                     selected_codes,
+                                     colors,
+                                     action_object) {
   message_path <- 'message_manhattan_plot_and_table'
+
+  timestamp <- Sys.time()
 
   # send data and options to the 2d plot
   output$manhattan_plot_and_table <- r2d3::renderD3({
-
     r2d3::r2d3(
       data = results_data,
       script = system.file("d3/manhattan_plot/manhattan_plot.js", package = "meToolkit"),
@@ -70,7 +101,6 @@ manhattan_plot_and_table <- function(
         system.file("d3/helpers.js", package = "meToolkit"),
         system.file("d3/manhattan_plot/phewas_table.js", package = "meToolkit"),
         system.file("d3/manhattan_plot/clusterize.js", package = "meToolkit")
-
       ),
       css = c(
         system.file("d3/helpers.css", package = "meToolkit"),
@@ -80,15 +110,19 @@ manhattan_plot_and_table <- function(
       options = list(
         msg_loc = session$ns(message_path),
         selected = selected_codes(),
-        colors = colors
+        sig_bar_locs = input$significance_threshold,
+        colors = colors,
+        timestamp = timestamp
       )
     )
   })
+
+  # Enable opening and closing of modal
+  shiny::callModule(help_modal, "phewas")
 
   # If we've received a message, package it into the returned reactive value
   observeEvent(input[[message_path]], {
     validate(need(input[[message_path]], message = FALSE))
     action_object(input[[message_path]])
   })
-
 }

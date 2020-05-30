@@ -70,7 +70,7 @@ returns the requested snp and phecodes. Called by extract_snp_codes_from_url" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">meToolkit</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -90,7 +90,12 @@ returns the requested snp and phecodes. Called by extract_snp_codes_from_url" />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/tbilab/meToolkit">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -105,7 +110,7 @@ returns the requested snp and phecodes. Called by extract_snp_codes_from_url" />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Extract SNP and Codes from raw URL query string</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/tbilab/meToolkit/blob/master/R/helpers_url_state_managers.R'><code>R/helpers_url_state_managers.R</code></a></small>
     <div class="hidden name"><code>extract_snp_codes_from_url_string.Rd</code></div>
     </div>
 
@@ -114,7 +119,7 @@ returns the requested snp and phecodes. Called by extract_snp_codes_from_url" />
 returns the requested snp and phecodes. Called by <code><a href='extract_snp_codes_from_url.html'>extract_snp_codes_from_url</a></code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>extract_snp_codes_from_url_string</span>(<span class='no'>query_string_raw</span>)</pre>
+    <pre class="usage"><span class='fu'>extract_snp_codes_from_url_string</span>(<span class='no'>query_string</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -130,12 +135,7 @@ returns the requested snp and phecodes. Called by <code><a href='extract_snp_cod
     <p>A list containing the requested SNP id and codes</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>extract_snp_codes_from_url_string</span>(<span class='st'>"?rs123456__00800_90800_08300"</span>)</div><div class='output co'>#&gt; $snp
-#&gt; [1] "rs123456"
-#&gt; 
-#&gt; $codes
-#&gt; [1] "008.00" "908.00" "083.00"
-#&gt; </div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>extract_snp_codes_from_url_string</span>(<span class='st'>"?rs123456__00800_90800_08300"</span>)</div><div class='output co'>#&gt; <span class='error'>Error in extract_snp_codes_from_url_string("?rs123456__00800_90800_08300"): could not find function "extract_snp_codes_from_url_string"</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -155,7 +155,7 @@ returns the requested snp and phecodes. Called by <code><a href='extract_snp_cod
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <!-- template.html -->
 
 <style>
@@ -16,16 +17,7 @@
     justify-content: space-between;
   }
 
-  #return-to-loader-button {
-    height: 70%;
-    align-self: center;
-    margin-right: 0.2rem;
-    padding: 0px 0.6rem;
-  }
 
-  #return-to-loader-button.hidden {
-    display: none;
-  }
 
   span.back-arrow {
     font-size: 1.1rem;
@@ -61,45 +53,74 @@
   .template-upset-plot     { grid-area: 1 / 4 / 3 / 6; }
   .template-network-plot   { grid-area: 3 / 4 / 5 / 6; }
 
+  .template-manhattan-plot,
+  .template-upset-plot .template-section-body{
+    position: relative;
+  }
+
   .template-section-title {
-    height: var(--section-title-height);
     margin-top: 0;
     margin-bottom: 0;
     padding-left: 5px;
     line-height: var(--section-title-height);
-    border-bottom: 1px solid dimgrey;
   }
 
   .template-section-body {
     height: calc(100% - var(--section-title-height));
   }
 
+  .title-bar {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #69696926;
+    padding: 2px;
+    margin-bottom: 2px;
+    height: var(--section-title-height);
+  }
+
+  .interaction-buttons a {
+    align-self: center;
+    margin-top: 0.4rem;
+    margin-right: 0.2rem;
+    font-size: 0.75rem;
+    color: var(--main-text-color);
+    font-weight: 400;
+    padding: 5px 10px;
+  }
+
+  #return-to-loader-button.hidden {
+    display: none;
+  }
+
+
+
+}
+
 </style>
+
 
 <div class = 'app-header'>
   <h2 class = 'app-title'> {{ app_title }} </h2>
-  <button id = 'return-to-loader-button' class = 'hidden'>Return to data loading</button>
+  <div class = 'interaction-buttons'>
+    {{subject_download_btn}}
+    <a id="return-to-loader-button" class="btn btn-default hidden" target="_blank">
+      <i class="fa fa-undo" aria-hidden="true"></i>
+      Return to data loading
+    </a>
+  </div>
 </div>
 <div class = 'template-parent'>
   <div class = 'template-info-panel template-section'>
     {{ info_panel }}
   </div>
   <div class = 'template-manhattan-plot template-section'>
-    <h3 class = 'template-section-title'>{{ manhattan_plot_title }}</h3>
-    <div class = 'template-section-body'>
-      {{ manhattan_plot }}
-    </div>
+    {{ manhattan_plot }}
   </div>
   <div class = 'template-upset-plot template-section'>
-     <h3 class = 'template-section-title'>{{ upset_title }}</h3>
-     <div class = 'template-section-body'>
-      {{ upset }}
-     </div>
+    {{ upset }}
   </div>
   <div class = 'template-network-plot template-section'>
-    <h3 class = 'template-section-title'>{{ network_title }}</h3>
-    <div class = 'template-section-body'>
-      {{ network }}
-    </div>
+    {{ network }}
   </div>
+
 </div>

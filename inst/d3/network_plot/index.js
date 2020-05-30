@@ -102,7 +102,7 @@ function setup_network_viz(dom_elements, on_node_click){
 
     // Make sure message buttons are hidden only if
     // no codes are selected.
-    if(selected_codes.length == 0) {
+    if(selected_codes.length === 0) {
       dom_elements.message_buttons.hide();
     }
 
@@ -175,10 +175,16 @@ function setup_network_viz(dom_elements, on_node_click){
     // Highlight SVG nodes if in export mode
     if(C.export_mode){
 
-      dom_elements.svg.selectAll('circle')
-        .at({
-          stroke: 'black',
-          strokeWidth: d => nodes_to_highlight.includes(d.name) ? 1: 0,
+      // Select all subject nodes
+      dom_elements.svg.selectAll('circle.subject')
+        .each(function(d){
+          const highlighted = nodes_to_highlight.includes(d.name);
+
+          d3.select(this)
+            .at(highlighted
+                ? {stroke: "black", strokeWidth: 1}
+                : {stroke: "white", strokeWidth: 0.5}
+               );
         });
 
     } else {
@@ -189,7 +195,6 @@ function setup_network_viz(dom_elements, on_node_click){
   const draw = function(highlight_pattern = viz.options.highlighted_pattern){
     // Update scales with the zoom if we have any
     update_scales();
-
 
     const node_callbacks = {
       mouseover: d => highlight_nodes({type: 'code', codes: d.name}),
@@ -346,24 +351,6 @@ function draw_svg_nodes({
   const x_max = scales.X.range()[1];
   const y_max = scales.Y.range()[1];
 
-  // Special attributes for selected codes
-  const choose_stroke_color = d => d.inverted ?  d.color: 'black';
-
-  const choose_stroke_width = d => {
-    if(d.inverted) return 3;
-
-    const selected = selected_codes.includes(d.name);
-
-    return selected ? 2 : 0;
-  };
-
-  const choose_fill = d => {
-    if(d.inverted){
-      return selected_codes.includes(d.name) ? 'grey' : 'white';
-    } else {
-      return d.color;
-    }
-  }
 
   const node_attrs = {
     r: d => C.case_radius*(d.selectable ? C.code_radius_mult: 1),
@@ -395,6 +382,7 @@ function draw_svg_nodes({
       cx: d => Math.random()*x_max,
       cy: d => Math.random()*y_max,
     })
+    .classed("subject", d => !d.selectable)
     .merge(node_circles)
     .at(node_attrs);
 
@@ -557,6 +545,43 @@ function draw_svg_nodes({
     }
 }
 
+function choose_fill({name, inverted, color}){
+  const selected = selected_codes.includes(name);
+
+  if(selected && inverted) {
+    return "grey";
+  } else if (inverted) {
+    return "white";
+  } else {
+    return color;
+  }
+}
+
+function choose_stroke_width(d){
+  const subject_node = !d.selectable;
+
+  // Phenotype nodes
+  if(subject_node){
+    return 0.5;
+  } else if(d.inverted){
+    return 3;
+  } else if(selected_codes.includes(d.name)){
+    return 2;
+  } else {
+    return 1;
+  }
+};
+
+function choose_stroke_color({name, inverted, color}){
+  const selected = selected_codes.includes(name);
+  if(inverted){
+    return color;
+  } else if (selected) {
+    return "grey";
+  } else {
+    return "white";
+  }
+}
 
 
 const settings_menu = div.selectAppend('div.settings_menu');
@@ -615,3 +640,32 @@ const export_mode_button = settings_menu.selectAppend('button.export_mode_button
 
     size_viz(viz.width, viz.height);
 });
+
+
+// Logic for when a svg node is clicked.
+function on_node_click(d){
+
+  if(selected_codes.includes(d.name)){
+    // pull code out of selected list
+    selected_codes = selected_codes.filter(code => code !== d.name);
+  } else {
+    // add code to selected codes list
+    selected_codes = [d.name, ...selected_codes];
+  }
+
+  // Update node style
+  d3.select(this).at({
+    stroke: choose_stroke_color(d),
+    strokeWidth: choose_stroke_width(d),
+  });
+
+  // do we have selected codes currently? If so display the action popup.
+  if(selected_codes.length > 0){
+    dom_elements.message_buttons.show(
+      selected_codes.length === 1 ? ['Delete', 'Invert']: 'all'
+    );
+  } else {
+    dom_elements.message_buttons.hide();
+  }
+}
+

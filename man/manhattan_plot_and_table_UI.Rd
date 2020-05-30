@@ -2,16 +2,12 @@
 % Please edit documentation in R/mod_manhattan_and_table.R
 \name{manhattan_plot_and_table_UI}
 \alias{manhattan_plot_and_table_UI}
-\title{Interactive manhattan plot and table}
+\title{Interactive manhattan plot and table: UI}
 \usage{
-manhattan_plot_and_table_UI(id, height = NULL)
+manhattan_plot_and_table_UI(id)
 }
 \arguments{
 \item{id}{String with unique id of module in app}
-
-\item{height}{How tall we want this module to be in pixels (defaults to
-\code{NULL}). If not provided the div must be styled to have a height using css.
-(See \code{div_class} argument for targeting.)}
 }
 \value{
 UI component of interactive manhattan plot

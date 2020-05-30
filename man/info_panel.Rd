@@ -2,10 +2,18 @@
 % Please edit documentation in R/mod_info_panel.R
 \name{info_panel}
 \alias{info_panel}
-\title{SNP info panel: Server function}
+\title{SNP info panel: Server}
 \usage{
-info_panel(input, output, session, snp_name, all_individual_data,
-  instructions, colors, current_individual_data)
+info_panel(
+  input,
+  output,
+  session,
+  snp_name,
+  all_individual_data,
+  instructions,
+  colors,
+  current_individual_data
+)
 }
 \arguments{
 \item{input}{Auto-filled by callModule | ignore}
@@ -32,7 +40,7 @@ currently viewed subset of the cohort, again needs a \code{snp} column.}
 Server component of info panel module
 }
 \description{
-SNP info panel: Server function
+SNP info panel: Server
 }
 \examples{
 callModule(info_panel, 'info_panel', snp_name, all_individual_data, current_individual_data)

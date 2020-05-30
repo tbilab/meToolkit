@@ -3,8 +3,9 @@
 <html>
   <head>
     {{ headContent() }}
+    <script src="https://unpkg.com/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
     <script>
-      function initiate_back_button(button_text){
+      Shiny.addCustomMessageHandler('show_back_button', function(button_text){
 
         const event_listener_add_attempt = setInterval(start_event_listener, 1000);
 
@@ -21,18 +22,32 @@
             );
 
             // Remove hidden class from button
-            back_button.className = '';
+            back_button.classList.remove("hidden");
             back_button.innerHTML = button_text;
 
             // Stop attempting to add event listener
             clearInterval(event_listener_add_attempt);
-            console.log("Successsfully added event listener to button.");
           }
         }
-      }
+      });
 
-      Shiny.addCustomMessageHandler('show_back_button', initiate_back_button);
+      Shiny.addCustomMessageHandler('load_popup', function(message){
+        swal(Object.assign(
+        message,
+        {
+          button: {
+            text: 'Okay',
+            className: 'btn',
+          }
+        }
+        ));
+      });
     </script>
+    <style>
+      .swal-button {
+        color: dimgrey !important;
+      }
+    </style>
   </head>
   <body>
     {{ app_content }}

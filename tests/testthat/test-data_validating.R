@@ -14,14 +14,14 @@ good_snp_data <- dplyr::tribble(
 )
 
 test_that("Exports snp name when desired", {
-  results <- meToolkit::checkGenomeFile(good_snp_data, separate = TRUE)
+  results <- check_genome_file(good_snp_data, separate = TRUE)
   expect_equal(results$snp_name, 'rs12345')
   expect_equal(colnames(results$data), c('id', 'snp'))
 })
 
 test_that("Leaves data intact when desired", {
   expect_equal(
-    meToolkit::checkGenomeFile(good_snp_data, separate = FALSE),
+    check_genome_file(good_snp_data, separate = FALSE),
     good_snp_data)
 })
 
@@ -30,7 +30,7 @@ test_that("No ID column fails", {
   expect_error(
     good_snp_data %>%
       dplyr::rename(some_random_name = id) %>%
-      meToolkit::checkGenomeFile(),
+      check_genome_file(),
     "Missing id column. Make sure your data has a column with one of the following names: iid, id, grid"
   )
 
@@ -41,7 +41,7 @@ test_that("Grid id column works and get converted", {
   expect_equal(
     good_snp_data %>%
       dplyr::rename(grid = id) %>%
-      meToolkit::checkGenomeFile(separate = FALSE),
+      check_genome_file(separate = FALSE),
     good_snp_data
   )
 
@@ -52,7 +52,7 @@ test_that("IID id column works and get converted", {
   expect_equal(
     good_snp_data %>%
       dplyr::rename(IID = id) %>%
-      meToolkit::checkGenomeFile(separate = FALSE),
+      check_genome_file(separate = FALSE),
     good_snp_data
   )
 
@@ -64,7 +64,7 @@ test_that("SNP counts too high fails", {
   expect_error(
     good_snp_data %>%
       dplyr::mutate(rs12345 = rs12345 + 1) %>%
-      meToolkit::checkGenomeFile(too_high_count_snp_data),
+      check_genome_file(too_high_count_snp_data),
     'Your SNP copies column appears to have values other than 0,1,2.')
 
   })
@@ -84,7 +84,7 @@ good_phenome_data <- dplyr::tribble(
 
 test_that("Good data flows through unchanged", {
   expect_equal(
-    meToolkit::checkPhenomeFile(good_phenome_data),
+    check_phenome_file(good_phenome_data),
     good_phenome_data
   )
 })
@@ -93,7 +93,7 @@ test_that("Grid id column works and get converted", {
   expect_equal(
     good_phenome_data %>%
       dplyr::rename(grid = id) %>%
-      meToolkit::checkPhenomeFile(),
+      check_phenome_file(),
     good_phenome_data
   )
 })
@@ -102,7 +102,7 @@ test_that("IID id column works and get converted", {
   expect_equal(
     good_phenome_data %>%
       dplyr::rename(IID = id) %>%
-      meToolkit::checkPhenomeFile(),
+      check_phenome_file(),
     good_phenome_data
   )
 })
@@ -111,7 +111,7 @@ test_that('Missing ID gets error', {
   expect_error(
     good_phenome_data %>%
       dplyr::rename(my_super_id = id) %>%
-      meToolkit::checkPhenomeFile(),
+      check_phenome_file(),
     "Missing id column. Make sure your data has a column with one of the following names: iid, id, grid"
   )
 })
@@ -120,7 +120,7 @@ test_that('Missing code gets error', {
   expect_error(
     good_phenome_data %>%
       dplyr::rename(my_super_code = code) %>%
-      meToolkit::checkPhenomeFile(),
+      check_phenome_file(),
     "Missing Code column."
   )
 })
@@ -141,7 +141,7 @@ good_phewas_results <- dplyr::tribble(
 )
 
 test_that("Good data flows through unchanged", {
-  results <- meToolkit::checkPhewasFile(good_phewas_results)
+  results <- check_phewas_file(good_phewas_results)
   expect_equal(results, good_phewas_results)
 })
 
@@ -149,7 +149,7 @@ test_that('Missing the code throws error', {
   expect_error(
     good_phewas_results %>%
       dplyr::select(-code) %>%
-      meToolkit::checkPhewasFile(),
+      check_phewas_file(),
     'Missing code column.'
   )
 })
@@ -158,7 +158,7 @@ test_that('Missing multiple columns throws error with column names missing', {
   expect_error(
    good_phewas_results %>%
       dplyr::rename(my_codes = code, my_or = OR, descrip = description) %>%
-      meToolkit::checkPhewasFile(),
+      check_phewas_file(),
     'Missing columns code, OR, and description.'
   )
 })

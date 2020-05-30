@@ -29,7 +29,7 @@ function sanitize_data(data){
     nodes: data_props.includes('vertices') ? data.vertices : data.nodes,
     links: data_props.includes('edges') ? data.edges : data.links,
   };
-};
+}
 
 
 // Function to add a dx or dy point to nodes for fixing them on a line in force simulation
@@ -108,7 +108,18 @@ function setup_dom_elements(div, C, on_message){
     svg.at(viz_sizing)
        .st(viz_sizing);
 
-    canvas.at(viz_sizing);
+    // Get the device pixel ratio, falling back to 1.
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas
+      .at({
+        width:   width*dpr,
+        height: height*dpr,
+      })
+      .st(viz_sizing);
+
+    // Scale canvas image so it looks good on retina displays
+    canvas.node().getContext('2d').scale(dpr,dpr);
   };
 
   return {svg, canvas, context, tooltip, message_buttons, resize};
@@ -309,7 +320,7 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
   // Clear canvas
   context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
 
-  // If we're in export mode don't do anything.
+  // If we're in export mode we dont need to draw anything to the canvas.
   if(C.export_mode) return;
 
   context.save();
@@ -331,18 +342,11 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
   // Draw patient nodes
   context.globalAlpha = C.case_opacity;
 
-  // Function to assign node highlights
-  // Only check for highlight modification if we need to to avoid expensive calculations
-  const node_border = d => highlighted_nodes.length != 0 ?
-    `rgba(0, 0, 0, ${highlighted_nodes.includes(d.name) ? 1 : 0})` :
-    `rgba(0, 0, 0, 0)`;
-
-
   nodes.forEach( d => {
     if(!d.selectable){
 
       // Border around the nodes.
-      context.strokeStyle = node_border(d);
+      context.strokeStyle = highlighted_nodes.includes(d.name) ? "black" : "white";
 
       context.fillStyle = d.color;
 
@@ -354,46 +358,6 @@ function draw_canvas_portion({nodes, links}, scales, {canvas, context}, C, highl
   });
 
 }
-
-
-// Logic for when a svg node is clicked.
-function on_node_click(d){
-  const node = d3.select(this);
-
-  // Is code already selected?
-  if(selected_codes.includes(d.name)){
-    // pull code out of selected list
-    selected_codes = selected_codes.filter(code => code !== d.name);
-
-    // reset the style of node
-    if(d.inverted){
-      node.attr("fill", 'white');
-    } else {
-      node.attr("stroke-width", 0);
-    }
-
-
-  } else {
-    // add code to selected codes list
-    selected_codes = [d.name, ...selected_codes];
-
-    // Emphasize highlight
-    if(d.inverted){
-      node.attr("fill", 'grey');
-    } else {
-      node.attr("stroke-width", 2);
-    }
-  }
-
-  // do we have selected codes currently? If so display the action popup.
-  if(selected_codes.length > 0){
-    dom_elements.message_buttons.show(
-      selected_codes.length === 1 ? ['Delete', 'Invert']: 'all'
-    );
-  } else {
-    dom_elements.message_buttons.hide();
-  }
-};
 
 
 // Finds which patient nodes contain a given pattern of codes.

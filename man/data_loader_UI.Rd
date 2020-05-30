@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_data_loader.R
 \name{data_loader_UI}
 \alias{data_loader_UI}
-\title{UI function of upset module}
+\title{Data loading screen: UI}
 \usage{
 data_loader_UI(id, app_title = "Multimorbidity Explorer")
 }
@@ -15,7 +15,7 @@ data_loader_UI(id, app_title = "Multimorbidity Explorer")
 HTML component of shiny module
 }
 \description{
-UI function of upset module
+Data loading screen: UI
 }
 \examples{
 data_loader_UI('my_app')

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Server function of manhattan plot module. — manhattan_plot_and_table • meToolkit</title>
+<title>Interactive manhattan plot and table: Server — manhattan_plot_and_table • meToolkit</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,7 @@
 
 
 
-<meta property="og:title" content="Server function of manhattan plot module. — manhattan_plot_and_table" />
+<meta property="og:title" content="Interactive manhattan plot and table: Server — manhattan_plot_and_table" />
 <meta property="og:description" content="Draw an interactive manhattan plot and table that can be used to send
 selections for codes to the rest of the app." />
 <meta name="twitter:card" content="summary" />
@@ -70,7 +70,7 @@ selections for codes to the rest of the app." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">meToolkit</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -90,7 +90,12 @@ selections for codes to the rest of the app." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/tbilab/meToolkit">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -104,8 +109,8 @@ selections for codes to the rest of the app." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Server function of manhattan plot module.</h1>
-    
+    <h1>Interactive manhattan plot and table: Server</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tbilab/meToolkit/blob/master/R/mod_manhattan_and_table.R'><code>R/mod_manhattan_and_table.R</code></a></small>
     <div class="hidden name"><code>manhattan_plot_and_table.Rd</code></div>
     </div>
 
@@ -114,8 +119,15 @@ selections for codes to the rest of the app." />
 selections for codes to the rest of the app.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>manhattan_plot_and_table</span>(<span class='no'>input</span>, <span class='no'>output</span>, <span class='no'>session</span>, <span class='no'>results_data</span>,
-  <span class='no'>selected_codes</span>, <span class='no'>colors</span>, <span class='no'>action_object</span>)</pre>
+    <pre class="usage"><span class='fu'>manhattan_plot_and_table</span>(
+  <span class='no'>input</span>,
+  <span class='no'>output</span>,
+  <span class='no'>session</span>,
+  <span class='no'>results_data</span>,
+  <span class='no'>selected_codes</span>,
+  <span class='no'>colors</span>,
+  <span class='no'>action_object</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -178,7 +190,7 @@ for updating app state.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

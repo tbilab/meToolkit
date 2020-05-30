@@ -1,4 +1,4 @@
-#' UI function of upset module
+#' Data loading screen: UI
 #'
 #' @param id String with unique id of module in app
 #' @param app_title Name of your app. Defaults to "Multimorbidity Explorer"
@@ -7,50 +7,47 @@
 #'
 #' @examples
 #' data_loader_UI('my_app')
-data_loader_UI <- function(id, app_title = "Multimorbidity Explorer") {
-  ns <- NS(id)
+data_loader_UI <-
+  function(id, app_title = "Multimorbidity Explorer") {
+    ns <- NS(id)
 
-  accepter_formats <- c(
-    "text/csv",
-    "text/comma-separated-values,text/plain",
-    ".csv")
+    accepter_formats <- c("text/csv",
+                          "text/comma-separated-values,text/plain",
+                          ".csv")
 
-  input_panel <- shiny::div(
-    shiny::uiOutput(ns("preloaded_snps")),
-    shiny::h3("Load your data"),
-    shiny::fileInput(
-      ns("phewas"),
-      "Phewas results file",
-      accept = accepter_formats),
-    shiny::fileInput(
-      ns("genome"),
-      "ID to SNP file",
-      accept = accepter_formats),
-    shiny::fileInput(
-      ns("phenome"),
-      "ID to phenome file",
-      accept = accepter_formats)
-  )
+    input_panel <- shiny::div(
+      shiny::uiOutput(ns("preloaded_snps")),
+      shiny::h3("Load your data"),
+      shiny::fileInput(ns("phewas"),
+                       "Phewas results file",
+                       accept = accepter_formats),
+      shiny::fileInput(ns("genome"),
+                       "ID to SNP file",
+                       accept = accepter_formats),
+      shiny::fileInput(ns("phenome"),
+                       "ID to phenome file",
+                       accept = accepter_formats),
+      shiny::h3("P-Value adjustment"),
+      shiny::p("Should multiple-comparisons adjustment be done on P-Values of phewas results file?"),
+      shiny::radioButtons(ns("pval_correction"), label = h3("Correction type"),
+                   choices = list("None" = "none", "Bonferroni" = "bonferroni", "Benjamini-Hochberg" = "BH"),
+                   selected = "none")
+    )
 
-  shiny::tagList(
-    use_reveal_element(),
-    use_pretty_popup(),
-    shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
-    shiny::htmlTemplate(
-      system.file(
-        "html_templates/data_loading_template.html",
-        package = "meToolkit"),
-      app_title = app_title,
-      input_panel = input_panel,
-      instruction_panel = shiny::includeMarkdown(
-        system.file("data_instructions.md",
-        package = "meToolkit")
+    shiny::tagList(
+      shiny::includeCSS(system.file("css/common.css", package = "meToolkit")),
+      shiny::htmlTemplate(
+        system.file("html_templates/data_loading_template.html",
+                    package = "meToolkit"),
+        app_title = app_title,
+        input_panel = input_panel,
+        instruction_panel = shiny::includeMarkdown(system.file("data_instructions.md",
+                                                               package = "meToolkit"))
       )
     )
-  )
-}
+  }
 
-#' Server function of upset module
+#' Data loading screen: Server
 #'
 #' @param input,output,session Auto-filled by callModule | ignore
 #' @param preloaded_path File path relative to app that preloaded data is
@@ -61,11 +58,8 @@ data_loader_UI <- function(id, app_title = "Multimorbidity Explorer") {
 #'
 #' @examples
 #' callModule(data_loader, "data_loader", "data/preloaded")
-data_loader <- function(
-  input, output, session,
-  preloaded_path = NULL
-) {
-
+data_loader <- function(input, output, session,
+                        preloaded_path = NULL) {
   #----------------------------------------------------------------
   # Reactive Values based upon user input
   #----------------------------------------------------------------
@@ -74,18 +68,29 @@ data_loader <- function(
     phenome_raw = NULL,
     genome_raw = NULL,
     phewas_raw = NULL,
-    data_loaded = FALSE,         # has the user uploaded all their data and the app processed it?
+    data_loaded = FALSE,
+    # has the user uploaded all their data and the app processed it?
     reconciled_data = NULL,
-    individual_data = NULL,      # holds big dataframe of individual level data
-    phewas_data = NULL,          # dataframe of results of univariate statistical tests
+    individual_data = NULL,
+    # holds big dataframe of individual level data
+    phewas_data = NULL,
+    # dataframe of results of univariate statistical tests
     snp_name = NULL              # Name of the current snp being looked at.
   )
+
+  pretty_popup <- function(title, msg){
+    session$sendCustomMessage(
+      "load_popup",
+      list(title = title, text = msg)
+    )
+  }
+
   data_to_return <- reactiveVal()
 
   bookmarked_snp <- reactiveVal()
 
   # Look to see if the URL used had desired codes in it.
-  url_state <- meToolkit::extract_snp_codes_from_url(session)
+  url_state <- extract_snp_codes_from_url(session)
 
   have_requested_snp <- !is.null(url_state$snp)
 
@@ -102,10 +107,8 @@ data_loader <- function(
             "Select a pre-loaded dataset:",
             preloaded_snps
           ),
-          shiny::actionButton(
-            session$ns("preLoadedData"),
-            "Use preloaded data"
-          ),
+          shiny::actionButton(session$ns("preLoadedData"),
+                              "Use preloaded data"),
           shiny::hr()
         )
       })
@@ -124,35 +127,28 @@ data_loader <- function(
 
 
   shiny::observeEvent(input$genome, {
-
     tryCatch({
       app_data$genome_raw <- readr::read_csv(input$genome$datapath) %>%
-        meToolkit::checkGenomeFile(separate = FALSE)
+        check_genome_file(separate = FALSE)
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
-        "There's something wrong with the format of your genome data",
-        glue::glue(
-          "Make sure the file has two columns. One with the title",
-          "IID with unique id and one with the title of your snp ",
-          "containing copies of the minor allele.")
-      )
+      pretty_popup(title = "There's something wrong with the format of your genome data",
+                   msg = glue::glue(
+                     "Make sure the file has two columns. One with the title",
+                     "IID with unique id and one with the title of your snp ",
+                     "containing copies of the minor allele."
+                   ))
     })
   })
 
   shiny::observeEvent(input$phewas, {
-
     tryCatch({
-      app_data$phewas_raw <- meToolkit::checkPhewasFile(
-        readr::read_csv(input$phewas$datapath)
-      )
+      app_data$phewas_raw <- check_phewas_file(readr::read_csv(input$phewas$datapath))
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
+      pretty_popup(
         "There's something wrong with the format of your results data.",
         "Make sure the file has the right columns as listed."
       )
@@ -161,14 +157,11 @@ data_loader <- function(
 
   shiny::observeEvent(input$phenome, {
     tryCatch({
-      app_data$phenome_raw <- meToolkit::checkPhenomeFile(
-        readr::read_csv(input$phenome$datapath)
-      )
+      app_data$phenome_raw <- check_phenome_file(readr::read_csv(input$phenome$datapath))
     },
     error = function(message) {
       print(message)
-      meToolkit::pretty_popup(
-        session,
+      pretty_popup(
         "There's something wrong with the format of your phenome data.",
         "Make sure the file has the right columns as listed."
       )
@@ -180,16 +173,19 @@ data_loader <- function(
   #----------------------------------------------------------------
   # Watches for all files to be loaded and then triggers.
   shiny::observe({
-    shiny::req(app_data$phewas_raw, app_data$genome_raw, app_data$phenome_raw)
+    shiny::req(app_data$phewas_raw,
+               app_data$genome_raw,
+               app_data$phenome_raw)
 
     shiny::withProgress(message = "Loading data", value = 0, {
       # read files into R's memory
       shiny::incProgress(1 / 3, detail = "Reading in uploaded files")
 
-      app_data$reconciled_data <- meToolkit::reconcile_data(
+      app_data$reconciled_data <- reconcile_data(
         phewas_results = app_data$phewas_raw,
         id_to_snp = app_data$genome_raw,
-        id_to_code = app_data$phenome_raw
+        id_to_code = app_data$phenome_raw,
+        multiple_comparisons_adjustment = input$pval_correction
       )
 
       # Sending to app
@@ -208,27 +204,27 @@ data_loader <- function(
 
   shiny::observeEvent(trigger_preload(), {
     base_dir <- glue::glue("{preloaded_path}/{input$dataset_selection}")
-    phewas_results <- glue::glue("{base_dir}/phewas_results.csv") %>%
+    phewas_results <-
+      glue::glue("{base_dir}/phewas_results.csv") %>%
       readr::read_csv()
     phenome <- glue::glue("{preloaded_path}/id_to_code.csv") %>%
       readr::read_csv()
     genome <- glue::glue("{base_dir}/id_to_snp.csv") %>%
       readr::read_csv()
 
-    app_data$reconciled_data <- meToolkit::reconcile_data(
+    app_data$reconciled_data <- reconcile_data(
       phewas_results =  phewas_results,
       id_to_snp = genome,
-      id_to_code = phenome
+      id_to_code = phenome,
+      multiple_comparisons_adjustment = input$pval_correction
     )
 
     app_data$data_loaded <- TRUE
 
-    data_to_return(
-      c(
-        list('timestamp' = date()),
-        shiny::isolate(app_data$reconciled_data)
-      )
-    )
+    data_to_return(c(
+      list('timestamp' = date()),
+      shiny::isolate(app_data$reconciled_data)
+    ))
   })
 
   return(data_to_return)
