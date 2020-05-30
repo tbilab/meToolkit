@@ -1,7 +1,8 @@
 Package: meToolkit
 Type: Package
+URL: https://prod.tbilab.org/phewas_me_manual/, https://github.com/tbilab/meToolkit
 Title: Build and Customize Phewas Multimorbidity Explorer Apps. 
-Version: 0.2.0
+Version: 0.3.0
 Author: Nick Strayer
 Maintainer: Nick Strayer <nick.strayer@gmail.com>
 Description: The main function in this package spins up a fully contained and self-hosted copy of an ME app for data privacy. 
