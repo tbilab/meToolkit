@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">meToolkit</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -89,7 +89,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/tbilab/meToolkit">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -104,7 +109,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Embed snp id and selected codes in app URL</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/tbilab/meToolkit/blob/master/R/helpers_url_state_managers.R'><code>R/helpers_url_state_managers.R</code></a></small>
     <div class="hidden name"><code>embed_snp_codes_in_url.Rd</code></div>
     </div>
 
@@ -112,7 +117,7 @@
     <p>Embed snp id and selected codes in app URL</p>
     </div>
 
-    <pre class="usage"><span class='fu'>embed_snp_codes_in_url</span>(<span class='no'>snp</span>, <span class='no'>codes</span>)</pre>
+    <pre class="usage"><span class='fu'>embed_snp_codes_in_url</span>(<span class='no'>snp</span>, <span class='no'>codes</span>, <span class='kw'>ma_filtered</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -124,6 +129,10 @@
     <tr>
       <th>codes</th>
       <td><p>List of currently selected codes</p></td>
+    </tr>
+    <tr>
+      <th>ma_filtered</th>
+      <td><p>Is the subject data currently filtered to minor allele carriers?</p></td>
     </tr>
     </table>
 

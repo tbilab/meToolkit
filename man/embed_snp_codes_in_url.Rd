@@ -4,12 +4,14 @@
 \alias{embed_snp_codes_in_url}
 \title{Embed snp id and selected codes in app URL}
 \usage{
-embed_snp_codes_in_url(snp, codes)
+embed_snp_codes_in_url(snp, codes, ma_filtered = FALSE)
 }
 \arguments{
 \item{snp}{Name of current snp}
 
 \item{codes}{List of currently selected codes}
+
+\item{ma_filtered}{Is the subject data currently filtered to minor allele carriers?}
 }
 \value{
 Nothing (updates app URL)

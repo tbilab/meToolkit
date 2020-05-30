@@ -4,7 +4,7 @@
 \alias{extract_snp_codes_from_url_string}
 \title{Extract SNP and Codes from raw URL query string}
 \usage{
-extract_snp_codes_from_url_string(query_string_raw)
+extract_snp_codes_from_url_string(query_string)
 }
 \arguments{
 \item{session}{session variable from current shiny server. Used to grab current URL string}
