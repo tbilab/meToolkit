@@ -27,6 +27,22 @@ Shiny app process
 Function to spawn a shiny app instance for Multimorbidity Explorer app with
 data loading screen. Optionally data can be preloaded.
 }
+\section{Preloading data}{
+ If a set of results are going to be repeatedly
+visited in the app, the data for the results can be preloaded to save time.
+Once data is preloaded it populates a dropdown menu on the data-loading
+screen that can be used to select the desired dataset. To do this, the data
+must be loaded into a path (relative to the main app working directory)
+provided to \code{run_data_loader()} in the \code{preloaded_data_path} argument.
+The neccesary files, relative to \verb{preloaded_data_loc/} are:
+\itemize{
+\item \verb{<SNP_ID>/id_to_code.csv} or \code{id_to_code.csv}:  Subject-level phenome file (if left in main preloaded directory is used as common phenome)
+\item \verb{<SNP_ID>/id_to_snp.csv}: Subject-level genotype file
+\item \verb{<SNP_ID>/phewas_results.csv}: PheWAS results
+}
+For further details on the format of these dataset see the \href{https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html}{getting started article on package website.}
+}
+
 \examples{
 \dontrun{
 meToolkit::build_me_w_loader()

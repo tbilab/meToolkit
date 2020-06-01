@@ -52,7 +52,6 @@ __App API__
 If you are starting an ME application with preloaded data from the R package API, the format of these files remains almost the same, with the exception being R dataframes are passed directly to the function `build_me_dashboard()`.  For more detailed information see the application documentation either in the ‘reference’ tab of this website or by accessing the package documentation in your R console with `?meToolkibuild_me_dashboard_app`.
 
 
-
 ## Data Loading Screen
 ```{r, echo = FALSE}
 embed_png("data_loading_screen.png")
@@ -66,14 +65,34 @@ As each file is uploaded the app will check to make sure the files match the req
 Once all data is loaded, the user is automatically sent  to the main dashboard. 
 
 
-
 ## Preloading data
 
 If a set of results are going to be repeatedly visited in the app, the data for the results can be preloaded to save time. Once data is preloaded it populates a dropdown menu on the data-loading screen that can be used to select the desired dataset. 
 
-To do this, the data must be loaded into a path (relative to the main app working directory) provided to `run_data_loader()` in the `preloaded_data_path` argument . The patient phenome file must be stored at `preloaded_data_loc/id_to_code.csv`, and each individual SNP's patient-to-snp and phewas results stored in `preloaded_data_loc/<SNP_ID>/id_to_snp.csv` and `preloaded_data_loc/<SNP_ID>/phewas_results.csv` respectively. 
+To do this, the data must be loaded into a path (relative to the main app working directory) provided to `run_data_loader()` in the `preloaded_data_path` argument. 
 
-_Note that due to sharing the same phenome mappings, all preloaded phewas results must be done on the same population._
+__Phenome Data:__ If the patient phenome file is common between all preloaded results it can be stored at `preloaded_data_loc/id_to_code.csv`. If it is unique to a given result set it can be set in that SNP's subfolder with the same name: e.g. `preloaded_data_loc/<SNP_ID>/id_to_code.csv`. If a phenome mapping dataset is provided for a SNP it will always take priority over the app-wide mapping. 
+
+__Genome Data:__ Each individual SNP's patient-to-snp data us stored in `preloaded_data_loc/<SNP_ID>/id_to_snp.csv`
+
+__PheWAS Results:__ The PheWAS results for the SNP go in as `preloaded_data_loc/<SNP_ID>/phewas_results.csv` respectively. 
+
+
+As an example, this is what the file preloaded directory structure looks like for a hosted PheWAS-ME application with two preloaded snps. 
+
+```
+$ tree app_w_preloaded_data/
+├── app.R
+└── preloaded_data
+    ├── id_to_code.csv
+    ├── rs123456
+    │   ├── id_to_snp.csv
+    │   └── phewas_results.csv
+    └── rs200445019
+        ├── id_to_code.csv
+        ├── id_to_snp.csv
+        └── phewas_results.csv
+```
 
 
 # Accessing app
