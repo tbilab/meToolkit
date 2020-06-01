@@ -91,7 +91,6 @@ data_loader <- function(input, output, session,
 
   # Look to see if the URL used had desired codes in it.
   url_state <- extract_snp_codes_from_url(session)
-
   have_requested_snp <- !is.null(url_state$snp)
 
   # Check if the user has given us a path to find preloaded data
@@ -105,7 +104,8 @@ data_loader <- function(input, output, session,
           shiny::selectInput(
             session$ns("dataset_selection"),
             "Select a pre-loaded dataset:",
-            preloaded_snps
+            preloaded_snps,
+            selected = url_state$snp
           ),
           shiny::actionButton(session$ns("preLoadedData"),
                               "Use preloaded data"),
@@ -205,7 +205,6 @@ data_loader <- function(input, output, session,
   shiny::observeEvent(trigger_preload(), {
 
     base_dir <- fs::path(preloaded_path, input$dataset_selection)
-
     # Check if there is a phenome file available in the SNPs folder
     has_snp_specific_phenome <- fs::path(base_dir, "id_to_code.csv") %>% fs::file_exists()
     phenome_loc <- if(has_snp_specific_phenome) fs::path(base_dir, "id_to_code.csv") else fs::path(preloaded_path, "id_to_code.csv")
