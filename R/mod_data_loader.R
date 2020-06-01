@@ -203,14 +203,18 @@ data_loader <- function(input, output, session,
   })
 
   shiny::observeEvent(trigger_preload(), {
-    base_dir <- glue::glue("{preloaded_path}/{input$dataset_selection}")
-    phewas_results <-
-      glue::glue("{base_dir}/phewas_results.csv") %>%
-      readr::read_csv()
-    phenome <- glue::glue("{preloaded_path}/id_to_code.csv") %>%
-      readr::read_csv()
-    genome <- glue::glue("{base_dir}/id_to_snp.csv") %>%
-      readr::read_csv()
+
+    base_dir <- fs::path(preloaded_path, input$dataset_selection)
+
+    # Check if there is a phenome file available in the SNPs folder
+    has_snp_specific_phenome <- fs::path(base_dir, "id_to_code.csv") %>% fs::file_exists()
+    phenome_loc <- if(has_snp_specific_phenome) fs::path(base_dir, "id_to_code.csv") else fs::path(preloaded_path, "id_to_code.csv")
+    genome_loc <- fs::path(base_dir, "id_to_snp.csv")
+    phewas_loc <- fs::path(base_dir, "phewas_results.csv")
+
+    phenome <- readr::read_csv(phenome_loc)
+    phewas_results <- readr::read_csv(phewas_loc)
+    genome <- readr::read_csv(genome_loc)
 
     app_data$reconciled_data <- reconcile_data(
       phewas_results =  phewas_results,
