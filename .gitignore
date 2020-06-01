@@ -8,3 +8,4 @@ raw_data/
 inst/doc
 data/manhattan_plot_zero_ors.rds
 .DS_Store
+inst/data_loading_app/preloaded_data/rs200445019
