@@ -85,8 +85,10 @@ manhattan_plot_and_table <- function(input,
                                      results_data,
                                      selected_codes,
                                      colors,
-                                     action_object) {
+                                     action_object = NULL) {
   message_path <- 'message_manhattan_plot_and_table'
+
+  msg_loc <- if(is.null(action_object)) "standalone" else session$ns(message_path)
 
   timestamp <- Sys.time()
 
@@ -108,7 +110,7 @@ manhattan_plot_and_table <- function(input,
         system.file("css/common.css", package = "meToolkit")
       ),
       options = list(
-        msg_loc = session$ns(message_path),
+        msg_loc = msg_loc,
         selected = selected_codes(),
         sig_bar_locs = input$significance_threshold,
         colors = colors,
