@@ -148,6 +148,19 @@ minor allele in network plot.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Shiny app process</p>
+    <h2 class="hasAnchor" id="preloading-data"><a class="anchor" href="#preloading-data"></a>Preloading data</h2>
+
+    <p>If a set of results are going to be repeatedly
+visited in the app, the data for the results can be preloaded to save time.
+Once data is preloaded it populates a dropdown menu on the data-loading
+screen that can be used to select the desired dataset. To do this, the data
+must be loaded into a path (relative to the main app working directory)
+provided to <code>run_data_loader()</code> in the <code>preloaded_data_path</code> argument.
+The neccesary files, relative to <code>preloaded_data_loc/</code> are:</p><ul>
+<li><p><code>&lt;SNP_ID&gt;/id_to_code.csv</code> or <code>id_to_code.csv</code>:  Subject-level phenome file (if left in main preloaded directory is used as common phenome)</p></li>
+<li><p><code>&lt;SNP_ID&gt;/id_to_snp.csv</code>: Subject-level genotype file</p></li>
+<li><p><code>&lt;SNP_ID&gt;/phewas_results.csv</code>: PheWAS results</p></li>
+</ul><p>For further details on the format of these dataset see the <a href='https://prod.tbilab.org/phewas_me_manual/articles/meToolkit.html'>getting started article on package website.</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -159,6 +172,7 @@ minor allele in network plot.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#preloading-data">Preloading data</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

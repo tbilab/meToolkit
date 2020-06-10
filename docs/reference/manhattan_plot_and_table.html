@@ -126,7 +126,7 @@ selections for codes to the rest of the app.</p>
   <span class='no'>results_data</span>,
   <span class='no'>selected_codes</span>,
   <span class='no'>colors</span>,
-  <span class='no'>action_object</span>
+  <span class='kw'>action_object</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -155,7 +155,9 @@ that are currently selected in the app.</p></td>
     <tr>
       <th>action_object</th>
       <td><p>A <code>reactiveVal</code> that will be updated by the module
-upon selection</p></td>
+upon selection. If nothing is passed then no action buttons (E.g. "Send to
+server") will be shown. Useful for building apps with just the manhattan
+plot.</p></td>
     </tr>
     </table>
 

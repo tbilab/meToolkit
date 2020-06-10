@@ -11,7 +11,7 @@ manhattan_plot_and_table(
   results_data,
   selected_codes,
   colors,
-  action_object
+  action_object = NULL
 )
 }
 \arguments{
@@ -28,7 +28,9 @@ that are currently selected in the app.}
 \code{light_grey, med_grey, dark_grey, light_blue}.}
 
 \item{action_object}{A \code{reactiveVal} that will be updated by the module
-upon selection}
+upon selection. If nothing is passed then no action buttons (E.g. "Send to
+server") will be shown. Useful for building apps with just the manhattan
+plot.}
 }
 \value{
 Server component of interactive manhattan plot. Returns type-payload

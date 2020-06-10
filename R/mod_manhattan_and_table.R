@@ -71,7 +71,9 @@ manhattan_plot_and_table_UI <- function(id) {
 #' @param colors A list of CSS-valid colors to paint interface in. Needs
 #'   \code{light_grey, med_grey, dark_grey, light_blue}.
 #' @param action_object A \code{reactiveVal} that will be updated by the module
-#'   upon selection
+#'   upon selection. If nothing is passed then no action buttons (E.g. "Send to
+#'   server") will be shown. Useful for building apps with just the manhattan
+#'   plot.
 #' @return Server component of interactive manhattan plot. Returns type-payload
 #'   list with the type \code{"selection"} to the passed \code{action_object}
 #'   for updating app state.
