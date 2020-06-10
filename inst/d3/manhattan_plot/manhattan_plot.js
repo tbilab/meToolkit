@@ -53,6 +53,7 @@ const buttons = div.append('div.buttons')
      position: 'absolute',
      right: 10,
      top: 2,
+     display: options.msg_loc == "standalone" ? "none": "block",
   });
 
 const send_button = buttons.append('button')

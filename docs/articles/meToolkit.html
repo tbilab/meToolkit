@@ -102,8 +102,22 @@
 <h2 class="hasAnchor">
 <a href="#preloading-data" class="anchor"></a>Preloading data</h2>
 <p>If a set of results are going to be repeatedly visited in the app, the data for the results can be preloaded to save time. Once data is preloaded it populates a dropdown menu on the data-loading screen that can be used to select the desired dataset.</p>
-<p>To do this, the data must be loaded into a path (relative to the main app working directory) provided to <code>run_data_loader()</code> in the <code>preloaded_data_path</code> argument . The patient phenome file must be stored at <code>preloaded_data_loc/id_to_code.csv</code>, and each individual SNP’s patient-to-snp and phewas results stored in <code>preloaded_data_loc/&lt;SNP_ID&gt;/id_to_snp.csv</code> and <code>preloaded_data_loc/&lt;SNP_ID&gt;/phewas_results.csv</code> respectively.</p>
-<p><em>Note that due to sharing the same phenome mappings, all preloaded phewas results must be done on the same population.</em></p>
+<p>To do this, the data must be loaded into a path (relative to the main app working directory) provided to <code>run_data_loader()</code> in the <code>preloaded_data_path</code> argument.</p>
+<p><strong>Phenome Data:</strong> If the patient phenome file is common between all preloaded results it can be stored at <code>preloaded_data_loc/id_to_code.csv</code>. If it is unique to a given result set it can be set in that SNP’s subfolder with the same name: e.g. <code>preloaded_data_loc/&lt;SNP_ID&gt;/id_to_code.csv</code>. If a phenome mapping dataset is provided for a SNP it will always take priority over the app-wide mapping.</p>
+<p><strong>Genome Data:</strong> Each individual SNP’s patient-to-snp data us stored in <code>preloaded_data_loc/&lt;SNP_ID&gt;/id_to_snp.csv</code></p>
+<p><strong>PheWAS Results:</strong> The PheWAS results for the SNP go in as <code>preloaded_data_loc/&lt;SNP_ID&gt;/phewas_results.csv</code> respectively.</p>
+<p>As an example, this is what the file preloaded directory structure looks like for a hosted PheWAS-ME application with two preloaded snps.</p>
+<pre><code>$ tree app_w_preloaded_data/
+├── app.R
+└── preloaded_data
+    ├── id_to_code.csv
+    ├── rs123456
+    │   ├── id_to_snp.csv
+    │   └── phewas_results.csv
+    └── rs200445019
+        ├── id_to_code.csv
+        ├── id_to_snp.csv
+        └── phewas_results.csv</code></pre>
 </div>
 <div id="accessing-app" class="section level1">
 <h1 class="hasAnchor">
@@ -111,15 +125,15 @@
 <p>There are two main ways to access Multimorbidity Explorer.</p>
 <p><strong>Hosted</strong> The first is to go to the hosted example at prod.tbilab.org/multimorbidity_explorer. Here you can run the app on preloaded simulated data or upload your own data. No uploaded data is saved on the hosting server.</p>
 <p><strong>Self-Hosting</strong> If data privacy is a concern, the app can be run entirely locally on any computer with R installed and the ability to install packages. To run locally install the <code>meToolkit</code> package from github using the <code>devtools</code> package…</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">'tbilab/meToolkit'</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">'tbilab/meToolkit'</span>)</span></code></pre></div>
 <p>Once the package is installed the app can be launched with the data loading interface using the command</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>meToolkit<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/meToolkit/man/build_me_w_loader.html">build_me_w_loader</a></span>()</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>meToolkit<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/meToolkit/man/build_me_w_loader.html">build_me_w_loader</a></span>()</span></code></pre></div>
 <p><strong>Customizing with R API</strong> The <code>meToolkit</code> package is setup modularly so the data loading page can be skipped if data is provided directly to the app via the function <code><a href="../reference/build_me_dashboard.html">meToolkit::build_me_dashboard()</a></code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>my_ME_app &lt;-<span class="st"> </span><span class="kw"><a href="../reference/build_me_dashboard.html">build_me_dashboard</a></span>(</span>
-<span id="cb3-2"><a href="#cb3-2"></a>  phewas_table,</span>
-<span id="cb3-3"><a href="#cb3-3"></a>  id_to_snp,</span>
-<span id="cb3-4"><a href="#cb3-4"></a>  phenotype_id_pairs</span>
-<span id="cb3-5"><a href="#cb3-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>my_ME_app &lt;-<span class="st"> </span><span class="kw"><a href="../reference/build_me_dashboard.html">build_me_dashboard</a></span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  phewas_table,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>  id_to_snp,</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  phenotype_id_pairs</span>
+<span id="cb4-5"><a href="#cb4-5"></a>)</span></code></pre></div>
 <p>The data format for <code>phewas_table</code>, <code>id_to_snp</code>, and <code>phenotype_id_pairs</code> follows exactly from the required input files as outlined in <a href="#Data">the Data section</a></p>
 <p>For further information on customizing applications read the packages documentation at prod.tbilab.org/meToolkit.</p>
 </div>
